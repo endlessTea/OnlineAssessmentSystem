@@ -1,2 +1,6 @@
-# msc
-CSC8099
+# MSc Final Project
+
+## Online assessment and feedback tool
+### CSC8099
+
+// TODO
