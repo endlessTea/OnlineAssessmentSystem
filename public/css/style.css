@@ -1,0 +1,46 @@
+body {
+	font-family: Palatino, 'Palatino Linotype', 'Palatino LT STD', 'Book Antiqua', Georgia, serif;
+}
+
+h1, h2 {
+	text-align: center;
+}
+
+#mainMenuNav {
+	height: 300px;
+	width: auto;
+	text-align: center;
+	padding-top: 20px;
+}
+
+.mainMenuImage {
+	width: 300px;
+	height: 300px;
+	background-size:contain;
+	background-repeat: no-repeat;
+	display: inline-block;
+	transition: all .2s ease;
+}
+
+.mainMenuImage:hover {
+	-ms-transform: scale(1.05);
+   	-webkit-transform: scale(1.05);
+	transform: scale(1.05);
+}
+
+.mainMenuImage p {
+	font-size: 1.5em;
+	margin-top: 300px;
+}
+
+#createTestImage {
+	background-image: url(../img/compose.png);
+}
+
+#takeTestImage {
+	background-image: url(../img/take.png);
+}
+
+#viewResultsImage {
+	background-image: url(../img/performance.png);
+}
