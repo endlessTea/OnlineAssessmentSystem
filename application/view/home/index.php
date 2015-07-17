@@ -5,16 +5,22 @@
 	<!-- use 3 images for temporary navigation -->
 	<nav id="mainMenuNav">
 		<ul>
-			<li class="mainMenuImage" id="createTestImage">
-				<p>COMPOSE</p>
-			</li>
-			<li class="mainMenuImage" id="takeTestImage">
-				<p>TAKE TEST</p>
-			</li>
-			<li class="mainMenuImage" id="viewResultsImage">
-				<p>RESULTS</p>
-			</li>
+			<a href="<?= URL; ?>compose">
+				<li class="mainMenuImage" id="createTestImage">
+					<p>COMPOSE</p>
+				</li>
+			</a>
+			<a href="<?= URL; ?>test">
+				<li class="mainMenuImage" id="takeTestImage">
+					<p>TAKE TEST</p>
+				</li>
+			</a>
+			<a href="<?= URL; ?>visualisation">
+				<li class="mainMenuImage" id="viewResultsImage">
+					<p>RESULTS</p>
+				</li>
+			</a>
 		</ul>
 	</nav>
-	
+
 </main>
