@@ -26,11 +26,14 @@ class Functions {
 		switch($controller) {
 
 			case 'Visualisation':
-				require APP . 'view/_templates/header_vis.php';
-				require APP . 'view/' . strtolower($controller) . '/' .
-					strtolower($view) . '.php';
-				require APP . 'view/_templates/footer_vis.php';
-			break;
+
+				if ($view == 'sample1') {
+					require APP . 'view/_templates/header_vis_sample1.php';
+					require APP . 'view/' . strtolower($controller) . '/' .
+						strtolower($view) . '.php';
+					require APP . 'view/_templates/footer_vis_sample1.php';
+					break;
+				}
 
 			default:
 				require APP . 'view/_templates/header.php';

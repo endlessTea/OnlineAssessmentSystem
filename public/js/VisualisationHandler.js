@@ -1,7 +1,5 @@
 // http://bl.ocks.org/mbostock/32bd93b1cc0fbccc9bf9
 
-var data = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 61, 70, 71, 72];
-
 var width = 400,
     height = 400;
 
@@ -75,7 +73,7 @@ d3.csv(baseURL + 'public/csv/vis_sample_1.csv', function(error, rows) {
       .data(pie(newData))
     .enter().append("path")
       .each(function(d) {
-        console.log((d.data / 20 * 100) + '%');   // do something with this...
+        console.log((d.data / 20 * 100) + '%');   //
         d.outerRadius = outerRadius - 20;
       })
       .attr("d", arc)
