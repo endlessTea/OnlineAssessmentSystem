@@ -1,2 +1,0 @@
-# Do not allow direct access to any files within the application directory
-deny from all
