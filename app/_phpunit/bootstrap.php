@@ -7,14 +7,16 @@
  */
 
 // MongoDB connection info, set up test DB
-$dbConfig = array(
-  'host' => 'localhost',
-  'db' => 'phpunit'
+$GLOBALS['config'] = array(
+  'mongodb' => array(
+    'host' => 'localhost',
+    'db' => 'phpunit'
+  )
 );
 
-// Use AutoLoader script and register all directories / PHP files in app folder
+// Use AutoLoader script and register all classes in PHP files of app directory
 include_once('AutoLoader.php');
-AutoLoader::registerDirectory('..' . DIRECTORY_SEPARATOR . 'models');
+AutoLoader::registerDirectory('..' . DIRECTORY_SEPARATOR . 'l1-utils');
 
 // Recursively print all classes loaded by AutoLoader for reference
 Autoloader::printClassNames();
