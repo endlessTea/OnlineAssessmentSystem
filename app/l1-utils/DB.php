@@ -51,16 +51,84 @@ class DB {
   }
 
   /**
-   *  Get collection
+   *  Get collection (private method)
    *  Return references to known collections only
    *  Throw InvalidArgumentException for unrecognised collections
    */
-  public function getCollection($collection) {
+  private function getCollection($collection) {
 
     if (in_array($collection, self::$_validCollections, true)) {
 
       return $this->_mongo->$collection;
 
-    } else throw new InvalidArgumentException('Invalid Collection');
+    } else throw new InvalidArgumentException(
+      '\'' . $collection . '\' is an invalid collection'
+    );
+  }
+
+  /**
+   *  Create one or more documents in a collection
+   */
+  public function create($collectionName, $documents) {
+
+    try {
+
+      $collection = $this->getCollection($collectionName);
+
+      if (is_array($documents)) {
+        $collection->batchInsert($documents);
+      } else {
+        $collection->insert($documents);
+      }
+
+      return true;
+
+    } catch (Exception $e) {
+      return $e->getMessage();
+    }
+  }
+
+  /**
+   *  Read (select) one or more documents from a collection
+   */
+  public function read($collectionName, $documents) {
+
+  }
+
+  /**
+   *  Update one or more documents in a collection
+   */
+  public function update($collectionName, $documents) {
+
+  }
+
+  /**
+   *  Delete one or more documents in a collection
+   */
+  public function delete($collectionName, $documents = null) {
+
+    try {
+
+      $collection = $this->getCollection($collectionName);
+
+      if (is_array($documents)) {
+
+        // delete array of documents
+
+      } elseif ($documents === null) {
+
+        // drop the collection
+        $collection->drop();
+
+      } else {
+
+        // delete single document
+      }
+
+      return true;
+
+    } catch (Exception $e) {
+      return $e->getMessage();
+    }
   }
 }
