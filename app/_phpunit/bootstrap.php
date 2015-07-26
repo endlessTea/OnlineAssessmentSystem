@@ -3,10 +3,12 @@
 /**
  *  BOOTSTRAP.PHP
  *  Load all classes in the application folder to enable unit testing
- *  http://jes.st/2011/phpunit-bootstrap-and-autoloading-classes/
+ *  @author Jess Telford
+ *  @link http://jes.st/2011/phpunit-bootstrap-and-autoloading-classes/
+ *  @license None
  */
 
-// MongoDB connection info, set up test DB
+// MongoDB connection info: use a practice database for unit testing
 $GLOBALS['config'] = array(
   'mongodb' => array(
     'host' => 'localhost',

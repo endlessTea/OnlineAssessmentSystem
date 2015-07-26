@@ -4,6 +4,7 @@
  *  DB.PHP
  *  Support a single, sharable connection to a MongoDB database.
  *  Constrain operations with create, read, update and delete (CRUD) methods.
+ *  @author Jonathan Lamb
  */
 class DB {
 
@@ -39,6 +40,7 @@ class DB {
   /**
    *  Get Instance
    *  Control instantiation of DB objects by creating one only
+   *  @return instance of the DB connection to MongoDB
    */
   public static function getInstance() {
 
@@ -52,8 +54,8 @@ class DB {
 
   /**
    *  Get collection (private method)
-   *  Return references to known collections only
-   *  Throw InvalidArgumentException for unrecognised collections
+   *  @return reference to known collection
+   *  @throws InvalidArgumentException for unrecognised collections
    */
   private function getCollection($collection) {
 
@@ -67,7 +69,27 @@ class DB {
   }
 
   /**
-   *  Create one or more documents in a collection
+   *  Check if a variable is a two-dimensional array
+   *  @author Vinko Vrsalovic
+   *  @link http://stackoverflow.com/questions/145337/checking-if-array-is-multidimensional-or-not
+   *  @license None
+   *  @return true (boolean) if variable is multi-dimensional, else returns false
+   */
+  private function is2DArray($variable) {
+
+    // check if any sub-item is not an array (return false if so)
+    foreach ($variable as $item) {
+      if (!is_array($item)) return false;
+    }
+
+    // otherwise every sub-item is an array
+    return true;
+  }
+
+  /**
+   *  CREATE
+   *  Insert one or more documents into a collection
+   *  @return true (boolean) for success, String warning of invalid collections
    */
   public function create($collectionName, $documents) {
 
@@ -75,12 +97,21 @@ class DB {
 
       $collection = $this->getCollection($collectionName);
 
-      if (is_array($documents)) {
-        $collection->batchInsert($documents);
-      } else {
-        $collection->insert($documents);
+      // return error if variable is not an array
+      if (!is_array($documents)) {
+
+        return 'Document variable invalid: supply an array of associate arrays, or a single assoc. array';
       }
 
+      // if 2D array, perform batch insert and return indicator of success
+      if ($this->is2DArray($documents)) {
+
+        $collection->batchInsert($documents);
+        return true;
+      }
+
+      // otherwise perform single document insert, return indicator of success
+      $collection->insert($documents);
       return true;
 
     } catch (Exception $e) {
@@ -89,43 +120,85 @@ class DB {
   }
 
   /**
-   *  Read (select) one or more documents from a collection
+   *  READ
+   *  Return (select) one or more documents from a collection
+   *  @return PHP array of documents matching condition criteria, all documents, or a warning String
    */
-  public function read($collectionName, $documents) {
-
-  }
-
-  /**
-   *  Update one or more documents in a collection
-   */
-  public function update($collectionName, $documents) {
-
-  }
-
-  /**
-   *  Delete one or more documents in a collection
-   */
-  public function delete($collectionName, $documents = null) {
+  public function read($collectionName, $conditions = null) {
 
     try {
 
       $collection = $this->getCollection($collectionName);
 
-      if (is_array($documents)) {
+      if ($conditions === 'ALL DOCUMENTS') {
 
-        // delete array of documents
+        return iterator_to_array($collection->find());
 
-      } elseif ($documents === null) {
+      } elseif (is_array($conditions)) {
+
+        return iterator_to_array($collection->find($conditions));
+      }
+
+      // if branches were not entered, inform user of error
+      return 'Read conditions are invalid: supply a valid associative array or \'ALL DOCUMENTS\'';
+
+    } catch (Exception $e) {
+      return $e->getMessage();
+    }
+  }
+
+  /**
+   *  UPDATE
+   *  Update one or more documents in a collection
+   *  @return true (boolean) or a warning String
+   */
+  public function update($collectionName, $conditions = null, $updates = null) {
+
+    try {
+
+      $collection = $this->getCollection($collectionName);
+
+      if (is_array($conditions) && is_array($updates)) {
+
+        $collection->update($conditions, array('$set' => $updates));
+        return true;
+      }
+
+      // if branches were not entered, inform user of error
+      return 'Updates and Conditions are invalid: supply two valid associative arrays';
+
+    } catch (Exception $e) {
+      return $e->getMessage();
+    }
+  }
+
+  /**
+   *  DELETE
+   *  Delete one or more documents based on certain conditions
+   *  Or drop all documents contained in a collection
+   *  @return true (boolean) for success, Strings warning of invalid collections or conditions
+   */
+  public function delete($collectionName, $conditions = null) {
+
+    try {
+
+      $collection = $this->getCollection($collectionName);
+
+      if (is_array($conditions)) {
+
+        // delete where condition is true
+        $collection->remove($conditions);
+        return true;
+
+      } elseif ($conditions === 'DROP COLLECTION') {
 
         // drop the collection
         $collection->drop();
-
-      } else {
-
-        // delete single document
+        return true;
       }
 
-      return true;
+      // if one of the branches did not enter, inform of error
+      return 'Delete conditions are invalid: supply a valid associative array or \'DROP COLLECTION\'';
 
     } catch (Exception $e) {
       return $e->getMessage();

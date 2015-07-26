@@ -1,8 +1,12 @@
 <?php
 
+/**
+ *  DBTEST.PHP
+ *  @author Jonathan Lamb
+ */
 class DBTest extends PHPUnit_Framework_TestCase {
 
-  // store instantiated class as instance variable
+  // store instantiated class and examples as instance variables
   private $_DB;
   private $_sampleDocumentOne;
   private $_sampleDocumentTwo;
@@ -39,6 +43,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
 
   /**
    *  @test
+   *  Check that the getInstance factory method returns the same object reference
    */
   public function getInstance_callMethodTwice_sameObjectReturned() {
 
@@ -71,6 +76,20 @@ class DBTest extends PHPUnit_Framework_TestCase {
 
   /**
    *  @test
+   *  Attempt to insert an invalid document (standard object)
+   */
+  public function create_insertStandardObjectAsDocument_returnsSpecificString() {
+
+    $object = new stdClass();
+    $result = $this->_DB->create('questions', $object);
+    $this->assertSame(
+      'Document variable invalid: supply an array of associate arrays, or a single assoc. array',
+      $result
+    );
+  }
+
+  /**
+   *  @test
    *  Attempt single document insert to an invalid collection
    */
   public function create_attemptInsertWithInvalidCollection_returnsSpecificString() {
@@ -84,11 +103,88 @@ class DBTest extends PHPUnit_Framework_TestCase {
 
   /**
    *  @test
-   *  Drop collection; delete all documents inserted
+   *  Get all documents in a collection
+   */
+  public function read_getAllDocumentsInCollection_arraySizeThree() {
+
+    $documents = $this->_DB->read('questions', 'ALL DOCUMENTS');
+    $this->assertEquals(3, count($documents));
+  }
+
+  /**
+   *  @test
+   *  Get a specific document in a collection
+   */
+  public function read_getSpecificDocument_arraySizeOne() {
+
+    $documents = $this->_DB->read('questions', array('name' => 'sample two'));
+    $this->assertEquals(1, count($documents));
+  }
+
+  /**
+   *  @test
+   *  Attempt to get documents with invalid conditions (standard object)
+   */
+  public function read_getDocumentsInvalidConditions_returnsSpecificString() {
+
+    $object = new stdClass();
+    $result = $this->_DB->read('questions', $object);
+    $this->assertSame(
+      'Read conditions are invalid: supply a valid associative array or \'ALL DOCUMENTS\'',
+      $result
+    );
+  }
+
+  /**
+   *  @test
+   *  Update documents using conditions
+   */
+  public function update_changeDocumentValues_returnsTrue() {
+
+    $result = $this->_DB->update(
+      'questions',
+      array(
+        'extra' => 'document extra property'
+      ),
+      array(
+        'extra' => 'things have changed'
+      )
+    );
+    $this->assertTrue($result);
+  }
+
+  /**
+   *  @test
+   *  Attempt an update with no conditions or updates
+   */
+  public function update_attemptUpdateNoConditionsOrUpdates_returnsSpecificString() {
+
+    $result = $this->_DB->update('questions');
+    $this->assertSame(
+      'Updates and Conditions are invalid: supply two valid associative arrays',
+      $result
+    );
+  }
+
+  /**
+   *  @test
+   *  Delete single document from collection with condition
+   */
+  public function delete_deleteSingleRecord_returnsTrue() {
+
+    $result = $this->_DB->delete('questions', array(
+      'name' => 'sample three'
+    ));
+    $this->assertTrue($result);
+  }
+
+  /**
+   *  @test
+   *  Drop collection; delete remaining documents inserted
    */
   public function delete_dropCollection_returnsTrue() {
 
-    $result = $this->_DB->delete('questions');
+    $result = $this->_DB->delete('questions', 'DROP COLLECTION');
     $this->assertTrue($result);
   }
 
@@ -98,9 +194,23 @@ class DBTest extends PHPUnit_Framework_TestCase {
    */
   public function delete_dropInvalidCollection_returnsSpecificString() {
 
-    $result = $this->_DB->delete('bananas');
+    $result = $this->_DB->delete('bananas', 'DROP COLLECTION');
     $this->assertSame(
       '\'bananas\' is an invalid collection',
+      $result
+    );
+  }
+
+  /**
+   *  @test
+   *  Attempt to delete with invalid 2nd parameter (not an array)
+   */
+  public function delete_attemptWithInvalidSecondParam_returnsSpecificString() {
+
+    $object = new stdClass();
+    $result = $this->_DB->delete('questions', $object);
+    $this->assertSame(
+      'Delete conditions are invalid: supply a valid associative array or \'DROP COLLECTION\'',
       $result
     );
   }
