@@ -32,6 +32,12 @@ class DB {
         'users', 'questions', 'tests'
       );
 
+      // create unique index for users based on username
+      $this->_mongo->users->createIndex(
+        array('username' => 1),
+        array('unique' => true)
+      );
+
     } catch (Exception $e) {
       die($e->getMessage());
     }

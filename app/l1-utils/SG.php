@@ -10,12 +10,10 @@ class SG {
   /**
    *  $_GET
    *  Allows escaped or dangerous input to be obtained
-   *
    *  Split URL method part of the 'Application' class in MINI PHP
-   *  @author original: Panique
+   *  @author original: Panique; modified: Jonathan Lamb
    *  @link https://github.com/panique/mini
    *  @license http://opensource.org/licenses/MIT MIT License
-   *
    *  @return escaped input, array of values for controller/action/params, or unfiltered values in $_GET
    */
   public static function get($key, $usage = null) {
@@ -82,7 +80,10 @@ class SG {
 
   /**
    *  $_SESSION
-   *  Maybe reference PHP Academy for shorthand?
+   *  Re-implementation of the 'Session' class from PHP Academy's OOP Login System
+   *  @author original: PHP Academy; modified: Jonathan Lamb
+   *  @link https://github.com/adamaoc/login_reg
+   *  @license None
    */
   public static function session($name, $usage = null, $value = null) {
 
@@ -105,6 +106,7 @@ class SG {
       	unset($_SESSION[$name]);
         return true;
       }
+      return false;
     }
 
     return 'Unrecognised usage: please specify \'exists\', \'put\', \'get\' or \'delete\'';
