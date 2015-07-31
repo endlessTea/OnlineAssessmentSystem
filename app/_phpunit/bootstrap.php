@@ -16,6 +16,9 @@ $GLOBALS['config'] = array(
   )
 );
 
+// define URL string for testing purposes
+define('URL', 'http://localhost/msc/');
+
 // Use AutoLoader script and register all classes in PHP files of app directory
 include_once('AutoLoader.php');
 AutoLoader::registerDirectory('..' . DIRECTORY_SEPARATOR . 'l1-utils');
