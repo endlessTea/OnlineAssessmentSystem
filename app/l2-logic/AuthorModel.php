@@ -2,7 +2,7 @@
 
 /**
  *  AUTHORMODEL.PHP
- *
+ *  Create, get, update and delete questions and tests
  *  @author Jonathan Lamb
  */
 class AuthorModel {
