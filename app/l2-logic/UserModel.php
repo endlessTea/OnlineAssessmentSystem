@@ -10,7 +10,7 @@
  */
 class UserModel {
 
-  // store DB utility as instance variable
+  // store DB utility, update restrictions, user data and login status as instance variables
   private $_DB,
     $_updateProperties,
     $_userData,

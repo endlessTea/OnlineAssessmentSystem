@@ -7,8 +7,8 @@
 class UserModelTest extends PHPUnit_Framework_TestCase {
 
   // store instantiated class and DB connection as instance variable
-  private $_UserModel;
-  private $_DB;
+  private $_DB,
+    $_UserModel;
 
   /**
    *  Constructor
@@ -311,7 +311,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
 
   /**
    *  @test
-   *  Delete User Session and drop Users collection (reset for later testing)
+   *  Drop Users collection (reset for later testing)
    */
   public function _dropUserCollection_methodReturnsTrue() {
 
