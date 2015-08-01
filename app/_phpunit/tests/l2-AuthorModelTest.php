@@ -9,7 +9,9 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   // store instantiated class and DB connection as instance variable
   private $_DB,
     $_AuthorModel,
-    $_commonAuthorId;
+    $_testQuestionAuthorId,
+    $_testTestAuthorId,
+    $_commonQuestionIds;
 
   /**
    *  Constructor
@@ -19,8 +21,14 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
 
     $this->_DB = DB::getInstance();
     $this->_AuthorModel = new AuthorModel();
-    $this->_commonAuthorId = '247tnfn2303u54093nf3';
+    $this->_testQuestionAuthorId = '247tnfn2303u54093nf3';
+    $this->_testTestAuthorId = 'hgrn93y89543hgnrsdnbgo';
+    $this->_commonQuestionIds = array();
   }
+
+  ##########################################################
+  ################# 'QUESTIONS' UNIT TESTS #################
+  ##########################################################
 
   /**
    *  @test
@@ -28,8 +36,9 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
    */
   public function createQuestion_schemaCompliant_methodReturnsTrue() {
 
-    $result = $this->_AuthorModel->createQuestion('boolean', array(
-      'author' => $this->_commonAuthorId,
+    $result = $this->_AuthorModel->createQuestion(array(
+      'schema' => 'boolean',
+      'author' => $this->_testQuestionAuthorId,
       'statement' => 'The capital city of France is Paris.',
       'singleAnswer' => 'TRUE',
       'feedbackCorrect' => 'It is indeed, well done.',
@@ -44,7 +53,8 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
    */
   public function createQuestion_unrecognisedSchema_methodReturnsFalse() {
 
-    $result = $this->_AuthorModel->createQuestion('inexistentSchema', array(
+    $result = $this->_AuthorModel->createQuestion(array(
+      'schema' => 'inexistentSchema',
       'key' => 'value'
     ));
     $this->assertFalse($result);
@@ -56,8 +66,9 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
    */
   public function createQuestion_booleanSchemaTestOptional_methodReturnsTrue() {
 
-    $result = $this->_AuthorModel->createQuestion('boolean', array(
-      'author' => $this->_commonAuthorId,
+    $result = $this->_AuthorModel->createQuestion(array(
+      'schema' => 'boolean',
+      'author' => $this->_testQuestionAuthorId,
       'statement' => 'This statement is false. Seriously, not a trick question.',
       'singleAnswer' => 'FALSE'
     ));
@@ -70,8 +81,9 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
    */
   public function createQuestion_doesNotComplyWithSchema_methodReturnsFalse() {
 
-    $result = $this->_AuthorModel->createQuestion('boolean', array(
-      'author' => $this->_commonAuthorId,
+    $result = $this->_AuthorModel->createQuestion(array(
+      'schema' => 'boolean',
+      'author' => $this->_testQuestionAuthorId,
       'sandwich' => 'This is a sandwich, not a statement.',
       'filling' => 'Jam, of course.'
     ));
@@ -84,8 +96,9 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
    */
   public function createQuestion_missingInformation_methodReturnsFalse() {
 
-    $result = $this->_AuthorModel->createQuestion('boolean', array(
-      'author' => $this->_commonAuthorId,
+    $result = $this->_AuthorModel->createQuestion(array(
+      'schema' => 'boolean',
+      'author' => $this->_testQuestionAuthorId,
       'answer' => 'TRUE'
     ));
     $this->assertFalse($result);
@@ -97,8 +110,9 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
    */
   public function createQuestion_invalidData_methodReturnsFalse() {
 
-    $result = $this->_AuthorModel->createQuestion('boolean', array(
-      'author' => $this->_commonAuthorId,
+    $result = $this->_AuthorModel->createQuestion(array(
+      'schema' => 'boolean',
+      'author' => $this->_testQuestionAuthorId,
       'question' => 'Can I borrow your stapler?',
       'answer' => 'Certainly.'
     ));
@@ -111,8 +125,9 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
    */
   public function createQuestion_validQuestionPlusInvalidData_methodReturnsFalse() {
 
-    $result = $this->_AuthorModel->createQuestion('boolean', array(
-      'author' => $this->_commonAuthorId,
+    $result = $this->_AuthorModel->createQuestion(array(
+      'schema' => 'boolean',
+      'author' => $this->_testQuestionAuthorId,
       'statement' => 'This question appears to be valid, but it is not.',
       'singleAnswer' => 'TRUE',
       'feedbackCorrect' => 'You\'ll see why soon',
@@ -128,7 +143,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
    */
   public function getQuestions_matchingAuthorId_methodReturnsArrayOfTwoDocuments() {
 
-    $documents = $this->_AuthorModel->getQuestions($this->_commonAuthorId);
+    $documents = $this->_AuthorModel->getQuestions($this->_testQuestionAuthorId);
     $this->assertEquals(2, count($documents));
   }
 
@@ -241,11 +256,308 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
 
   /**
    *  @test
-   *  Drop Questions collection (reset for later testing)
+   *  Delete a question with matching author ID
    */
-  public function _dropQuestionsCollection_methodReturnsTrue() {
+  public function deleteQuestion_deleteWithMatchingAuthor_methodReturnsTrue() {
+
+    // obtain MongoId value for first question
+    $question = $this->_DB->read('questions', array(
+      'statement' => 'The capital city of France is Paris.'
+    ));
+    $questionId = key($question);
+
+    $result = $this->_AuthorModel->deleteQuestion(
+      new MongoId($questionId),
+      $this->_testQuestionAuthorId
+    );
+    $this->assertTrue($result);
+  }
+
+  /**
+   *  @test
+   *  Attempt to delete a question with an ID that isn't a Mongo ID object
+   */
+  public function deleteQuestion_attemptDeleteNotMongoId_methodReturnsFalse() {
+
+    $result = $this->_AuthorModel->deleteQuestion(
+      'abc123def456',
+      $this->_testQuestionAuthorId
+    );
+    $this->assertFalse($result);
+  }
+
+  /**
+   *  @test
+   *  Attempt to delete a question with an author ID that doesn't match
+   */
+  public function deleteQuestion_attemptDeleteAuthorIdDoesntMatch_methodReturnsFalse() {
+
+    // get last question's id
+    $question = $this->_DB->read('questions', array(
+      'statement' => 'This statement is false. Seriously, not a trick question.'
+    ));
+    $questionId = key($question);
+
+    $result = $this->_AuthorModel->deleteQuestion(
+      new MongoId($questionId),
+      'hmitl3hmfol343943nfs'
+    );
+    $this->assertFalse($result);
+  }
+
+  #####################################################
+  ################# 'TEST' UNIT TESTS #################
+  #####################################################
+
+  /**
+   *  @test
+   *  Create questions and create a typical test
+   */
+  public function createTest_createQuestionsTypicalTest_methodReturnsTrue() {
+
+    // create questions
+    $this->_AuthorModel->createQuestion(array(
+      'schema' => 'boolean',
+      'author' => $this->_testTestAuthorId,
+      'statement' => '2 + 2 = 4',
+      'singleAnswer' => 'TRUE',
+    ));
+    $this->_AuthorModel->createQuestion(array(
+      'schema' => 'boolean',
+      'author' => $this->_testTestAuthorId,
+      'statement' => '2 + 4 = 10',
+      'singleAnswer' => 'FALSE',
+    ));
+    $this->_AuthorModel->createQuestion(array(
+      'schema' => 'boolean',
+      'author' => $this->_testTestAuthorId,
+      'statement' => '5 * 5 = 25',
+      'singleAnswer' => 'TRUE',
+    ));
+    $this->_AuthorModel->createQuestion(array(
+      'schema' => 'boolean',
+      'author' => $this->_testTestAuthorId,
+      'statement' => '8 - 2 = 1',
+      'singleAnswer' => 'FALSE',
+    ));
+
+    // get questions & get id's
+    $documents = $this->_AuthorModel->getQuestions($this->_testTestAuthorId);
+    $questionIds = array_keys($documents);
+    $this->_commonQuestionIds = $questionIds;
+
+    // create test
+    $result = $this->_AuthorModel->createTest(array(
+      'schema' => 'standard',
+      'author' => $this->_testTestAuthorId,
+      'questions' => $questionIds
+    ));
+    $this->assertTrue($result);
+  }
+
+  /**
+   *  @test
+   *  Attempt to create a test with a missing requirement (questions)
+   */
+  public function createTest_attemptToCreateMissingRequirement_methodReturnsFalse() {
+
+    $result = $this->_AuthorModel->createTest(array(
+      'schema' => 'standard',
+      'author' => $this->_testTestAuthorId
+    ));
+    $this->assertFalse($result);
+  }
+
+  /**
+   *  @test
+   *  Get test created earlier
+   */
+  public function getTests_checkTestReturnedContainsQuestionIds_arrayValuesMatch() {
+
+    $document = $this->_AuthorModel->getTests($this->_testTestAuthorId);
+    $this->assertEquals(1, count($document));
+  }
+
+  /**
+   *  @test
+   *  Return an empty array for request for tests where author id doesn't match
+   */
+  public function getTests_authorIdDoesNotMatch_methodReturnsEmptyArray() {
+
+    $result = $this->_AuthorModel->getTests('t4949984304903hnfgnfj3');
+    $this->assertTrue(empty($result));
+  }
+
+  /**
+   *  @test
+   *  Attempt to get tests where the author id isn't hexadecimal characters
+   */
+  public function getTests_authorIdNotHexadecimalString_methodReturnsFalse() {
+
+    $result = $this->_AuthorModel->getTests('<script>alert();</script>');
+    $this->assertFalse($result);
+  }
+
+  /**
+   *  @test
+   *  Update an existing key value pair in a test that is not restricted
+   */
+  public function updateTest_performValidUpdate_methodReturnsTrue() {
+
+    // get ID of the test created
+    $test = $this->_DB->read('tests', array(
+      'author' => $this->_testTestAuthorId
+    ));
+    $testId = key($test);
+
+    $result = $this->_AuthorModel->updateTest(
+      new MongoId($testId),
+      array('questions' => array(
+        'fng84902hnbtf4892hf42o',
+        '8903hngfoensiofgn980w2'
+      ))
+    );
+    $this->assertTrue($result);
+  }
+
+  // TODO: reject update if questions is not an array
+
+  /**
+   *  @test
+   *  Attempt to update a test if questions are not an array
+   */
+  public function updateTest_attemptUpdateQuestionsNotArray_methodReturnsFalse() {
+
+    $test = $this->_DB->read('tests', array(
+      'author' => $this->_testTestAuthorId
+    ));
+    $testId = key($test);
+
+    $result = $this->_AuthorModel->updateTest(
+      new MongoId($testId),
+      array(
+        'questions' => 'not an array'
+      )
+    );
+    $this->assertFalse($result);
+  }
+
+  /**
+   *  @test
+   *  Attempt to update a test with an invalid identifier (i.e. not MongoId)
+   */
+  public function updateTest_attemptNonMongoIdUpdate_methodReturnsFalse() {
+
+    $result = $this->_AuthorModel->updateTest(
+      'abc123def456',
+      array('questions' => array(
+        'fng84902hnbtf4892hf42o',
+        '8903hngfoensiofgn980w2'
+      ))
+    );
+    $this->assertFalse($result);
+  }
+
+  /**
+   *  @test
+   *  Attempt to update a test where the key does not exist in the schema
+   */
+  public function updateTest_attemptUpdateKeyNotInSchema_methodReturnsFalse() {
+
+    $test = $this->_DB->read('tests', array(
+      'author' => $this->_testTestAuthorId
+    ));
+    $testId = key($test);
+
+    $result = $this->_AuthorModel->updateTest(
+      new MongoId($testId),
+      array(
+        'badKey' => 'worseValue'
+      )
+    );
+    $this->assertFalse($result);
+  }
+
+  /**
+   *  @test
+   *  Attempt to update a test where the update is not permitted (e.g. author update)
+   */
+  public function updateTest_attemptUpdateNotPermitted_methodReturnsFalse() {
+
+    $test = $this->_DB->read('tests', array(
+      'author' => $this->_testTestAuthorId
+    ));
+    $testId = key($test);
+
+    $result = $this->_AuthorModel->updateTest(
+      new MongoId($testId),
+      array('author' => 'hmitl3hmfol343943nfs')
+    );
+    $this->assertFalse($result);
+  }
+
+  /**
+   *  @test
+   *  Attempt to delete a test with an author ID that doesn't match
+   */
+  public function deleteTest_attemptDeleteAuthorIdDoesntMatch_methodReturnsFalse() {
+
+    $test = $this->_DB->read('tests', array(
+      'author' => $this->_testTestAuthorId
+    ));
+    $testId = key($test);
+
+    $result = $this->_AuthorModel->deleteTest(
+      new MongoId($testId),
+      'hmitl3hmfol343943nfs'
+    );
+    $this->assertFalse($result);
+  }
+
+  /**
+   *  @test
+   *  Attempt to delete a test with an ID that isn't a Mongo ID object
+   */
+  public function deleteTest_attemptDeleteNotMongoId_methodReturnsFalse() {
+
+    $result = $this->_AuthorModel->deleteTest(
+      'abc123def456',
+      $this->_testTestAuthorId
+    );
+    $this->assertFalse($result);
+  }
+
+  /**
+   *  @test
+   *  Delete a test with matching author ID
+   */
+  public function deleteTest_deleteWithMatchingAuthor_methodReturnsTrue() {
+
+    // obtain MongoId value for first test
+    $test = $this->_DB->read('tests', array(
+      'author' => $this->_testTestAuthorId
+    ));
+    $testId = key($test);
+
+    $result = $this->_AuthorModel->deleteTest(
+      new MongoId($testId),
+      $this->_testTestAuthorId
+    );
+    $this->assertTrue($result);
+  }
+
+  #########################################
+  ################# RESET #################
+  #########################################
+
+  /**
+   *  @test
+   *  Drop Questions and Tests collections (reset for later testing)
+   */
+  public function _dropCollections_methodsReturnsTrue() {
 
     $dropQuestionsResult = $this->_DB->delete('questions', 'DROP COLLECTION');
-    $this->assertTrue($dropQuestionsResult);
+    $dropTestsResult = $this->_DB->delete('tests', 'DROP COLLECTION');
+    $this->assertTrue($dropQuestionsResult && $dropTestsResult);
   }
 }
