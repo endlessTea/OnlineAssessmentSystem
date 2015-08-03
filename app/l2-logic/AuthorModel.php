@@ -190,10 +190,6 @@ class AuthorModel {
       // any remaining data is not part of the schema, fail the operation
       if (!empty($test)) return false;
 
-      // add arrays for making tests available to users and keeping track of who has taken them
-      $document["available"] = array();
-      $document["taken"] = array();
-
       // otherwise the test provided was valid, return the result of the DB operation
       return $this->_DB->create("tests", $document);
     }
@@ -249,15 +245,40 @@ class AuthorModel {
   /**
    *  MAKE A TEST AVAILABLE TO A USER
    *
-   *  @return
+   *  @return true (boolean) on success, else false
    */
   public function makeTestAvailableToUser($testIdObj, $studentIdObj) {
 
     // check testIdObj and studentIdObj are MongoIds
     if (is_a($testIdObj, 'MongoId') && is_a($studentIdObj, 'MongoId')) {
 
+      // check that queries for the test and student account return one result only
+      $test = $this->_DB->read("tests", array("_id" => $testIdObj));
+      if (count($test) !== 1) return false;
+      $test = array_pop($test);
 
+      $student = $this->_DB->read("users", array("_id" => $studentIdObj));
+      if (count($student) !== 1) return false;
+      $student = array_pop($student);
 
+      // check if the student has already taken the test
+      if (isset($test["taken"]))
+        if (in_array($student["_id"]->{'$id'}, $test["taken"])) return false;
+
+      // copy the availability array and add new student if it exists
+      if (isset($test["available"])) {
+
+        $availableArray = $test["available"];
+        $availableArray[] = $student["_id"]->{'$id'};
+
+      } else {
+
+        // otherwise create a new array
+        $availableArray = array($student["_id"]->{'$id'});
+      }
+
+      // return the result of the database operation
+      return $this->_DB->update("tests", array("_id" => $testIdObj), array("available" => $availableArray));
     }
 
     return false;
@@ -284,7 +305,7 @@ class AuthorModel {
         return $this->_DB->delete("tests", array("_id" => $testIdObj));
       }
     }
-    
+
     return false;
   }
 }
