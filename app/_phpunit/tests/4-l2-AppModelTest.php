@@ -20,6 +20,13 @@ class AppModelTest extends PHPUnit_Framework_TestCase {
 
   /**
    *  @test
+   */
+  public function _confirmStart() {
+    print_r(" - start of AppModel Test -  \n");
+  }
+
+  /**
+   *  @test
    *  Check that a request for GET data returns escaped data
    */
   public function getGETData_confirmDataEscaped_returnsEscapedData() {
@@ -128,5 +135,12 @@ class AppModelTest extends PHPUnit_Framework_TestCase {
       'Location: http://localhost/msc/forbidden',
       $result
     );
+  }
+
+  /**
+   *  @test
+   */
+  public function _confirmEnd() {
+    print_r("\n  - end of AppModel Test -  \n\n");
   }
 }

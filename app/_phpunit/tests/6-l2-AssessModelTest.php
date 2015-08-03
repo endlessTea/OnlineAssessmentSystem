@@ -65,6 +65,13 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
 
   /**
    *  @test
+   */
+  public function _confirmStart() {
+    print_r(" - start of AssessModel Test -  \n");
+  }
+
+  /**
+   *  @test
    *  Check if a user is eligible to take a test
    */
   public function checkTestAvailability_checkWithValidStudent_methodReturnsTrue() {
@@ -81,5 +88,10 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
     // TODO
   }
 
-
+  /**
+   *  @test
+   */
+  public function _confirmEnd() {
+    print_r("\n  - end of AssessModel Test -  \n\n");
+  }
 }

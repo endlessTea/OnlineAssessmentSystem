@@ -22,6 +22,13 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
 
   /**
    *  @test
+   */
+  public function _confirmStart() {
+    print_r(" - start of UserModel Test -  \n");
+  }
+
+  /**
+   *  @test
    *  Confirm salt method returns unique character strings
    */
   public function makeSalt_createTwoUniqueSalts_valuesDifferent() {
@@ -317,5 +324,12 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
 
     $dropUsersResult = $this->_DB->delete('users', 'DROP COLLECTION');
     $this->assertTrue($dropUsersResult);
+  }
+
+  /**
+   *  @test
+   */
+  public function _confirmEnd() {
+    print_r("\n  - end of UserModel Test -  \n\n");
   }
 }

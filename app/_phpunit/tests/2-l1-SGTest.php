@@ -8,6 +8,13 @@ class SGTest extends PHPUnit_Framework_TestCase {
 
   /**
    *  @test
+   */
+  public function _confirmStart() {
+    print_r(" - start of SG Test -  \n");
+  }
+
+  /**
+   *  @test
    *  Request escaped input (GET)
    */
   public function get_usageEqualsEscape_returnsEscapedInput() {
@@ -177,5 +184,12 @@ class SGTest extends PHPUnit_Framework_TestCase {
       'Unrecognised usage: please specify \'exists\', \'put\', \'get\' or \'delete\'',
       $result
     );
+  }
+
+  /**
+   *  @test
+   */
+  public function _confirmEnd() {
+    print_r("\n  - end of SG Test -  \n\n");
   }
 }

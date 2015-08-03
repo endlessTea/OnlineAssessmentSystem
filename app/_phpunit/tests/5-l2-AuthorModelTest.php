@@ -24,6 +24,13 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
     $this->_testTestAuthorId = 'hgrn93y89543hgnrsdnbgo';
   }
 
+  /**
+   *  @test
+   */
+  public function _confirmStart() {
+    print_r(" - start of AuthorModel Test -  \n");
+  }
+
   ##########################################################
   ################# 'QUESTIONS' UNIT TESTS #################
   ##########################################################
@@ -493,66 +500,66 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
     $this->assertFalse($result);
   }
 
-  // /**
-  //  *  @test
-  //  *  Make test available to a valid user
-  //  */
-  // public function makeTestAvailableToUser_validUserAssociation_methodReturnsTrue() {
-  //
-  //   // get test created earlier & turn into MongoId
-  //   $test = $this->_DB->read('tests', array(
-  //     'author' => $this->_testTestAuthorId
-  //   ));
-  //   $testId = new MongoId(key($test));
-  //
-  //   // create a user & turn into MongoId
-  //   $userModel = new UserModel();
-  //   $userModel->createUser('jeeves', 'password123');
-  //   $user = $this->_DB->read('users', array(
-  //     'username' => 'jeeves'
-  //   ));
-  //   $studentId = new MongoId(key($user));
-  //
-  //   $result = $this->_AuthorModel->makeTestAvailableToUser($testId, $studentId);
-  //   $this->assertTrue($result);
-  // }
-  //
-  // /**
-  //  *  @test
-  //  *  Attempt to make test available to invalid user id
-  //  */
-  // public function makeTestAvailableToUser_invalidUserId_methodReturnsFalse() {
-  //
-  //   $test = $this->_DB->read('tests', array(
-  //     'author' => $this->_testTestAuthorId
-  //   ));
-  //   $testId = new MongoId(key($test));
-  //
-  //   $result = $this->_AuthorModel->makeTestAvailableToUser($testId, 'rfu9320fn3o2wno');
-  //   $this->assertFalse($result);
-  // }
-  //
-  // /**
-  //  *  @test
-  //  *  Attempt to make test available to a user that has already taken the test
-  //  */
-  // public function makeTestAvailableToUser_userAlreadyTakenTest_methodReturnsFalse() {
-  //
-  //   $test = $this->_DB->read('tests', array(
-  //     'author' => $this->_testTestAuthorId
-  //   ));
-  //   $testId = new MongoId(key($test));
-  //
-  //   // get user that would have already taken the test
-  //   $user = $this->_DB->read('users', array(
-  //     'username' => 'jeeves'
-  //   ));
-  //   $studentId = new MongoId(key($user));
-  //
-  //   // update the test document to reflect that the user has taken the test
-  //   $result = $this->_DB->update('tests', array('_id' => $testId), array("taken" => key($user)));
-  //   print_r($result);
-  // }
+  /**
+   *  @test
+   *  Make test available to a valid user
+   */
+  public function makeTestAvailableToUser_validUserAssociation_methodReturnsTrue() {
+
+    // get test created earlier & turn into MongoId
+    $test = $this->_DB->read('tests', array(
+      'author' => $this->_testTestAuthorId
+    ));
+    $testId = new MongoId(key($test));
+
+    // create a user & turn into MongoId
+    $userModel = new UserModel();
+    $userModel->createUser('jeeves', 'password123');
+    $user = $this->_DB->read('users', array(
+      'username' => 'jeeves'
+    ));
+    $studentId = new MongoId(key($user));
+
+    $result = $this->_AuthorModel->makeTestAvailableToUser($testId, $studentId);
+    $this->assertTrue($result);
+  }
+
+  /**
+   *  @test
+   *  Attempt to make test available to invalid user id
+   */
+  public function makeTestAvailableToUser_invalidUserId_methodReturnsFalse() {
+
+    $test = $this->_DB->read('tests', array(
+      'author' => $this->_testTestAuthorId
+    ));
+    $testId = new MongoId(key($test));
+
+    $result = $this->_AuthorModel->makeTestAvailableToUser($testId, 'rfu9320fn3o2wno');
+    $this->assertFalse($result);
+  }
+
+  /**
+   *  @test
+   *  Attempt to make test available to a user that has already taken the test
+   */
+  public function makeTestAvailableToUser_userAlreadyTakenTest_methodReturnsFalse() {
+
+    $test = $this->_DB->read('tests', array(
+      'author' => $this->_testTestAuthorId
+    ));
+    $testId = new MongoId(key($test));
+
+    // get user that would have already taken the test
+    $user = $this->_DB->read('users', array(
+      'username' => 'jeeves'
+    ));
+    $studentId = new MongoId(key($user));
+
+    // update the test document to reflect that the user has taken the test
+    $result = $this->_DB->update('tests', array('_id' => $testId), array("taken" => key($user)));
+    print_r($result);
+  }
 
   /**
    *  @test
@@ -616,7 +623,14 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
 
     $dropQuestionsResult = $this->_DB->delete('questions', 'DROP COLLECTION');
     $dropTestsResult = $this->_DB->delete('tests', 'DROP COLLECTION');
-    //$dropUsersResult = $this->_DB->delete('users', 'DROP COLLECTION');
-    $this->assertTrue($dropQuestionsResult && $dropTestsResult); //&& $dropUsersResult);
+    $dropUsersResult = $this->_DB->delete('users', 'DROP COLLECTION');
+    $this->assertTrue($dropQuestionsResult && $dropTestsResult && $dropUsersResult);
+  }
+
+  /**
+   *  @test
+   */
+  public function _confirmEnd() {
+    print_r("\n  - end of AuthorModel Test -  \n\n");
   }
 }

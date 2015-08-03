@@ -43,6 +43,13 @@ class DBTest extends PHPUnit_Framework_TestCase {
 
   /**
    *  @test
+   */
+  public function _confirmStart() {
+    print_r(" - start of DB Test -  \n");
+  }
+
+  /**
+   *  @test
    *  Check that the getInstance factory method returns the same object reference
    */
   public function getInstance_callMethodTwice_sameObjectReturned() {
@@ -213,5 +220,12 @@ class DBTest extends PHPUnit_Framework_TestCase {
       'Delete conditions are invalid: supply a valid associative array or \'DROP COLLECTION\'',
       $result
     );
+  }
+
+  /**
+   *  @test
+   */
+  public function _confirmEnd() {
+    print_r("\n  - end of DB Test -  \n\n");
   }
 }
