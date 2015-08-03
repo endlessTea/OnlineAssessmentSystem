@@ -18,12 +18,12 @@ class SG {
    */
   public static function get($key, $usage = null) {
 
-    if ($usage === 'escape') {
+    if ($usage === "escape") {
 
       $get = $_GET[$key];
       return htmlentities($get, ENT_QUOTES, 'UTF-8');
 
-    } elseif ($key === 'url') {
+    } elseif ($key === "url") {
 
       if (isset($_GET['url'])) {
 
@@ -48,12 +48,12 @@ class SG {
         return $response;
 			}
 
-    } elseif ($usage === 'dangerous') {
+    } elseif ($usage === "dangerous") {
 
       return $_GET[$key];
     }
 
-    return 'Unrecognised usage: please specify \'escape\', \'url\' (with key of \'url\') or \'dangerous\'';
+    return "Unrecognised usage: please specify 'escape', 'url' (with key of 'url') or 'dangerous'";
   }
 
   /**
@@ -63,17 +63,17 @@ class SG {
    */
   public static function post($key, $usage = null) {
 
-    if ($usage === 'escape') {
+    if ($usage === "escape") {
 
       $post = $_POST[$key];
       return htmlentities($post, ENT_QUOTES, 'UTF-8');
 
-    } elseif ($usage === 'dangerous') {
+    } elseif ($usage === "dangerous") {
 
       return $_POST[$key];
     }
 
-    return 'Unrecognised usage: please specify \'escape\' or \'dangerous\'';
+    return "Unrecognised usage: please specify 'escape' or 'dangerous'";
   }
 
   // SESSION - exists, put, get, delete
@@ -87,28 +87,28 @@ class SG {
    */
   public static function session($name, $usage = null, $value = null) {
 
-    if ($usage === 'exists') {
+    if ($usage === "exists") {
 
       return (isset($_SESSION[$name])) ? true : false;
 
-    } elseif ($usage === 'put' && $value !== null) {
+    } elseif ($usage === "put" && $value !== null) {
 
       $_SESSION[$name] = $value;
       return true;
 
-    } elseif ($usage === 'get') {
+    } elseif ($usage === "get") {
 
       return $_SESSION[$name];
 
-    } elseif ($usage === 'delete') {
+    } elseif ($usage === "delete") {
 
-      if (SG::session($name, 'exists')) {
+      if (SG::session($name, "exists")) {
       	unset($_SESSION[$name]);
         return true;
       }
       return false;
     }
 
-    return 'Unrecognised usage: please specify \'exists\', \'put\', \'get\' or \'delete\'';
+    return "Unrecognised usage: please specify 'exists', 'put', 'get' or 'delete'";
   }
 }

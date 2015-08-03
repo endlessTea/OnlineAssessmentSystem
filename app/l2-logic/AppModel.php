@@ -16,7 +16,7 @@ class AppModel {
    */
   public function __construct($testMode = null) {
 
-    if ($testMode === 'testMode') {
+    if ($testMode === "testMode") {
 
       $this->_testMode = true;
 
@@ -32,7 +32,7 @@ class AppModel {
    *  @return escaped data from $_GET
    */
   public function getGETData($key) {
-    return SG::get($key, 'escape');
+    return SG::get($key, "escape");
   }
 
   /**
@@ -41,7 +41,7 @@ class AppModel {
    *  @return array of values signifying which controller, action and parameters to use
    */
   public function getURL() {
-    return SG::get('url');
+    return SG::get("url");
   }
 
   /**
@@ -50,7 +50,7 @@ class AppModel {
    *  @return escaped data from $_POST
    */
   public function getPOSTData($key) {
-    return SG::post($key, 'escape');
+    return SG::post($key, "escape");
   }
 
   /**
@@ -65,24 +65,24 @@ class AppModel {
     extract($resources);
 
     // header string rep.
-    if (array_key_exists('header', $views)) {
-      $header = 'app/l4-ui/_headers/' . strtolower($views['header']) . '.php';
+    if (array_key_exists("header", $views)) {
+      $header = "app/l4-ui/_headers/" . strtolower($views["header"]) . ".php";
     } else {
-      $header = 'app/l4-ui/_headers/default.php';
+      $header = "app/l4-ui/_headers/default.php";
     }
 
     // main template string rep.
-    if (array_key_exists('main', $views)) {
-      $main = 'app/l4-ui/' . strtolower($controller) . '/' . strtolower($views['main']) . '.php';
+    if (array_key_exists("main", $views)) {
+      $main = "app/l4-ui/" . strtolower($controller) . "/" . strtolower($views["main"]) . ".php";
     } else {
-      $main = 'app/l4-ui/' . strtolower($controller) . '/index.php';
+      $main = "app/l4-ui/" . strtolower($controller) . "/index.php";
     }
 
     // footer string rep.
-    if (array_key_exists('footer', $views)) {
-      $footer = 'app/l4-ui/_footers/' . strtolower($views['footer']) . '.php';
+    if (array_key_exists("footer", $views)) {
+      $footer = "app/l4-ui/_footers/" . strtolower($views["footer"]) . ".php";
     } else {
-      $footer = 'app/l4-ui/_footers/default.php';
+      $footer = "app/l4-ui/_footers/default.php";
     }
 
     // if testmode is on, return the string representations as an array, else require templates
@@ -114,18 +114,18 @@ class AppModel {
 			switch($location) {
 
 				case 404:
-          $headerString = 'Location: ' . URL . 'error';
+          $headerString = "Location: " . URL . "error";
 					break;
 
         case 403:
-          $headerString = 'Location: ' . URL . 'forbidden';
+          $headerString = "Location: " . URL . "forbidden";
           break;
 			}
 
     } else {
 
-      // use location reference for 'header' string
-      $headerString = 'Location: ' . $location;
+      // use location reference for "header" string
+      $headerString = "Location: " . $location;
     }
 
     // return string in test mode, otherwise redirect user

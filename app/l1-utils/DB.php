@@ -29,13 +29,13 @@ class DB {
 
       // define valid collections
       self::$_validCollections = array(
-        'users', 'questions', 'tests', 'samples'
+        "users", "questions", "tests", "samples"
       );
 
       // create unique index for users based on username
       $this->_mongo->users->createIndex(
-        array('username' => 1),
-        array('unique' => true)
+        array("username" => 1),
+        array("unique" => true)
       );
 
     } catch (Exception $e) {
@@ -70,7 +70,7 @@ class DB {
       return $this->_mongo->$collection;
 
     } else throw new InvalidArgumentException(
-      '\'' . $collection . '\' is an invalid collection'
+      "'{$collection}' is an invalid collection"
     );
   }
 
@@ -106,7 +106,7 @@ class DB {
       // return error if variable is not an array
       if (!is_array($documents)) {
 
-        return 'Document variable invalid: supply an array of associate arrays, or a single assoc. array';
+        return "Document variable invalid: supply an array of associate arrays, or a single assoc. array";
       }
 
       // if 2D array, perform batch insert and return indicator of success
@@ -136,7 +136,7 @@ class DB {
 
       $collection = $this->getCollection($collectionName);
 
-      if ($conditions === 'ALL DOCUMENTS') {
+      if ($conditions === "ALL DOCUMENTS") {
 
         return iterator_to_array($collection->find());
 
@@ -146,7 +146,7 @@ class DB {
       }
 
       // if branches were not entered, inform user of error
-      return 'Read conditions are invalid: supply a valid associative array or \'ALL DOCUMENTS\'';
+      return "Read conditions are invalid: supply a valid associative array or 'ALL DOCUMENTS'";
 
     } catch (Exception $e) {
       return $e->getMessage();
@@ -166,12 +166,13 @@ class DB {
 
       if (is_array($conditions) && is_array($updates)) {
 
+        // otherwise update-by-replace where condition is true
         $collection->update($conditions, array('$set' => $updates));
         return true;
       }
 
       // if branches were not entered, inform user of error
-      return 'Updates and Conditions are invalid: supply two valid associative arrays';
+      return "Updates and Conditions are invalid: supply two valid associative arrays";
 
     } catch (Exception $e) {
       return $e->getMessage();
@@ -196,7 +197,7 @@ class DB {
         $collection->remove($conditions);
         return true;
 
-      } elseif ($conditions === 'DROP COLLECTION') {
+      } elseif ($conditions === "DROP COLLECTION") {
 
         // drop the collection
         $collection->drop();
@@ -204,7 +205,7 @@ class DB {
       }
 
       // if one of the branches did not enter, inform of error
-      return 'Delete conditions are invalid: supply a valid associative array or \'DROP COLLECTION\'';
+      return "Delete conditions are invalid: supply a valid associative array or 'DROP COLLECTION'";
 
     } catch (Exception $e) {
       return $e->getMessage();

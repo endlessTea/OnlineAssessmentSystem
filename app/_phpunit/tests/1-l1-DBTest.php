@@ -20,24 +20,24 @@ class DBTest extends PHPUnit_Framework_TestCase {
 
     $this->_DB = DB::getInstance();
     $this->_sampleDocumentOne = array(
-      'name' => 'sample one',
-      'array' => array(
-        'arrayValueOne' => 1234,
-        'arrayValueTwo' => 'a String'
+      "name" => "sample one",
+      "testArray" => array(
+        "arrayValueOne" => "1234",
+        "arrayValueTwo" => "a String"
       )
     );
     $this->_sampleDocumentTwo = array(
-      'name' => 'sample two',
-      'extra' => 'document extra property',
-      'array' => array(
-        'arrayValueOne' => 'another String',
-        'arrayValueTwo' => 5678,
-        'arrayValueThree' => 'abcdefg'
+      "name" => "sample two",
+      "extra" => "document extra property",
+      "testArray" => array(
+        "arrayValueOne" => "another String",
+        "arrayValueTwo" => "5678",
+        "arrayValueThree" => "abcdefg"
       )
     );
     $this->_sampleDocumentThree = array(
-      'name' => 'sample three',
-      'extra' => 'document extra property'
+      "name" => "sample three",
+      "extra" => "document extra property"
     );
   }
 
@@ -64,7 +64,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
    */
   public function create_insertSingleDocument_returnsTrue() {
 
-    $result = $this->_DB->create('samples', $this->_sampleDocumentOne);
+    $result = $this->_DB->create("samples", $this->_sampleDocumentOne);
     $this->assertTrue($result);
   }
 
@@ -74,7 +74,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
    */
   public function create_insertMultipleDocuments_returnsTrue() {
 
-    $result = $this->_DB->create('samples', array(
+    $result = $this->_DB->create("samples", array(
       $this->_sampleDocumentTwo,
       $this->_sampleDocumentThree,
     ));
@@ -88,9 +88,9 @@ class DBTest extends PHPUnit_Framework_TestCase {
   public function create_insertStandardObjectAsDocument_returnsSpecificString() {
 
     $object = new stdClass();
-    $result = $this->_DB->create('samples', $object);
+    $result = $this->_DB->create("samples", $object);
     $this->assertSame(
-      'Document variable invalid: supply an array of associate arrays, or a single assoc. array',
+      "Document variable invalid: supply an array of associate arrays, or a single assoc. array",
       $result
     );
   }
@@ -101,9 +101,9 @@ class DBTest extends PHPUnit_Framework_TestCase {
    */
   public function create_attemptInsertWithInvalidCollection_returnsSpecificString() {
 
-    $result = $this->_DB->create('bananas', $this->_sampleDocumentOne);
+    $result = $this->_DB->create("bananas", $this->_sampleDocumentOne);
     $this->assertSame(
-      '\'bananas\' is an invalid collection',
+      "'bananas' is an invalid collection",
       $result
     );
   }
@@ -114,7 +114,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
    */
   public function read_getAllDocumentsInCollection_arraySizeThree() {
 
-    $documents = $this->_DB->read('samples', 'ALL DOCUMENTS');
+    $documents = $this->_DB->read("samples", "ALL DOCUMENTS");
     $this->assertEquals(3, count($documents));
   }
 
@@ -124,7 +124,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
    */
   public function read_getSpecificDocument_arraySizeOne() {
 
-    $documents = $this->_DB->read('samples', array('name' => 'sample two'));
+    $documents = $this->_DB->read("samples", array("name" => "sample two"));
     $this->assertEquals(1, count($documents));
   }
 
@@ -135,9 +135,9 @@ class DBTest extends PHPUnit_Framework_TestCase {
   public function read_getDocumentsInvalidConditions_returnsSpecificString() {
 
     $object = new stdClass();
-    $result = $this->_DB->read('samples', $object);
+    $result = $this->_DB->read("samples", $object);
     $this->assertSame(
-      'Read conditions are invalid: supply a valid associative array or \'ALL DOCUMENTS\'',
+      "Read conditions are invalid: supply a valid associative array or 'ALL DOCUMENTS'",
       $result
     );
   }
@@ -149,12 +149,12 @@ class DBTest extends PHPUnit_Framework_TestCase {
   public function update_changeDocumentValues_returnsTrue() {
 
     $result = $this->_DB->update(
-      'samples',
+      "samples",
       array(
-        'extra' => 'document extra property'
+        "extra" => "document extra property"
       ),
       array(
-        'extra' => 'things have changed'
+        "extra" => "things have changed"
       )
     );
     $this->assertTrue($result);
@@ -166,10 +166,63 @@ class DBTest extends PHPUnit_Framework_TestCase {
    */
   public function update_attemptUpdateNoConditionsOrUpdates_returnsSpecificString() {
 
-    $result = $this->_DB->update('samples');
+    $result = $this->_DB->update("samples");
     $this->assertSame(
-      'Updates and Conditions are invalid: supply two valid associative arrays',
+      "Updates and Conditions are invalid: supply two valid associative arrays",
       $result
+    );
+  }
+
+  /**
+   *  @test
+   *  Update an array by copying contents and overwritting the existing array
+   */
+  public function update_overwriteExistingArray_arrayLengthEqualsFour() {
+
+    // get the mongo id for the 2nd object
+    $document = array_pop($this->_DB->read("samples", array("name" => "sample two")));
+    $newArray = $document["testArray"];
+    $newArray["arrayValueFour"] = "here's another array value, again!";
+
+    $this->_DB->update(
+      "samples",
+      array(
+        "name" => "sample two"
+      ),
+      array(
+        "testArray" => $newArray
+      )
+    );
+
+    $document = array_pop($this->_DB->read("samples", array("name" => "sample two")));
+    $this->assertEquals(
+      4,
+      count($document["testArray"])
+    );
+  }
+
+  /**
+   *  @test
+   *  Create additional field using update operation
+   */
+  public function update_createAdditionalField_arrayLengthEqualsTwo() {
+
+    $this->_DB->update(
+      "samples",
+      array(
+        "name" => "sample two"
+      ),
+      array(
+        "brandNewArray" => array(
+          "valueOne", "valueTwo"
+        )
+      )
+    );
+
+    $document = array_pop($this->_DB->read("samples", array("name" => "sample two")));
+    $this->assertEquals(
+      2,
+      count($document["brandNewArray"])
     );
   }
 
@@ -179,8 +232,8 @@ class DBTest extends PHPUnit_Framework_TestCase {
    */
   public function delete_deleteSingleRecord_returnsTrue() {
 
-    $result = $this->_DB->delete('samples', array(
-      'name' => 'sample three'
+    $result = $this->_DB->delete("samples", array(
+      "name" => "sample three"
     ));
     $this->assertTrue($result);
   }
@@ -191,7 +244,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
    */
   public function delete_dropCollection_returnsTrue() {
 
-    $result = $this->_DB->delete('samples', 'DROP COLLECTION');
+    $result = $this->_DB->delete("samples", "DROP COLLECTION");
     $this->assertTrue($result);
   }
 
@@ -201,9 +254,9 @@ class DBTest extends PHPUnit_Framework_TestCase {
    */
   public function delete_dropInvalidCollection_returnsSpecificString() {
 
-    $result = $this->_DB->delete('bananas', 'DROP COLLECTION');
+    $result = $this->_DB->delete("bananas", "DROP COLLECTION");
     $this->assertSame(
-      '\'bananas\' is an invalid collection',
+      "'bananas' is an invalid collection",
       $result
     );
   }
@@ -215,9 +268,9 @@ class DBTest extends PHPUnit_Framework_TestCase {
   public function delete_attemptWithInvalidSecondParam_returnsSpecificString() {
 
     $object = new stdClass();
-    $result = $this->_DB->delete('samples', $object);
+    $result = $this->_DB->delete("samples", $object);
     $this->assertSame(
-      'Delete conditions are invalid: supply a valid associative array or \'DROP COLLECTION\'',
+      "Delete conditions are invalid: supply a valid associative array or 'DROP COLLECTION'",
       $result
     );
   }

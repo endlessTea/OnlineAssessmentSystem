@@ -27,16 +27,16 @@ class UserModel {
 
     // define which fields may be updated
     $this->_updateProperties = array(
-      'hash', 'salt'
+      "hash", "salt"
     );
 
     // if an existing session exists..
-    if (SG::session('user', 'exists')) {
+    if (SG::session("user", "exists")) {
 
       // attempt to convert to MongoId Object and check if the user exists..
       try {
 
-        $mongoIdObj = new MongoId(SG::session('user', 'get'));
+        $mongoIdObj = new MongoId(SG::session("user", "get"));
         if ($this->findUser($mongoIdObj)) {
 
           // indicate that the current user is logged in
@@ -65,8 +65,8 @@ class UserModel {
    *  GENERATE PASSWORD HASH
    *  @return 64 character hash using input string and salt
    */
-  public function makeHash($string, $salt = '') {
-    return hash('sha256', $string . $salt);
+  public function makeHash($string, $salt = "") {
+    return hash("sha256", $string . $salt);
   }
 
   /**
@@ -82,17 +82,17 @@ class UserModel {
 
     // create user object to store as BSON document in DB
     $user = array(
-      'username' => $username,
-      'hash' => $hash,
-      'salt' => $salt
+      "username" => $username,
+      "hash" => $hash,
+      "salt" => $salt
     );
 
     // attempt to create user
-    $result = $this->_DB->create('users', $user);
+    $result = $this->_DB->create("users", $user);
 
-    if (preg_match('/E11000/', $result) === 1) {
+    if (preg_match("/E11000/", $result) === 1) {
 
-      return 'Duplicate key: The username \'' . $username . '\' already exists.';
+      return "Duplicate key: The username '{$username}' already exists.";
     }
 
     return $result;
@@ -107,13 +107,13 @@ class UserModel {
   public function findUser($userIdentifier) {
 
 
-    if (is_a($userIdentifier, 'MongoId')) {
+    if (is_a($userIdentifier, "MongoId")) {
 
-      $data = $this->_DB->read('users', array('_id' => $userIdentifier));
+      $data = $this->_DB->read("users", array("_id" => $userIdentifier));
 
     } elseif ($userIdentifier !== null) {
 
-      $data = $this->_DB->read('users', array('username' => $userIdentifier));
+      $data = $this->_DB->read("users", array("username" => $userIdentifier));
     }
 
     // if the user exists, change $_userData values and return true
@@ -121,9 +121,9 @@ class UserModel {
       $this->_userData = new stdClass();
       $this->_userData->userId = key($data);
       $data = array_pop($data);
-      $this->_userData->username = $data['username'];
-      $this->_userData->hash = $data['hash'];
-      $this->_userData->salt = $data['salt'];
+      $this->_userData->username = $data["username"];
+      $this->_userData->hash = $data["hash"];
+      $this->_userData->salt = $data["salt"];
       return true;
     }
 
@@ -143,9 +143,9 @@ class UserModel {
       // if update property is allowed to be changed
       if (in_array($property, $this->_updateProperties, true)) {
 
-        // update current user's values
+        // update current user"s values
         $mongoIdObj = new MongoId($this->_userData->userId);
-        return $this->_DB->update('users', array('_id' => $mongoIdObj), array($property => $value));
+        return $this->_DB->update("users", array("_id" => $mongoIdObj), array($property => $value));
       }
     }
 
@@ -154,7 +154,7 @@ class UserModel {
 
   /**
    *  LOG USER IN
-   *  Creates a hash of the password provided as a parameter against the chosen user account's password
+   *  Creates a hash of the password provided as a parameter against the chosen user account"s password
    *  Update Session superglobal on success
    *  @return true (boolean) on success, else false
    */
@@ -167,7 +167,7 @@ class UserModel {
       if ($this->getUserData()->hash === $this->makeHash($password, $this->getUserData()->salt)) {
 
         // create session for user, change login status, return true
-        SG::session('user', 'put', $this->getUserData()->userId);
+        SG::session("user", "put", $this->getUserData()->userId);
         $this->_loginStatus = true;
         return true;
       }
@@ -181,7 +181,7 @@ class UserModel {
    *  @return true (boolean) on success, else false
    */
   public function logUserOut() {
-    return SG::session('user', 'delete');
+    return SG::session("user", "delete");
   }
 
   /**

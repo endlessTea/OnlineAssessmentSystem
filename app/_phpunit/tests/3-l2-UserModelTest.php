@@ -56,7 +56,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
 
     $saltOne = $this->_UserModel->makeSalt();
     $saltTwo = $this->_UserModel->makeSalt();
-    $originalPassword = 'password';
+    $originalPassword = "password";
     $hashOne = $this->_UserModel->makeHash(
       $originalPassword, $saltOne
     );
@@ -73,7 +73,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   public function makeHash_createHashesSameSalt_valuesMatch() {
 
     $salt = $this->_UserModel->makeSalt();
-    $originalPassword = 'password';
+    $originalPassword = "password";
     $hashOne = $this->_UserModel->makeHash(
       $originalPassword, $salt
     );
@@ -90,7 +90,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   public function makeHash_createHashMatchRegExp_value64HexadecimalCharacters() {
 
     $salt = $this->_UserModel->makeSalt();
-    $originalPassword = 'password';
+    $originalPassword = "password";
     $hash = $this->_UserModel->makeHash(
       $originalPassword, $salt
     );
@@ -103,8 +103,8 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
    */
   public function createUser_createSampleUser_methodReturnsTrue() {
 
-    $username = 'sample';
-    $originalPassword = 'password';
+    $username = "sample";
+    $originalPassword = "password";
     $result = $this->_UserModel->createUser($username, $originalPassword);
     $this->assertTrue($result);
   }
@@ -115,22 +115,22 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
    */
   public function createUser_attemptCreateDuplicateUser_returnsSpecificString() {
 
-    $username = 'sample';
-    $originalPassword = 'password';
+    $username = "sample";
+    $originalPassword = "password";
     $result = $this->_UserModel->createUser($username, $originalPassword);
     $this->assertSame(
-      'Duplicate key: The username \'sample\' already exists.',
+      "Duplicate key: The username 'sample' already exists.",
       $result
     );
   }
 
   /**
    *  @test
-   *  Check if a user exists with UserModel's 'find' method (MongoId object)
+   *  Check if a user exists with UserModel's "find" method (MongoId object)
    */
   public function findUser_findSampleUserByMongoId_methodReturnsTrue() {
 
-    $user = $this->_DB->read('users', array('username' => 'sample'));
+    $user = $this->_DB->read("users", array("username" => "sample"));
     $mongoIdObj = new MongoId(key($user));
     $result = $this->_UserModel->findUser($mongoIdObj);
     $this->assertTrue($result);
@@ -142,17 +142,17 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
    */
   public function findUser_findSampleUserByUsername_methodReturnsTrue() {
 
-    $result = $this->_UserModel->findUser('sample');
+    $result = $this->_UserModel->findUser("sample");
     $this->assertTrue($result);
   }
 
   /**
    *  @test
-   *  Check for an inexistent user using 'find' method
+   *  Check for an inexistent user using "find" method
    */
   public function findUser_attemptToFindInexistentUser_methodReturnsFalse() {
 
-    $junk = '12345';
+    $junk = "12345";
     $result = $this->_UserModel->findUser($junk);
     $this->assertFalse($result);
   }
@@ -163,12 +163,12 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
    */
   public function constructAndGetUserData_checkDataMatch_methodReturnsMatchingData() {
 
-    $user = $this->_DB->read('users', array('username' => 'sample'));
-    SG::session('user', 'put', key($user));
+    $user = $this->_DB->read("users", array("username" => "sample"));
+    SG::session("user", "put", key($user));
     $user = array_pop($user);
     $newUserModel = new UserModel();
     $this->assertSame(
-      $user['username'],
+      $user["username"],
       $newUserModel->getUserData()->username
     );
   }
@@ -179,8 +179,8 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
    */
   public function constructAndGetLoginStatus_checkLoginStatus_methodReturnsTrue() {
 
-    $user = $this->_DB->read('users', array('username' => 'sample'));
-    SG::session('user', 'put', key($user));
+    $user = $this->_DB->read("users", array("username" => "sample"));
+    SG::session("user", "put", key($user));
     $newUserModel = new UserModel();
     $this->assertTrue($newUserModel->getLoginStatus());
   }
@@ -202,17 +202,17 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   public function updateUser_changePassword_methodReturnsTrue() {
 
     // get sample user and update session superglobal
-    $user = $this->_DB->read('users', array('username' => 'sample'));
-    SG::session('user', 'put', key($user));
+    $user = $this->_DB->read("users", array("username" => "sample"));
+    SG::session("user", "put", key($user));
     $user = array_pop($user);
 
     // create new password hash
-    $newPassword = 'abc123def456';
-    $newHash = $this->_UserModel->makeHash($newPassword, $user['salt']);
+    $newPassword = "abc123def456";
+    $newHash = $this->_UserModel->makeHash($newPassword, $user["salt"]);
 
     // create new User Model
     $newUserModel = new UserModel();
-    $result = $newUserModel->updateUser('hash', $newHash);
+    $result = $newUserModel->updateUser("hash", $newHash);
     $this->assertTrue($result);
   }
 
@@ -222,10 +222,10 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
    */
   public function updateUser_attemptUsernameChange_methodReturnsFalse() {
 
-    $user = $this->_DB->read('users', array('username' => 'sample'));
-    SG::session('user', 'put', key($user));
+    $user = $this->_DB->read("users", array("username" => "sample"));
+    SG::session("user", "put", key($user));
     $newUserModel = new UserModel();
-    $result = $newUserModel->updateUser('username', 'newUsername');
+    $result = $newUserModel->updateUser("username", "newUsername");
     $this->assertFalse($result);
   }
 
@@ -235,7 +235,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
    */
   public function updateUser_attemptPasswordChangeUserNotLoggedIn_methodReturnsFalse() {
 
-    $result = $this->_UserModel->updateUser('hash', '12345');
+    $result = $this->_UserModel->updateUser("hash", "12345");
     $this->assertFalse($result);
   }
 
@@ -245,7 +245,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
    */
   public function logUserIn_logInUserToUserModelInstanceVariable_methodReturnsTrue() {
 
-    $result = $this->_UserModel->logUserIn('sample', 'abc123def456');
+    $result = $this->_UserModel->logUserIn("sample", "abc123def456");
     $this->assertTrue($result);
   }
 
@@ -256,7 +256,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   public function logUserIn_attemptLogInWithInvalidUsername_methodReturnsFalse() {
 
     $newUserModel = new UserModel();
-    $result = $newUserModel->logUserIn('jamSandwich', 'abc123def456');
+    $result = $newUserModel->logUserIn("jamSandwich", "abc123def456");
     $this->assertFalse($result);
   }
 
@@ -267,7 +267,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   public function logUserIn_attemptLogInWithInvalidPassword_methodReturnsFalse() {
 
     $newUserModel = new UserModel();
-    $result = $newUserModel->logUserIn('sample', 'openSesame');
+    $result = $newUserModel->logUserIn("sample", "openSesame");
     $this->assertFalse($result);
   }
 
@@ -277,7 +277,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
    */
   public function getLoginStatus_checkInstanceVariableOfUMIsLoggedIn_methodReturnsTrue() {
 
-    $result = $this->_UserModel->logUserIn('sample', 'abc123def456');
+    $result = $this->_UserModel->logUserIn("sample", "abc123def456");
     $result = $this->_UserModel->getLoginStatus();
     $this->assertTrue($result);
   }
@@ -288,7 +288,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
    */
   public function logUserOut_logOutInstanceVariableUserModel_methodReturnsTrue() {
 
-    $result = $this->_UserModel->logUserIn('sample', 'abc123def456');
+    $result = $this->_UserModel->logUserIn("sample", "abc123def456");
     $result = $this->_UserModel->logUserOut();
     $this->assertTrue($result);
   }
@@ -299,8 +299,8 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
    */
   public function logUserOut_logOutAfterObjectConstructionUsingSession_methodReturnsTrue() {
 
-    $user = $this->_DB->read('users', array('username' => 'sample'));
-    SG::session('user', 'put', key($user));
+    $user = $this->_DB->read("users", array("username" => "sample"));
+    SG::session("user", "put", key($user));
     $newUserModel = new UserModel();
     $result = $newUserModel->logUserOut();
     $this->assertTrue($result);
@@ -322,7 +322,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
    */
   public function _dropUserCollection_methodReturnsTrue() {
 
-    $dropUsersResult = $this->_DB->delete('users', 'DROP COLLECTION');
+    $dropUsersResult = $this->_DB->delete("users", "DROP COLLECTION");
     $this->assertTrue($dropUsersResult);
   }
 

@@ -15,7 +15,7 @@ class AppModelTest extends PHPUnit_Framework_TestCase {
    */
   public function __construct() {
 
-    $this->_AppModel = new AppModel('testMode');
+    $this->_AppModel = new AppModel("testMode");
   }
 
   /**
@@ -31,8 +31,8 @@ class AppModelTest extends PHPUnit_Framework_TestCase {
    */
   public function getGETData_confirmDataEscaped_returnsEscapedData() {
 
-    $_GET['data'] = "<script>alert('here is data');</script>";
-    $result = $this->_AppModel->getGETData('data');
+    $_GET["data"] = "<script>alert('here is data');</script>";
+    $result = $this->_AppModel->getGETData("data");
     $this->assertSame(
       "&lt;script&gt;alert(&#039;here is data&#039;);&lt;/script&gt;",
       $result
@@ -45,14 +45,14 @@ class AppModelTest extends PHPUnit_Framework_TestCase {
    */
   public function getURL_confirmValuesParsedAsArray_returnsArrayOfValues() {
 
-    $_GET['url'] = "controller/action/param1/param2/param3/param4";
+    $_GET["url"] = "controller/action/param1/param2/param3/param4";
     $result = $this->_AppModel->getURL();
     $this->assertSame(
       array(
-        'controller' => 'controller',
-        'action' => 'action',
-        'parameters' => array(
-          'param1', 'param2', 'param3', 'param4'
+        "controller" => "controller",
+        "action" => "action",
+        "parameters" => array(
+          "param1", "param2", "param3", "param4"
         )
       ),
       $result
@@ -65,8 +65,8 @@ class AppModelTest extends PHPUnit_Framework_TestCase {
    */
   public function getPOSTData_confirmDataEscaped_returnsEscapedData() {
 
-    $_POST['data'] = "<script>alert('post data');</script>";
-    $result = $this->_AppModel->getPOSTData('data');
+    $_POST["data"] = "<script>alert('post data');</script>";
+    $result = $this->_AppModel->getPOSTData("data");
     $this->assertSame(
       "&lt;script&gt;alert(&#039;post data&#039;);&lt;/script&gt;",
       $result
@@ -79,12 +79,12 @@ class AppModelTest extends PHPUnit_Framework_TestCase {
    */
   public function renderTemplates_confirmDefaultTemplatesProvided_returnsArrayOfSpecificStrings() {
 
-    $result = $this->_AppModel->renderTemplates('controller');
+    $result = $this->_AppModel->renderTemplates("controller");
     $this->assertSame(
       array(
-        'app/l4-ui/_headers/default.php',
-        'app/l4-ui/controller/index.php',
-        'app/l4-ui/_footers/default.php'
+        "app/l4-ui/_headers/default.php",
+        "app/l4-ui/controller/index.php",
+        "app/l4-ui/_footers/default.php"
       ),
       $result
     );
@@ -96,16 +96,16 @@ class AppModelTest extends PHPUnit_Framework_TestCase {
    */
   public function renderTemplates_confirmRequestedTemplatesProvided_returnsArrayOfSpecificStrings() {
 
-    $result = $this->_AppModel->renderTemplates('controller', array(
-      'header' => 'specific_header',
-      'main' => 'specific_main_template',
-      'footer' => 'specific_footer'
+    $result = $this->_AppModel->renderTemplates("controller", array(
+      "header" => "specific_header",
+      "main" => "specific_main_template",
+      "footer" => "specific_footer"
     ));
     $this->assertSame(
       array(
-        'app/l4-ui/_headers/specific_header.php',
-        'app/l4-ui/controller/specific_main_template.php',
-        'app/l4-ui/_footers/specific_footer.php'
+        "app/l4-ui/_headers/specific_header.php",
+        "app/l4-ui/controller/specific_main_template.php",
+        "app/l4-ui/_footers/specific_footer.php"
       ),
       $result
     );
@@ -119,7 +119,7 @@ class AppModelTest extends PHPUnit_Framework_TestCase {
 
     $result = $this->_AppModel->redirectTo(404);
     $this->assertSame(
-      'Location: http://localhost/msc/error',
+      "Location: http://localhost/msc/error",
       $result
     );
   }
@@ -132,7 +132,7 @@ class AppModelTest extends PHPUnit_Framework_TestCase {
 
     $result = $this->_AppModel->redirectTo(403);
     $this->assertSame(
-      'Location: http://localhost/msc/forbidden',
+      "Location: http://localhost/msc/forbidden",
       $result
     );
   }

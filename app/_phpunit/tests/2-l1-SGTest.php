@@ -19,8 +19,8 @@ class SGTest extends PHPUnit_Framework_TestCase {
    */
   public function get_usageEqualsEscape_returnsEscapedInput() {
 
-    $_GET['test'] = "<script>alert('hi');</script>";
-    $result = SG::get('test', 'escape');
+    $_GET["test"] = "<script>alert('hi');</script>";
+    $result = SG::get("test", "escape");
     $this->assertSame(
       "&lt;script&gt;alert(&#039;hi&#039;);&lt;/script&gt;",
       $result
@@ -33,14 +33,14 @@ class SGTest extends PHPUnit_Framework_TestCase {
    */
   public function get_usageEqualsUrl_returnsArray() {
 
-    $_GET['url'] = "home/login/param1/param2/param3";
-    $result = SG::get('url');
+    $_GET["url"] = "home/login/param1/param2/param3";
+    $result = SG::get("url");
     $this->assertSame(
       array(
-        'controller' => 'home',
-        'action' => 'login',
-        'parameters' => array(
-          'param1', 'param2', 'param3'
+        "controller" => "home",
+        "action" => "login",
+        "parameters" => array(
+          "param1", "param2", "param3"
         )
       ),
       $result
@@ -53,8 +53,8 @@ class SGTest extends PHPUnit_Framework_TestCase {
    */
   public function get_usageEqualsDangerous_returnsUnsafeInput() {
 
-    $_GET['test'] = "<script>alert('hi');</script>";
-    $result = SG::get('test', 'dangerous');
+    $_GET["test"] = "<script>alert('hi');</script>";
+    $result = SG::get("test", "dangerous");
     $this->assertSame(
       "<script>alert('hi');</script>",
       $result
@@ -67,9 +67,9 @@ class SGTest extends PHPUnit_Framework_TestCase {
    */
   public function get_usageUnspecified_returnsSpecificString() {
 
-    $result = SG::get('test');
+    $result = SG::get("test");
     $this->assertSame(
-      'Unrecognised usage: please specify \'escape\', \'url\' (with key of \'url\') or \'dangerous\'',
+      "Unrecognised usage: please specify 'escape', 'url' (with key of 'url') or 'dangerous'",
       $result
     );
   }
@@ -82,8 +82,8 @@ class SGTest extends PHPUnit_Framework_TestCase {
    */
   public function post_usageEqualsEscape_returnsEscapedInput() {
 
-    $_POST['test'] = "<script>alert('hello');</script>";
-    $result = SG::post('test', 'escape');
+    $_POST["test"] = "<script>alert('hello');</script>";
+    $result = SG::post("test", "escape");
     $this->assertSame(
       "&lt;script&gt;alert(&#039;hello&#039;);&lt;/script&gt;",
       $result
@@ -96,8 +96,8 @@ class SGTest extends PHPUnit_Framework_TestCase {
    */
   public function post_usageEqualsDangerous_returnsUnsafeInput() {
 
-    $_POST['test'] = "<script>alert('hello');</script>";
-    $result = SG::post('test', 'dangerous');
+    $_POST["test"] = "<script>alert('hello');</script>";
+    $result = SG::post("test", "dangerous");
     $this->assertSame(
       "<script>alert('hello');</script>",
       $result
@@ -110,9 +110,9 @@ class SGTest extends PHPUnit_Framework_TestCase {
    */
   public function post_usageUnspecified_returnsSpecificString() {
 
-    $result = SG::post('test');
+    $result = SG::post("test");
     $this->assertSame(
-      'Unrecognised usage: please specify \'escape\' or \'dangerous\'',
+      "Unrecognised usage: please specify 'escape' or 'dangerous'",
       $result
     );
   }
@@ -123,7 +123,7 @@ class SGTest extends PHPUnit_Framework_TestCase {
    */
   public function session_checkInexistent_returnsFalse() {
 
-    $result = SG::session('inexistent', 'exists');
+    $result = SG::session("inexistent", "exists");
     $this->assertFalse($result);
   }
 
@@ -133,7 +133,7 @@ class SGTest extends PHPUnit_Framework_TestCase {
    */
   public function session_putSessionValue_returnsTrue() {
 
-    $result = SG::session('mySession', 'put', 'myValue');
+    $result = SG::session("mySession", "put", "myValue");
     $this->assertTrue($result);
   }
 
@@ -143,8 +143,8 @@ class SGTest extends PHPUnit_Framework_TestCase {
    */
   public function session_checkExistingSession_returnsTrue() {
 
-    SG::session('mySession2', 'put', 'myValue2');
-    $result = SG::session('mySession2', 'exists');
+    SG::session("mySession2", "put", "myValue2");
+    $result = SG::session("mySession2", "exists");
     $this->assertTrue($result);
   }
 
@@ -154,10 +154,10 @@ class SGTest extends PHPUnit_Framework_TestCase {
    */
   public function session_getSessionValue_returnsSpecificString() {
 
-    SG::session('mySession3', 'put', 'myValue3');
-    $result = SG::session('mySession3', 'get');
+    SG::session("mySession3", "put", "myValue3");
+    $result = SG::session("mySession3", "get");
     $this->assertSame(
-      'myValue3',
+      "myValue3",
       $result
     );
   }
@@ -168,8 +168,8 @@ class SGTest extends PHPUnit_Framework_TestCase {
    */
   public function session_deleteSession_returnsTrue() {
 
-    SG::session('mySession4', 'put', 'myValue4');
-    $result = SG::session('mySession4', 'delete');
+    SG::session("mySession4", "put", "myValue4");
+    $result = SG::session("mySession4", "delete");
     $this->assertTrue($result);
   }
 
@@ -179,9 +179,9 @@ class SGTest extends PHPUnit_Framework_TestCase {
    */
   public function session_usageUnspecified_returnsSpecificString() {
 
-    $result = SG::session('inexistent');
+    $result = SG::session("inexistent");
     $this->assertSame(
-      'Unrecognised usage: please specify \'exists\', \'put\', \'get\' or \'delete\'',
+      "Unrecognised usage: please specify 'exists', 'put', 'get' or 'delete'",
       $result
     );
   }

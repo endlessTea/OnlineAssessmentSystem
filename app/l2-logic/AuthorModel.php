@@ -23,22 +23,22 @@ class AuthorModel {
 
     // define question schema: restrict document structure of questions
     $this->_questionSchema = array(
-      'boolean' => array(
-        'schema' => 'required',
-        'author' => 'required',
-        'statement' => 'required',
-        'singleAnswer' => 'required',
-        'feedbackCorrect' => 'optional',
-        'feedbackIncorrect' => 'optional'
+      "boolean" => array(
+        "schema" => "required",
+        "author" => "required",
+        "statement" => "required",
+        "singleAnswer" => "required",
+        "feedbackCorrect" => "optional",
+        "feedbackIncorrect" => "optional"
       )
     );
 
     // define test schema: restrict document structure of tests
     $this->_testSchema = array(
-      'standard' => array(
-        'schema' => 'required',
-        'author' => 'required',
-        'questions' => 'required'
+      "standard" => array(
+        "schema" => "required",
+        "author" => "required",
+        "questions" => "required"
       )
     );
   }
@@ -55,21 +55,21 @@ class AuthorModel {
   public function createQuestion($question = array()) {
 
     // fail the operation if the user did not provide a schema key, otherwise check if schema is recognised
-    if (!isset($question['schema'])) return false;
-    if (array_key_exists($question['schema'], $this->_questionSchema)) {
+    if (!isset($question["schema"])) return false;
+    if (array_key_exists($question["schema"], $this->_questionSchema)) {
 
       // prepare document to insert (valid data will be transfered to this new variable)
       $document = array();
 
       // loop through each schema property
-      foreach ($this->_questionSchema[$question['schema']] as $sProperty => $sRequirement) {
+      foreach ($this->_questionSchema[$question["schema"]] as $sProperty => $sRequirement) {
 
         // if a required property was not provided, fail the operation
-        if ($sRequirement === 'required' && !isset($question[$sProperty])) return false;
+        if ($sRequirement === "required" && !isset($question[$sProperty])) return false;
 
         // if property is required or property is optional AND there is a value that can be used
-        if ($sRequirement === 'required' ||
-         ($sRequirement === 'optional' && isset($question[$sProperty]))) {
+        if ($sRequirement === "required" ||
+         ($sRequirement === "optional" && isset($question[$sProperty]))) {
 
           // copy item from the question to the insertion document and remove it from question array
           $document[$sProperty] = $question[$sProperty];
@@ -81,7 +81,7 @@ class AuthorModel {
       if (!empty($question)) return false;
 
       // otherwise the question provided was valid, return the result of the DB operation
-      return $this->_DB->create('questions', $document);
+      return $this->_DB->create("questions", $document);
     }
 
     return false;
@@ -98,7 +98,7 @@ class AuthorModel {
     if (preg_match('/^([a-z0-9])+$/', $userIdStr) === 0) return false;
 
     // return data
-    return $this->_DB->read('questions', array('author' => $userIdStr));
+    return $this->_DB->read("questions", array("author" => $userIdStr));
   }
 
   /**
@@ -113,15 +113,15 @@ class AuthorModel {
     if (is_a($questionIdObj, 'MongoId')) {
 
       // identify the schema of the question
-      $document = $this->_DB->read('questions', array('_id' => $questionIdObj));
-      $schema = $document[key($document)]['schema'];
+      $document = $this->_DB->read("questions", array("_id" => $questionIdObj));
+      $schema = $document[key($document)]["schema"];
 
-      // only continue if the update complies with the schema AND it isn't an author update
+      // only continue if the update complies with the schema AND it isn"t an author update
       if (array_key_exists(key($update), $this->_questionSchema[$schema])
-        && key($update) !== 'author') {
+        && key($update) !== "author") {
 
         // return the result of the update operation
-        return $this->_DB->update('questions', array('_id' => $questionIdObj), $update);
+        return $this->_DB->update("questions", array("_id" => $questionIdObj), $update);
       }
     }
 
@@ -139,14 +139,14 @@ class AuthorModel {
     if (is_a($questionIdObj, 'MongoId')) {
 
       // identify the author of the question
-      $document = $this->_DB->read('questions', array('_id' => $questionIdObj));
-      $author = $document[key($document)]['author'];
+      $document = $this->_DB->read("questions", array("_id" => $questionIdObj));
+      $author = $document[key($document)]["author"];
 
       // permit delete operation if the author ID matches
       if ($authorIdStr === $author) {
 
         // return the result of the delete operation
-        return $this->_DB->delete('questions', array('_id' => $questionIdObj));
+        return $this->_DB->delete("questions", array("_id" => $questionIdObj));
       }
     }
 
@@ -165,21 +165,21 @@ class AuthorModel {
   public function createTest($test = array()) {
 
     // fail the operation if the user did not provide a schema key, otherwise check if schema is recognised
-    if (!isset($test['schema'])) return false;
-    if (array_key_exists($test['schema'], $this->_testSchema)) {
+    if (!isset($test["schema"])) return false;
+    if (array_key_exists($test["schema"], $this->_testSchema)) {
 
       // prepare document to insert (valid data will be transfered to this new variable)
       $document = array();
 
       // loop through each schema property
-      foreach ($this->_testSchema[$test['schema']] as $tProperty => $tRequirement) {
+      foreach ($this->_testSchema[$test["schema"]] as $tProperty => $tRequirement) {
 
         // if a required property was not provided, fail the operation
-        if ($tRequirement === 'required' && !isset($test[$tProperty])) return false;
+        if ($tRequirement === "required" && !isset($test[$tProperty])) return false;
 
         // if property is required or property is optional AND there is a value that can be used
-        if ($tRequirement === 'required' ||
-         ($tRequirement === 'optional' && isset($test[$tProperty]))) {
+        if ($tRequirement === "required" ||
+         ($tRequirement === "optional" && isset($test[$tProperty]))) {
 
           // copy item from the question to the insertion document and remove it from question array
           $document[$tProperty] = $test[$tProperty];
@@ -191,11 +191,11 @@ class AuthorModel {
       if (!empty($test)) return false;
 
       // add arrays for making tests available to users and keeping track of who has taken them
-      $document['available'] = array();
-      $document['taken'] = array();
+      $document["available"] = array();
+      $document["taken"] = array();
 
       // otherwise the test provided was valid, return the result of the DB operation
-      return $this->_DB->create('tests', $document);
+      return $this->_DB->create("tests", $document);
     }
 
     return false;
@@ -212,7 +212,7 @@ class AuthorModel {
     if (preg_match('/^([a-z0-9])+$/', $userIdStr) === 0) return false;
 
     // return data
-    return $this->_DB->read('tests', array('author' => $userIdStr));
+    return $this->_DB->read("tests", array("author" => $userIdStr));
   }
 
   /**
@@ -227,19 +227,19 @@ class AuthorModel {
     if (is_a($testIdObj, 'MongoId')) {
 
       // identify the schema of the test
-      $document = $this->_DB->read('tests', array('_id' => $testIdObj));
-      $schema = $document[key($document)]['schema'];
+      $document = $this->_DB->read("tests", array("_id" => $testIdObj));
+      $schema = $document[key($document)]["schema"];
 
       // if update contains questions and its value is not an array, fail the operation
-      if (isset($update['questions']))
-        if (!is_array($update['questions'])) return false;
+      if (isset($update["questions"]))
+        if (!is_array($update["questions"])) return false;
 
-      // only continue if update complies with schema AND it isn't an author update
+      // only continue if update complies with schema AND it isn"t an author update
       if (array_key_exists(key($update), $this->_testSchema[$schema])
-        && key($update) !== 'author') {
+        && key($update) !== "author") {
 
           // return the result of the update operation
-          return $this->_DB->update('tests', array('_id' => $testIdObj), $update);
+          return $this->_DB->update("tests", array("_id" => $testIdObj), $update);
       }
     }
 
@@ -274,16 +274,17 @@ class AuthorModel {
     if (is_a($testIdObj, 'MongoId')) {
 
       // identify the author of the question
-      $document = $this->_DB->read('tests', array('_id' => $testIdObj));
-      $author = $document[key($document)]['author'];
+      $document = $this->_DB->read("tests", array("_id" => $testIdObj));
+      $author = $document[key($document)]["author"];
 
       // permit delete operation if the author ID matches
       if ($authorIdStr === $author) {
 
         // return the result of the delete operation
-        return $this->_DB->delete('tests', array('_id' => $testIdObj));
+        return $this->_DB->delete("tests", array("_id" => $testIdObj));
       }
     }
+    
     return false;
   }
 }
