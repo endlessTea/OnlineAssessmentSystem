@@ -57,7 +57,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
    */
   public function create_insertSingleDocument_returnsTrue() {
 
-    $result = $this->_DB->create('questions', $this->_sampleDocumentOne);
+    $result = $this->_DB->create('samples', $this->_sampleDocumentOne);
     $this->assertTrue($result);
   }
 
@@ -67,7 +67,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
    */
   public function create_insertMultipleDocuments_returnsTrue() {
 
-    $result = $this->_DB->create('questions', array(
+    $result = $this->_DB->create('samples', array(
       $this->_sampleDocumentTwo,
       $this->_sampleDocumentThree,
     ));
@@ -81,7 +81,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
   public function create_insertStandardObjectAsDocument_returnsSpecificString() {
 
     $object = new stdClass();
-    $result = $this->_DB->create('questions', $object);
+    $result = $this->_DB->create('samples', $object);
     $this->assertSame(
       'Document variable invalid: supply an array of associate arrays, or a single assoc. array',
       $result
@@ -107,7 +107,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
    */
   public function read_getAllDocumentsInCollection_arraySizeThree() {
 
-    $documents = $this->_DB->read('questions', 'ALL DOCUMENTS');
+    $documents = $this->_DB->read('samples', 'ALL DOCUMENTS');
     $this->assertEquals(3, count($documents));
   }
 
@@ -117,7 +117,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
    */
   public function read_getSpecificDocument_arraySizeOne() {
 
-    $documents = $this->_DB->read('questions', array('name' => 'sample two'));
+    $documents = $this->_DB->read('samples', array('name' => 'sample two'));
     $this->assertEquals(1, count($documents));
   }
 
@@ -128,7 +128,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
   public function read_getDocumentsInvalidConditions_returnsSpecificString() {
 
     $object = new stdClass();
-    $result = $this->_DB->read('questions', $object);
+    $result = $this->_DB->read('samples', $object);
     $this->assertSame(
       'Read conditions are invalid: supply a valid associative array or \'ALL DOCUMENTS\'',
       $result
@@ -142,7 +142,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
   public function update_changeDocumentValues_returnsTrue() {
 
     $result = $this->_DB->update(
-      'questions',
+      'samples',
       array(
         'extra' => 'document extra property'
       ),
@@ -159,7 +159,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
    */
   public function update_attemptUpdateNoConditionsOrUpdates_returnsSpecificString() {
 
-    $result = $this->_DB->update('questions');
+    $result = $this->_DB->update('samples');
     $this->assertSame(
       'Updates and Conditions are invalid: supply two valid associative arrays',
       $result
@@ -172,7 +172,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
    */
   public function delete_deleteSingleRecord_returnsTrue() {
 
-    $result = $this->_DB->delete('questions', array(
+    $result = $this->_DB->delete('samples', array(
       'name' => 'sample three'
     ));
     $this->assertTrue($result);
@@ -184,7 +184,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
    */
   public function delete_dropCollection_returnsTrue() {
 
-    $result = $this->_DB->delete('questions', 'DROP COLLECTION');
+    $result = $this->_DB->delete('samples', 'DROP COLLECTION');
     $this->assertTrue($result);
   }
 
@@ -208,7 +208,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
   public function delete_attemptWithInvalidSecondParam_returnsSpecificString() {
 
     $object = new stdClass();
-    $result = $this->_DB->delete('questions', $object);
+    $result = $this->_DB->delete('samples', $object);
     $this->assertSame(
       'Delete conditions are invalid: supply a valid associative array or \'DROP COLLECTION\'',
       $result

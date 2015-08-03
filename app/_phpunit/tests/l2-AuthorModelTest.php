@@ -10,8 +10,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   private $_DB,
     $_AuthorModel,
     $_testQuestionAuthorId,
-    $_testTestAuthorId,
-    $_commonQuestionIds;
+    $_testTestAuthorId;
 
   /**
    *  Constructor
@@ -23,7 +22,6 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
     $this->_AuthorModel = new AuthorModel();
     $this->_testQuestionAuthorId = '247tnfn2303u54093nf3';
     $this->_testTestAuthorId = 'hgrn93y89543hgnrsdnbgo';
-    $this->_commonQuestionIds = array();
   }
 
   ##########################################################
@@ -42,7 +40,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
       'statement' => 'The capital city of France is Paris.',
       'singleAnswer' => 'TRUE',
       'feedbackCorrect' => 'It is indeed, well done.',
-      'feedbackIncorrect' => 'Don\'t worry, geography wasn\'t my strongest subject either.'
+      'feedbackIncorrect' => 'Don\'t worry, it\'s an easy mistake to make.'
     ));
     $this->assertTrue($result);
   }
@@ -344,7 +342,6 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
     // get questions & get id's
     $documents = $this->_AuthorModel->getQuestions($this->_testTestAuthorId);
     $questionIds = array_keys($documents);
-    $this->_commonQuestionIds = $questionIds;
 
     // create test
     $result = $this->_AuthorModel->createTest(array(
@@ -496,6 +493,67 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
     $this->assertFalse($result);
   }
 
+  // /**
+  //  *  @test
+  //  *  Make test available to a valid user
+  //  */
+  // public function makeTestAvailableToUser_validUserAssociation_methodReturnsTrue() {
+  //
+  //   // get test created earlier & turn into MongoId
+  //   $test = $this->_DB->read('tests', array(
+  //     'author' => $this->_testTestAuthorId
+  //   ));
+  //   $testId = new MongoId(key($test));
+  //
+  //   // create a user & turn into MongoId
+  //   $userModel = new UserModel();
+  //   $userModel->createUser('jeeves', 'password123');
+  //   $user = $this->_DB->read('users', array(
+  //     'username' => 'jeeves'
+  //   ));
+  //   $studentId = new MongoId(key($user));
+  //
+  //   $result = $this->_AuthorModel->makeTestAvailableToUser($testId, $studentId);
+  //   $this->assertTrue($result);
+  // }
+  //
+  // /**
+  //  *  @test
+  //  *  Attempt to make test available to invalid user id
+  //  */
+  // public function makeTestAvailableToUser_invalidUserId_methodReturnsFalse() {
+  //
+  //   $test = $this->_DB->read('tests', array(
+  //     'author' => $this->_testTestAuthorId
+  //   ));
+  //   $testId = new MongoId(key($test));
+  //
+  //   $result = $this->_AuthorModel->makeTestAvailableToUser($testId, 'rfu9320fn3o2wno');
+  //   $this->assertFalse($result);
+  // }
+  //
+  // /**
+  //  *  @test
+  //  *  Attempt to make test available to a user that has already taken the test
+  //  */
+  // public function makeTestAvailableToUser_userAlreadyTakenTest_methodReturnsFalse() {
+  //
+  //   $test = $this->_DB->read('tests', array(
+  //     'author' => $this->_testTestAuthorId
+  //   ));
+  //   $testId = new MongoId(key($test));
+  //
+  //   // get user that would have already taken the test
+  //   $user = $this->_DB->read('users', array(
+  //     'username' => 'jeeves'
+  //   ));
+  //   $studentId = new MongoId(key($user));
+  //
+  //   // update the test document to reflect that the user has taken the test
+  //   $result = $this->_DB->update('tests', array('_id' => $testId), array("taken" => key($user)));
+  //   print_r($result);
+  // }
+
   /**
    *  @test
    *  Attempt to delete a test with an author ID that doesn't match
@@ -552,12 +610,13 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
 
   /**
    *  @test
-   *  Drop Questions and Tests collections (reset for later testing)
+   *  Drop Questions, Tests and Users collections (reset for later testing)
    */
   public function _dropCollections_methodsReturnsTrue() {
 
     $dropQuestionsResult = $this->_DB->delete('questions', 'DROP COLLECTION');
     $dropTestsResult = $this->_DB->delete('tests', 'DROP COLLECTION');
-    $this->assertTrue($dropQuestionsResult && $dropTestsResult);
+    //$dropUsersResult = $this->_DB->delete('users', 'DROP COLLECTION');
+    $this->assertTrue($dropQuestionsResult && $dropTestsResult); //&& $dropUsersResult);
   }
 }

@@ -190,6 +190,10 @@ class AuthorModel {
       // any remaining data is not part of the schema, fail the operation
       if (!empty($test)) return false;
 
+      // add arrays for making tests available to users and keeping track of who has taken them
+      $document['available'] = array();
+      $document['taken'] = array();
+
       // otherwise the test provided was valid, return the result of the DB operation
       return $this->_DB->create('tests', $document);
     }
@@ -237,6 +241,23 @@ class AuthorModel {
           // return the result of the update operation
           return $this->_DB->update('tests', array('_id' => $testIdObj), $update);
       }
+    }
+
+    return false;
+  }
+
+  /**
+   *  MAKE A TEST AVAILABLE TO A USER
+   *
+   *  @return
+   */
+  public function makeTestAvailableToUser($testIdObj, $studentIdObj) {
+
+    // check testIdObj and studentIdObj are MongoIds
+    if (is_a($testIdObj, 'MongoId') && is_a($studentIdObj, 'MongoId')) {
+
+
+
     }
 
     return false;
