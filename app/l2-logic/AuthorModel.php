@@ -8,10 +8,10 @@
  */
 class AuthorModel {
 
-  // store DB utility question and test schema as instance variables
+  // store DB utility, question and test schema as instance variables
   private $_DB,
-    $_questionSchema,
-    $_testSchema;
+    $_QuestionSchema,
+    $_TestSchema;
 
   /**
    *  Constructor
@@ -22,26 +22,9 @@ class AuthorModel {
     // store instance of DB class for CRUD operations
     $this->_DB = DB::getInstance();
 
-    // define question schema: restrict document structure of questions
-    $this->_questionSchema = array(
-      "boolean" => array(
-        "schema" => "required",
-        "author" => "required",
-        "statement" => "required",
-        "singleAnswer" => "required",
-        "feedbackCorrect" => "optional",
-        "feedbackIncorrect" => "optional"
-      )
-    );
-
-    // define test schema: restrict document structure of tests
-    $this->_testSchema = array(
-      "standard" => array(
-        "schema" => "required",
-        "author" => "required",
-        "questions" => "required"
-      )
-    );
+    // import question and test schema: restrict document structure of questions
+    $this->_QuestionSchema = new QuestionSchema();
+    $this->_TestSchema = new TestSchema();
   }
 
   #############################################
@@ -57,13 +40,13 @@ class AuthorModel {
 
     // fail the operation if the user did not provide a schema key, otherwise check if schema is recognised
     if (!isset($question["schema"])) return false;
-    if (array_key_exists($question["schema"], $this->_questionSchema)) {
+    if (in_array($question["schema"], $this->_QuestionSchema->getSchemaList())) {
 
       // prepare document to insert (valid data will be transfered to this new variable)
       $document = array();
 
       // loop through each schema property
-      foreach ($this->_questionSchema[$question["schema"]] as $sProperty => $sRequirement) {
+      foreach ($this->_QuestionSchema->getSchema($question["schema"]) as $sProperty => $sRequirement) {
 
         // if a required property was not provided, fail the operation
         if ($sRequirement === "required" && !isset($question[$sProperty])) return false;
@@ -117,9 +100,9 @@ class AuthorModel {
       $document = $this->_DB->read("questions", array("_id" => $questionIdObj));
       $schema = $document[key($document)]["schema"];
 
-      // only continue if the update complies with the schema AND it isn"t an author update
-      if (array_key_exists(key($update), $this->_questionSchema[$schema])
-        && key($update) !== "author") {
+      // only continue if the update complies with the schema AND it isn't an author or schema update
+      if (array_key_exists(key($update), $this->_QuestionSchema->getSchema($schema))
+        && key($update) !== "author" && key($update) !== "schema") {
 
         // return the result of the update operation
         return $this->_DB->update("questions", array("_id" => $questionIdObj), $update);
@@ -167,13 +150,13 @@ class AuthorModel {
 
     // fail the operation if the user did not provide a schema key, otherwise check if schema is recognised
     if (!isset($test["schema"])) return false;
-    if (array_key_exists($test["schema"], $this->_testSchema)) {
+    if (in_array($test["schema"], $this->_TestSchema->getSchemaList())) {
 
       // prepare document to insert (valid data will be transfered to this new variable)
       $document = array();
 
       // loop through each schema property
-      foreach ($this->_testSchema[$test["schema"]] as $tProperty => $tRequirement) {
+      foreach ($this->_TestSchema->getSchema($test["schema"]) as $tProperty => $tRequirement) {
 
         // if a required property was not provided, fail the operation
         if ($tRequirement === "required" && !isset($test[$tProperty])) return false;
@@ -231,9 +214,9 @@ class AuthorModel {
       if (isset($update["questions"]))
         if (!is_array($update["questions"])) return false;
 
-      // only continue if update complies with schema AND it isn"t an author update
-      if (array_key_exists(key($update), $this->_testSchema[$schema])
-        && key($update) !== "author") {
+      // only continue if update complies with schema AND it isn't an author or schema update
+      if (array_key_exists(key($update), $this->_TestSchema->getSchema($schema))
+        && key($update) !== "author" && key($update) !== "schema") {
 
           // return the result of the update operation
           return $this->_DB->update("tests", array("_id" => $testIdObj), $update);

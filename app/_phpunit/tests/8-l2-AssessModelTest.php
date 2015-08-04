@@ -202,10 +202,10 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
     // TODO complete me
   }
 
-  /**
+  /*
    *  @test
    *  Start the test loaded as instance variable in AssessModel
-   */
+
   public function startTestGetJSONData_startNewTest_methodReturnsTrue() {
 
     $this->_UserModel->findUser("testStudent");
@@ -223,6 +223,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
       $result
     );
   }
+  */
 
   /**
    *  @test
