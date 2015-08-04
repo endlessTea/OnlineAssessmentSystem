@@ -3,6 +3,7 @@
 /**
  *  AUTHORMODEL.PHP
  *  Create, get, update and delete questions and tests
+ *  Register users to be eligible to take tests
  *  @author Jonathan Lamb
  */
 class AuthorModel {
@@ -69,7 +70,7 @@ class AuthorModel {
 
         // if property is required or property is optional AND there is a value that can be used
         if ($sRequirement === "required" ||
-         ($sRequirement === "optional" && isset($question[$sProperty]))) {
+          ($sRequirement === "optional" && isset($question[$sProperty]))) {
 
           // copy item from the question to the insertion document and remove it from question array
           $document[$sProperty] = $question[$sProperty];
@@ -244,7 +245,7 @@ class AuthorModel {
 
   /**
    *  MAKE A TEST AVAILABLE TO A USER
-   *
+   *  Register a user id with a test so they may take it
    *  @return true (boolean) on success, else false
    */
   public function makeTestAvailableToUser($testIdObj, $studentIdObj) {
