@@ -24,6 +24,8 @@ class AppModel {
 
       $this->_testMode = false;
     }
+
+    $this->_SG = new SG();
   }
 
   /**
@@ -32,7 +34,7 @@ class AppModel {
    *  @return escaped data from $_GET
    */
   public function getGETData($key) {
-    return SG::get($key, "escape");
+    return $this->_SG->get($key, "escape");
   }
 
   /**
@@ -41,7 +43,7 @@ class AppModel {
    *  @return array of values signifying which controller, action and parameters to use
    */
   public function getURL() {
-    return SG::get("url");
+    return $this->_SG->get("url");
   }
 
   /**
@@ -50,7 +52,7 @@ class AppModel {
    *  @return escaped data from $_POST
    */
   public function getPOSTData($key) {
-    return SG::post($key, "escape");
+    return $this->_SG->post($key, "escape");
   }
 
   /**

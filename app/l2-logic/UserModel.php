@@ -12,6 +12,7 @@ class UserModel {
 
   // store DB utility, update restrictions, user data and login status as instance variables
   private $_DB,
+    $_SG,
     $_updateProperties,
     $_userData,
     $_loginStatus;
@@ -22,8 +23,9 @@ class UserModel {
    */
   public function __construct() {
 
-    // store instance of DB class for CRUD operations
+    // store instance of DB class for CRUD operations and SG access object
     $this->_DB = DB::getInstance();
+    $this->_SG = new SG();
 
     // define which fields may be updated
     $this->_updateProperties = array(
@@ -31,7 +33,7 @@ class UserModel {
     );
 
     // if an existing session exists..
-    if (SG::session("user", "exists")) {
+    if ($this->_SG->session("user", "exists")) {
 
       // attempt to convert to MongoId Object and check if the user exists..
       try {
@@ -167,7 +169,7 @@ class UserModel {
       if ($this->getUserData()->hash === $this->makeHash($password, $this->getUserData()->salt)) {
 
         // create session for user, change login status, return true
-        SG::session("user", "put", $this->getUserData()->userId);
+        $this->_SG->session("user", "put", $this->getUserData()->userId);
         $this->_loginStatus = true;
         return true;
       }
@@ -181,7 +183,7 @@ class UserModel {
    *  @return true (boolean) on success, else false
    */
   public function logUserOut() {
-    return SG::session("user", "delete");
+    return $this->_SG->session("user", "delete");
   }
 
   /**

@@ -8,6 +8,14 @@
 class SG {
 
   /**
+   *  Constructor
+   */
+  public function __construct() {
+
+    // no instance variables to initialise
+  }
+
+  /**
    *  $_GET
    *  Allows escaped or dangerous input to be obtained
    *  Split URL method part of the 'Application' class in MINI PHP
@@ -16,7 +24,7 @@ class SG {
    *  @license http://opensource.org/licenses/MIT MIT License
    *  @return escaped input, array of values for controller/action/params, or unfiltered values in $_GET
    */
-  public static function get($key, $usage = null) {
+  public function get($key, $usage = null) {
 
     if ($usage === "escape") {
 
@@ -61,7 +69,7 @@ class SG {
    *  Allows escaped or dangerous input to be obtained
    *  @return escaped input or dangerous input from $_POST
    */
-  public static function post($key, $usage = null) {
+  public function post($key, $usage = null) {
 
     if ($usage === "escape") {
 
@@ -76,8 +84,6 @@ class SG {
     return "Unrecognised usage: please specify 'escape' or 'dangerous'";
   }
 
-  // SESSION - exists, put, get, delete
-
   /**
    *  $_SESSION
    *  Re-implementation of the 'Session' class from PHP Academy's OOP Login System
@@ -85,7 +91,7 @@ class SG {
    *  @link https://github.com/adamaoc/login_reg
    *  @license None
    */
-  public static function session($name, $usage = null, $value = null) {
+  public function session($name, $usage = null, $value = null) {
 
     if ($usage === "exists") {
 
@@ -102,7 +108,7 @@ class SG {
 
     } elseif ($usage === "delete") {
 
-      if (SG::session($name, "exists")) {
+      if ($this->session($name, "exists")) {
       	unset($_SESSION[$name]);
         return true;
       }
