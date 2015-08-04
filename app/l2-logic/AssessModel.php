@@ -9,6 +9,7 @@ class AssessModel {
 
   // store DB utility as instance variable
   private $_DB,
+    $_QuestionSchema,
     $_testDocument,
     $_studentId,
     $_testStarted,
@@ -23,6 +24,9 @@ class AssessModel {
 
     // store instance of DB class for CRUD operations
     $this->_DB = DB::getInstance();
+
+    // import schema
+    $this->_QuestionSchema = new QuestionSchema();
   }
 
   /**
@@ -75,9 +79,12 @@ class AssessModel {
         $this->_questionsFull[] = $document;
       }
 
-      // TODO: convert full questions to presentable JSON format
+      // covert question set into JSON format for assessment; store as instance variable
+      $this->_questionsJSON = $this->convertQuestionsToJSON();
 
-      if ($this->_testDocument != null && $this->_studentId != null) return true;
+      if ($this->_testDocument != null
+        && !empty($this->_questionsFull) 
+        && $this->_questionsJSON !== false) return true;
     }
 
     throw new Exception("Invalid test identifier / MongoId");
@@ -91,9 +98,34 @@ class AssessModel {
    */
   public function convertQuestionsToJSON() {
 
-    if (isset($this->questionsFull)) {
+    if (isset($this->_questionsFull)) {
 
-      
+      // create a base object and question counter
+      $questionRoot = new stdClass();
+      $questionNo = 0;
+
+      foreach ($this->_questionsFull as $fullQuestion) {
+
+        $questionRoot->{$questionNo} = new stdClass();
+        $questionRoot->{$questionNo}->schema = $fullQuestion["schema"];
+
+        // create additional object properties based on recognised schemas
+        switch ($fullQuestion["schema"]) {
+
+          case "boolean":
+            $questionRoot->{$questionNo}->statement = $fullQuestion["statement"];
+            break;
+
+          default:
+            throw new Exception("The question schema '{$fullQuestion["schema"]}' has not been implemented");
+        }
+
+        // increment question number
+        $questionNo++;
+      }
+
+      // return json encoded, reduced question set
+      return json_encode($questionRoot);
     }
 
     throw new Exception("Test questions have not been initialised");
@@ -112,7 +144,7 @@ class AssessModel {
       // stop operation if the test has been started already, otherwise change the start indicator
       if ($this->_testStarted) return false;
       $this->_testStarted = true;
-      return "dataForUser";
+      return $this->_questionsJSON;
     }
 
     throw new Exception("Test has not been initialised");

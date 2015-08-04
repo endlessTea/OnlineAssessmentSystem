@@ -199,13 +199,28 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
    */
   public function convertQuestionsToJSON_convertValidQuestions_methodReturnsTrue() {
 
-    // TODO complete me
+    // prepare test and load data
+    $this->_UserModel->findUser("testStudent");
+    $studentId = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("testAuthor");
+    $authorId = $this->_UserModel->getUserData()->userId;
+    $testId = key($this->_DB->read("tests", array("author" => $authorId)));
+    $this->_AssessModel->loadTest(new MongoId($testId), $studentId);
+
+    // attempt conversion
+    $result = $this->_AssessModel->convertQuestionsToJSON();
+    $this->assertSame(
+      "{\"0\":{\"schema\":\"boolean\",\"statement\":\"This sentence contains no vowels\"}," .
+      "\"1\":{\"schema\":\"boolean\",\"statement\":\"This sentence contains 10 vowels\"}," .
+      "\"2\":{\"schema\":\"boolean\",\"statement\":\"This sentence contains a jam sandwich\"}}",
+      $result
+    );
   }
 
-  /*
+  /**
    *  @test
    *  Start the test loaded as instance variable in AssessModel
-
+   */
   public function startTestGetJSONData_startNewTest_methodReturnsTrue() {
 
     $this->_UserModel->findUser("testStudent");
@@ -219,11 +234,13 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
 
     $result = $this->_AssessModel->startTestGetJSONData();
     $this->assertSame(
-      "",
+      "{\"0\":{\"schema\":\"boolean\",\"statement\":\"This sentence contains no vowels\"}," .
+      "\"1\":{\"schema\":\"boolean\",\"statement\":\"This sentence contains 10 vowels\"}," .
+      "\"2\":{\"schema\":\"boolean\",\"statement\":\"This sentence contains a jam sandwich\"}}",
       $result
     );
   }
-  */
+
 
   /**
    *  @test
@@ -237,8 +254,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
     $authorId = $this->_UserModel->getUserData()->userId;
     $testId = key($this->_DB->read("tests", array("author" => $authorId)));
     $this->_AssessModel->loadTest(new MongoId($testId), $studentId);
-    $result = $this->_AssessModel->startTestGetJSONData();
-
+    $this->_AssessModel->startTestGetJSONData();
     $this->assertFalse($this->_AssessModel->startTestGetJSONData());
   }
 
