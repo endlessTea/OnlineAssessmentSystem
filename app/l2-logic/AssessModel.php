@@ -12,7 +12,7 @@ class AssessModel {
     $_QuestionSchema,
     $_testDocument,
     $_studentId,
-    $_testStarted,
+    $_expectingAnswers,
     $_questionsFull,
     $_questionsJSON;
 
@@ -27,6 +27,9 @@ class AssessModel {
 
     // import schema
     $this->_QuestionSchema = new QuestionSchema();
+
+    // do not anticipate answers unless set by defined methods
+    $this->_expectingAnswers = false;
   }
 
   /**
@@ -83,7 +86,7 @@ class AssessModel {
       $this->_questionsJSON = $this->convertQuestionsToJSON();
 
       if ($this->_testDocument != null
-        && !empty($this->_questionsFull) 
+        && !empty($this->_questionsFull)
         && $this->_questionsJSON !== false) return true;
     }
 
@@ -133,7 +136,7 @@ class AssessModel {
 
   /**
    *  START TEST
-   *  Return an indication of
+   *  Change the boolean flag to indicate that the test has been started, or check if the test has already started
    *  @return JSON of test data (questions only), else return false to indicate test was already stated
    *  @throws Exception if test has not been initialised as an instance variable
    */
@@ -142,8 +145,9 @@ class AssessModel {
     if (isset($this->_testDocument)) {
 
       // stop operation if the test has been started already, otherwise change the start indicator
-      if ($this->_testStarted) return false;
-      $this->_testStarted = true;
+      if ($this->_expectingAnswers) return false;
+      $this->_expectingAnswers = true;
+
       return $this->_questionsJSON;
     }
 
@@ -151,12 +155,94 @@ class AssessModel {
   }
 
   /**
-   *  UPDATE TEST ANSWERS
-   *
+   *  PROCESS QUESTION ANSWERS
+   *  Update answers to questions if the user's input is valid, test has been started and answers are expected
+   *  @return true (boolean) on success, else false
    */
-  public function updateTestAnswers() {
+  public function updateTestAnswers($answers) {
 
-    // check if the test was already submitted...
+    // check if answers are expect and if variable is valid object that can be processed
+    if ($this->_expectingAnswers) {
+      if (is_object($answers)) {
+
+        // keep track of the number of correctly answered questions
+        $totalCorrect = 0;
+
+        foreach ($this->_questionsFull as $qNo => $fullQuestion) {
+
+          // fail the operation if the question doesn't exist
+          if (!isset($answers->{$qNo})) return false;
+
+          // check if an 'understanding of question' was provided and if the values are valid
+          if (!isset($answers->{$qNo}->{'uq'})) return false;
+          if ($answers->{$qNo}->{'uq'} !== 0 && $answers->{$qNo}->{'uq'} !== 1) return false;
+
+          // check if an answer was provided at all
+          if (!isset($answers->{$qNo}->{'ans'})) return false;
+
+          // Check value of and mark answer
+          switch ($fullQuestion["schema"]) {
+
+            case "boolean":
+
+              // answer must be 'TRUE' or 'FALSE' only; mark according to $fullQuestion's 'singleAnswer'
+              if ($answers->{$qNo}->{'ans'} !== 'TRUE' && $answers->{$qNo}->{'ans'} !== 'FALSE') return false;
+              if ($answers->{$qNo}->{'ans'} === $fullQuestion["singleAnswer"]) {
+
+                $correct = 1;
+                $totalCorrect++;
+
+              } else {
+
+                $correct = 0;
+              }
+
+              $convertedResponse = array(
+                "uq" => $answers->{$qNo}->{'uq'},
+                "ca" => $correct
+              );
+              break;
+
+            default:
+              throw new Exception("The question schema '{$fullQuestion["schema"]}' has not been implemented");
+          }
+
+          // copy and update the question's "taken" array if it exists, otherwise create a new one to insert
+          if (isset($fullQuestion["taken"])) {
+
+            $takenQuestionArray = $fullQuestion["taken"];
+            $takenQuestionArray[$this->_studentId] = $convertedResponse;
+
+          } else {
+
+            $takenQuestionArray = array($this->_studentId => $convertedResponse);
+          }
+
+          // Update Question: if the operation fails for any question, throw an Exception
+          if (!$this->_DB->update("questions", array("_id" => $fullQuestion["_id"]), array("taken" => $takenQuestionArray)))
+            throw new Exception("The following question update failed: " . implode($takenQuestionArray));
+        }
+
+        // copy and update the tests's "taken" array if it exists, otherwise create a new one to insert
+        if (isset($this->_testDocument["taken"])) {
+
+          $takenTestArray = $this->_testDocument["taken"];
+          $takenTestArray[$this->_studentId] = $totalCorrect;
+
+        } else {
+
+          $takenTestArray = array($this->_studentId => $convertedResponse);
+        }
+
+        // Update Test: if the operation fails for any question, throw an Exception
+        if (!$this->_DB->update("tests", array("_id" => $this->_testDocument["_id"]), array("taken" => $takenTestArray)))
+          throw new Exception("The following test update failed: " . implode($takenTestArray));
+
+        return true;
+      }
+    }
+
+    return false;
   }
 
 }

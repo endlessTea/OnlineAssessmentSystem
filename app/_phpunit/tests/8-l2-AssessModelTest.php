@@ -257,6 +257,191 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
 
   /**
    *  @test
+   *  Submit answers to a test (valid)
+   */
+  public function updateTestAnswers_submitAnswersValidInput_methodReturnsTrueDocumentUpdated() {
+
+    // load test and start
+    $this->_UserModel->findUser("testStudent");
+    $studentId = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("testAuthor");
+    $authorId = $this->_UserModel->getUserData()->userId;
+    $testId = key($this->_DB->read("tests", array("author" => $authorId)));
+    $this->_AssessModel->loadTest(new MongoId($testId), $studentId);
+    $this->_AssessModel->startTestGetJSONData();
+
+    // prepare answers (simulate PHP representation of JSON data)
+    $input = new stdClass();
+    $input->{0} = new stdClass();
+    $input->{0}->{'uq'} = 1;    // this is an incorrect answer to a question...
+    $input->{0}->{'ans'} = 'TRUE';
+    $input->{1} = new stdClass();
+    $input->{1}->{'uq'} = 1;
+    $input->{1}->{'ans'} = 'FALSE';
+    $input->{2} = new stdClass();
+    $input->{2}->{'uq'} = 0;
+    $input->{2}->{'ans'} = 'FALSE';
+
+    $this->assertTrue($this->_AssessModel->updateTestAnswers($input));
+
+    // check that the user's answer was marked and the question document was updated
+    $questionToCheck = array_pop($this->_DB->read("questions", array("statement" => "This sentence contains no vowels")));
+    $this->assertSame(
+      0,
+      $questionToCheck["taken"][$studentId]["ca"]
+    );
+
+    // check that the test document has been updated as well containing the total number of correct answers
+    $testToCheck = array_pop($this->_DB->read("tests", array("author" => $authorId)));
+    $this->assertSame(
+      1,
+      $testToCheck["taken"][$studentId]
+    );
+  }
+
+  /**
+   *  @test
+   *  Attempt to submit answers to a test when they are not expected
+   */
+  public function updateTestAnswers_submitAnswersNotExpected_methodReturnsFalse() {
+
+    // prepare answers (simulate PHP representation of JSON data)
+    $input = new stdClass();
+    $input->{0} = new stdClass();
+    $input->{0}->{'uq'} = 1;
+    $input->{0}->{'ans'} = 'TRUE';
+    $input->{1} = new stdClass();
+    $input->{1}->{'uq'} = 1;
+    $input->{1}->{'ans'} = 'FALSE';
+    $input->{2} = new stdClass();
+    $input->{2}->{'uq'} = 0;
+    $input->{2}->{'ans'} = 'FALSE';
+
+    $this->assertFalse($this->_AssessModel->updateTestAnswers($input));
+  }
+
+  /**
+   *  @test
+   *  Attempt to submit invalid JSON as answers to a test
+   */
+  public function updateTestAnswers_submitInvalidInput_methodReturnsFalse() {
+
+    $this->assertFalse($this->_AssessModel->updateTestAnswers($input = "Invalid JSON: Syntax error"));
+  }
+
+  /**
+   *  @test
+   *  Attempt to submit mising question (root + answer and 'understanding of question')
+   */
+  public function updateTestAnswers_missingQuestion_methodReturnsFalse() {
+
+    // load test and start
+    $this->_UserModel->findUser("testStudent");
+    $studentId = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("testAuthor");
+    $authorId = $this->_UserModel->getUserData()->userId;
+    $testId = key($this->_DB->read("tests", array("author" => $authorId)));
+    $this->_AssessModel->loadTest(new MongoId($testId), $studentId);
+    $this->_AssessModel->startTestGetJSONData();
+
+    // prepare answers (simulate PHP representation of JSON data)
+    $input = new stdClass();
+    $input->{0} = new stdClass();
+    $input->{0}->{'uq'} = 1;
+    $input->{0}->{'ans'} = 'TRUE';
+    $input->{2} = new stdClass();
+    $input->{2}->{'uq'} = 0;
+    $input->{2}->{'ans'} = 'FALSE';
+
+    $this->assertFalse($this->_AssessModel->updateTestAnswers($input));
+  }
+
+  /**
+   *  @test
+   *  Attempt to submit a single missing answer or 'understanding of question'
+   */
+  public function updateTestAnswers_missingAnswerOrUQ_methodReturnsFalse() {
+
+    // load test and start
+    $this->_UserModel->findUser("testStudent");
+    $studentId = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("testAuthor");
+    $authorId = $this->_UserModel->getUserData()->userId;
+    $testId = key($this->_DB->read("tests", array("author" => $authorId)));
+    $this->_AssessModel->loadTest(new MongoId($testId), $studentId);
+    $this->_AssessModel->startTestGetJSONData();
+
+    // prepare answers (simulate PHP representation of JSON data)
+    $inputOne = new stdClass();
+    $inputOne->{0} = new stdClass();
+    $inputOne->{0}->{'uq'} = 1;    // missing answer
+    $inputOne->{1} = new stdClass();
+    $inputOne->{1}->{'uq'} = 1;
+    $inputOne->{1}->{'ans'} = 'FALSE';
+    $inputOne->{2} = new stdClass();
+    $inputOne->{2}->{'uq'} = 0;
+    $inputOne->{2}->{'ans'} = 'FALSE';
+
+    $this->assertFalse($this->_AssessModel->updateTestAnswers($inputOne));
+
+    $inputTwo = new stdClass();
+    $inputTwo->{0} = new stdClass();
+    $inputTwo->{0}->{'uq'} = 1;
+    $inputTwo->{0}->{'ans'} = 'TRUE';
+    $inputTwo->{1} = new stdClass();
+    $inputTwo->{1}->{'uq'} = 1;
+    $inputTwo->{1}->{'ans'} = 'FALSE';
+    $inputTwo->{2} = new stdClass();
+    $inputTwo->{2}->{'ans'} = 'FALSE';   // missing 'understanding of question'
+
+    $this->assertFalse($this->_AssessModel->updateTestAnswers($inputTwo));
+  }
+
+  /**
+   *  @test
+   *  Attempt to submit an invalid answer or 'understanding of question'
+   */
+  public function updateTestAnswers_invalidAnswerOrUQ_methodReturnsFalse() {
+
+    // load test and start
+    $this->_UserModel->findUser("testStudent");
+    $studentId = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("testAuthor");
+    $authorId = $this->_UserModel->getUserData()->userId;
+    $testId = key($this->_DB->read("tests", array("author" => $authorId)));
+    $this->_AssessModel->loadTest(new MongoId($testId), $studentId);
+    $this->_AssessModel->startTestGetJSONData();
+
+    // prepare answers (simulate PHP representation of JSON data)
+    $inputOne = new stdClass();
+    $inputOne->{0} = new stdClass();
+    $inputOne->{0}->{'uq'} = 1;
+    $inputOne->{0}->{'ans'} = 'goats';   // invalid answer
+    $inputOne->{1} = new stdClass();
+    $inputOne->{1}->{'uq'} = 1;
+    $inputOne->{1}->{'ans'} = 'FALSE';
+    $inputOne->{2} = new stdClass();
+    $inputOne->{2}->{'uq'} = 0;
+    $inputOne->{2}->{'ans'} = 'FALSE';
+
+    $this->assertFalse($this->_AssessModel->updateTestAnswers($inputOne));
+
+    $inputTwo = new stdClass();
+    $inputTwo->{0} = new stdClass();
+    $inputTwo->{0}->{'uq'} = 1;
+    $inputTwo->{0}->{'ans'} = 'TRUE';
+    $inputTwo->{1} = new stdClass();
+    $inputTwo->{1}->{'uq'} = 2;        // invalid 'understanding of question'
+    $inputTwo->{1}->{'ans'} = 'FALSE';
+    $inputTwo->{2} = new stdClass();
+    $inputTwo->{2}->{'uq'} = 0;
+    $inputTwo->{2}->{'ans'} = 'FALSE';
+
+    $this->assertFalse($this->_AssessModel->updateTestAnswers($inputTwo));
+  }
+
+  /**
+   *  @test
    *  Drop Questions, Tests and Users collections (reset for later testing)
    */
   public function _dropCollections_methodsReturnTrue() {
