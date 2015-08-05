@@ -230,8 +230,6 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
     $testId = key($this->_DB->read("tests", array("author" => $authorId)));
     $this->_AssessModel->loadTest(new MongoId($testId), $studentId);
 
-    // TODO complete me
-
     $result = $this->_AssessModel->startTestGetJSONData();
     $this->assertSame(
       "{\"0\":{\"schema\":\"boolean\",\"statement\":\"This sentence contains no vowels\"}," .
@@ -240,7 +238,6 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
       $result
     );
   }
-
 
   /**
    *  @test
