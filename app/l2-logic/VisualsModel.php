@@ -2,27 +2,33 @@
 
 /**
  *  VISUALSMODEL.PHP
- *
+ *  Returns data required for visualisation of performance and question/feedback understanding
  *  @author Jonathan Lamb
  */
 class VisualsModel {
 
-  // GET STUDENT PERFORMANCE, SINGLE QUESTION
+  // store DB utility as instance variable
+  private $_DB;
 
-  // GET STUDENT PERFORMANCE, SINGLE TEST
+  /**
+   *  Constructor
+   *  Initialise instance variables
+   */
+  public function __construct() {
 
-  // GET STUDENT PERFORMANCE, ALL TESTS
+    // store instance of DB class for CRUD operations
+    $this->_DB = DB::getInstance();
+  }
 
-  // GET CLASS PERFORMANCE, SINGLE QUESTION
-
-  // GET CLASS PERFORMANCE, SINGLE TEST
-
-  // GET CLASS PERFORMANCE, ALL TESTS
-
-  // GET FEEDBACK, SINGLE QUESTION
-
-  // GET FEEDBACK, SINGLE TEST
-
-  // GET FEEDBACK, ALL TESTS
-
+  /*        VISUALISATION REQUIREMENTS
+    // GET STUDENT PERFORMANCE, SINGLE QUESTION
+    // GET STUDENT PERFORMANCE, SINGLE TEST
+    // GET STUDENT PERFORMANCE, ALL TESTS - IDEA: Scatterplot, single colour
+    // GET CLASS PERFORMANCE, SINGLE QUESTION
+    // GET CLASS PERFORMANCE, SINGLE TEST - IDEA: Scatterplot, single colour
+    // GET CLASS PERFORMANCE, ALL TESTS - IDEA: Scatterplot, multiple colours
+    // GET FEEDBACK, SINGLE QUESTION
+    // GET FEEDBACK, SINGLE TEST
+    // GET FEEDBACK, ALL TESTS
+  */
 }

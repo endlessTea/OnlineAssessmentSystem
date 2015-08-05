@@ -24,22 +24,30 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
 
   /**
    *  @test
-   *  Confirm start AND create database entries ONCE only
    */
   public function _confirmStart() {
     print_r(" - start of AssessModel Test -  \n");
+  }
+
+  /**
+   *  @test
+   *  Create required MongoDB entries once only
+   */
+  public function _createMongoDBentries_methodsReturnTrue() {
 
     // create users
     $this->_UserModel->createUser("testAuthor", "password");
+    $this->_UserModel->createUser("testStudent", "password");
+    $this->_UserModel->createUser("testStudent2", "password");
+    $this->_UserModel->createUser("testStudent3", "password");
+
+    // get user id's
     $this->_UserModel->findUser("testAuthor");
     $authorId = $this->_UserModel->getUserData()->userId;
-    $this->_UserModel->createUser("testStudent", "password");
     $this->_UserModel->findUser("testStudent");
     $studentIdAvailable = $this->_UserModel->getUserData()->userId;
-    $this->_UserModel->createUser("testStudent2", "password");
     $this->_UserModel->findUser("testStudent2");
     $studentIdTaken = $this->_UserModel->getUserData()->userId;
-    $this->_UserModel->createUser("testStudent3", "password");
 
     // create new questions
     $this->_DB->create("questions", array(

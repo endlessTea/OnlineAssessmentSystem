@@ -2,7 +2,8 @@
 
 /**
  *  ASSESSMODEL.PHP
- *
+ *  Sets up tests to be taken, processes student answers and understanding of questions
+ *  Issues feedback for incorrect answers and processes students' undersanding of feedback
  *  @author Jonathan Lamb
  */
 class AssessModel {
@@ -237,12 +238,22 @@ class AssessModel {
 
         } else {
 
-          $takenTestArray = array($this->_studentId => $convertedResponse);
+          $takenTestArray = array($this->_studentId => $totalCorrect);
         }
 
         // Update Test: if the operation fails for any question, throw an Exception
         if (!$this->_DB->update("tests", array("_id" => $this->_testDocument["_id"]), array("taken" => $takenTestArray)))
           throw new Exception("The following test update failed: " . implode($takenTestArray));
+
+        // remove student from 'available array'
+        // http://stackoverflow.com/questions/7225070/php-array-delete-by-value-not-key
+        $availableTestArray = $this->_testDocument["available"];
+        $key = array_search($this->_studentId, $availableTestArray);
+        unset($availableTestArray[$key]);
+
+        // Update 'available' array in Test: if the operation fails for any question, throw an Exception
+        if (!$this->_DB->update("tests", array("_id" => $this->_testDocument["_id"]), array("available" => $availableTestArray)))
+          throw new Exception("The following test update failed: " . implode($availableTestArray));
 
         // initialise instance variable of feedback for delivery
         $this->_feedbackJSON = json_encode($feedbackToStudent);
