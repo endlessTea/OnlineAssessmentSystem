@@ -81,7 +81,13 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
       "singleAnswer" => "FALSE",
       "feedback" => "Ask Richard Stallman for futher details."
     ));
-    $this->assertTrue($resultOne && $resultTwo && $resultThree && $resultFour);
+    $resultFive = $this->_AuthorModel->createQuestion(array(
+      "schema" => "boolean",
+      "author" => $authorId,
+      "statement" => "This question will not be included in any tests",
+      "singleAnswer" => "TRUE"
+    ));
+    $this->assertTrue($resultOne && $resultTwo && $resultThree && $resultFour && $resultFive);
 
     // get question id's
     foreach ($this->_AuthorModel->getQuestions($authorId) as $qKey => $q) {
@@ -196,6 +202,42 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
     $s2t2feedback->{0} = 1;
     $s2t2feedback->{1} = 0;
     $this->assertTrue($this->_AssessModel->updateFeedbackFromStudent($s2t2feedback));
+
+    //print_r($this->_AuthorModel->getTests($authorId));
+    //print_r($this->_AuthorModel->getQuestions($authorId));
+  }
+
+  /**
+   *  @test
+   *  Check the performance of a single student on a single question
+   */
+  public function getStudentPerformanceSingleQuestion_validRequest_methodReturnsMatchingJSON() {
+
+    // get student one's id and get the first question's id
+    $this->_UserModel->findUser("studentOne");
+    $studentId = $this->_UserModel->getUserData()->userId;
+    $questionId = key($this->_DB->read("questions", array("statement" => "JavaScript is also known as ECMAScript.")));
+
+    $this->assertSame(
+      "{\"{$studentId}\":1}",
+      $this->_VisualsModel->getStudentPerformanceSingleQuestion(new MongoId($questionId), $studentId)
+    );
+  }
+
+  /**
+   *  @test
+   *  Attempt to get student data for a question they have not taken
+   */
+  public function getStudentPerformanceSingleQuestion_studentHasntTakenQuestion_methodReturnsFalse() {
+
+    // get student one's id and get the untaken question id
+    $this->_UserModel->findUser("studentOne");
+    $studentId = $this->_UserModel->getUserData()->userId;
+    $questionId = key($this->_DB->read("questions", array("statement" => "This question will not be included in any tests")));
+
+    $this->assertFalse(
+      $this->_VisualsModel->getStudentPerformanceSingleQuestion(new MongoId($questionId), $studentId)
+    );
   }
 
   /**
