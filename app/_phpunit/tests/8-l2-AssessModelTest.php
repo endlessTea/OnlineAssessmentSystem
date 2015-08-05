@@ -46,19 +46,22 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
       "schema" => "boolean",
       "author" => $authorId,
       "statement" => "This sentence contains no vowels",
-      "singleAnswer" => "FALSE"
+      "singleAnswer" => "FALSE",
+      "feedback" => "The sentence contains 2x 'i', 4x 'e', 3x 'o' and 1x 'a'"
     ));
     $this->_DB->create("questions", array(
       "schema" => "boolean",
       "author" => $authorId,
       "statement" => "This sentence contains 10 vowels",
-      "singleAnswer" => "TRUE"
+      "singleAnswer" => "TRUE",
+      "feedback" => "Count the instances of 'a', 'e', 'i', 'o' and 'u'"
     ));
     $this->_DB->create("questions", array(
       "schema" => "boolean",
       "author" => $authorId,
       "statement" => "This sentence contains a jam sandwich",
-      "singleAnswer" => "FALSE"
+      "singleAnswer" => "FALSE",
+      "feedback" => "Clue: you cannot eat the question"
     ));
 
     // get the question id's
@@ -169,6 +172,15 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
+   *  @expectedException
+   *  Attempt to get feedback data if it has not been initialised
+   */
+  public function issueFeedbackGetJSONData_attemptToGetUninitialisedFeedback_methodThrowsException() {
+
+    $this->_AssessModel->issueFeedbackGetJSONData();
+  }
+
+  /**
    *  @test
    *  Check if AssessModel correctly loads a test as an instance variable
    */
@@ -221,7 +233,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
    *  @test
    *  Start the test loaded as instance variable in AssessModel
    */
-  public function startTestGetJSONData_startNewTest_methodReturnsTrue() {
+  public function startTestGetJSONData_startNewTest_methodReturnsJSON() {
 
     $this->_UserModel->findUser("testStudent");
     $studentId = $this->_UserModel->getUserData()->userId;
@@ -233,8 +245,8 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
     $result = $this->_AssessModel->startTestGetJSONData();
     $this->assertSame(
       "{\"0\":{\"schema\":\"boolean\",\"statement\":\"This sentence contains no vowels\"}," .
-      "\"1\":{\"schema\":\"boolean\",\"statement\":\"This sentence contains 10 vowels\"}," .
-      "\"2\":{\"schema\":\"boolean\",\"statement\":\"This sentence contains a jam sandwich\"}}",
+        "\"1\":{\"schema\":\"boolean\",\"statement\":\"This sentence contains 10 vowels\"}," .
+        "\"2\":{\"schema\":\"boolean\",\"statement\":\"This sentence contains a jam sandwich\"}}",
       $result
     );
   }
@@ -259,7 +271,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
    *  @test
    *  Submit answers to a test (valid)
    */
-  public function updateTestAnswers_submitAnswersValidInput_methodReturnsTrueDocumentUpdated() {
+  public function updateTestAnswers_submitAnswersValidInput_methodReturnsTrueDocumentsUpdated() {
 
     // load test and start
     $this->_UserModel->findUser("testStudent");
@@ -438,6 +450,132 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
     $inputTwo->{2}->{'ans'} = 'FALSE';
 
     $this->assertFalse($this->_AssessModel->updateTestAnswers($inputTwo));
+  }
+
+  /**
+   *  @test
+   *  Take a test, get all the answers wrong and check that the feedback matches
+   */
+  public function issueFeedbackGetJSONData_getProcessedFeedback_methodReturnsJSON() {
+
+    // load test and start
+    $this->_UserModel->findUser("testStudent");
+    $studentId = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("testAuthor");
+    $authorId = $this->_UserModel->getUserData()->userId;
+    $testId = key($this->_DB->read("tests", array("author" => $authorId)));
+    $this->_AssessModel->loadTest(new MongoId($testId), $studentId);
+    $this->_AssessModel->startTestGetJSONData();
+
+    // prepare answers (simulate PHP representation of JSON data)
+    $input = new stdClass();
+    $input->{0} = new stdClass();
+    $input->{0}->{'uq'} = 1;    // this is an incorrect answer to a question...
+    $input->{0}->{'ans'} = 'TRUE';
+    $input->{1} = new stdClass();
+    $input->{1}->{'uq'} = 1;
+    $input->{1}->{'ans'} = 'FALSE';
+    $input->{2} = new stdClass();
+    $input->{2}->{'uq'} = 0;
+    $input->{2}->{'ans'} = 'TRUE';
+
+    $this->assertTrue($this->_AssessModel->updateTestAnswers($input));
+    $feedback = $this->_AssessModel->issueFeedbackGetJSONData();
+    $this->assertSame(
+      "{\"0\":\"The sentence contains 2x 'i', 4x 'e', 3x 'o' and 1x 'a'\"," .
+        "\"1\":\"Count the instances of 'a', 'e', 'i', 'o' and 'u'\"," .
+        "\"2\":\"Clue: you cannot eat the question\"}",
+      $feedback
+    );
+  }
+
+  /**
+   *  @test
+   *  Submit student feedback for questions (valid)
+   */
+  public function updateFeedbackFromStudent_submitValidInput_methodReturnsTrueDocumentUpdated() {
+
+    $this->_UserModel->findUser("testStudent");
+    $studentId = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("testAuthor");
+    $authorId = $this->_UserModel->getUserData()->userId;
+    $testId = key($this->_DB->read("tests", array("author" => $authorId)));
+    $this->_AssessModel->loadTest(new MongoId($testId), $studentId);
+    $this->_AssessModel->startTestGetJSONData();
+
+    $input = new stdClass();
+    $input->{0} = new stdClass();
+    $input->{0}->{'uq'} = 1;    // this is an incorrect answer to a question...
+    $input->{0}->{'ans'} = 'TRUE';
+    $input->{1} = new stdClass();
+    $input->{1}->{'uq'} = 1;
+    $input->{1}->{'ans'} = 'FALSE';
+    $input->{2} = new stdClass();
+    $input->{2}->{'uq'} = 0;
+    $input->{2}->{'ans'} = 'TRUE';
+    $this->assertTrue($this->_AssessModel->updateTestAnswers($input));
+
+    // simulate feedback from student by creating PHP object, representative of valid, parsed JSON
+    $studentFeedback = new stdClass();
+    $studentFeedback->{0} = 1;
+    $studentFeedback->{1} = 0;
+    $studentFeedback->{2} = 1;
+
+    // check method returns true, check question document retains student answer and new feedback data
+    $this->assertTrue($this->_AssessModel->updateFeedbackFromStudent($studentFeedback));
+    $questionToCheck = array_pop($this->_DB->read("questions", array("statement" => "This sentence contains a jam sandwich")));
+    $this->assertSame(
+      0,
+      $questionToCheck["taken"][$studentId]["ca"]
+    );
+    $this->assertSame(
+      1,
+      $questionToCheck["taken"][$studentId]["uf"]
+    );
+  }
+
+  /**
+   *  @test
+   *  Attempt to submit invalid JSON as feedback to test
+   */
+  public function updateFeedbackFromStudent_submitInvalidInput_methodReturnsFalse() {
+
+    $this->assertFalse($this->_AssessModel->updateFeedbackFromStudent("Invalid JSON: Syntax error"));
+  }
+
+  /**
+   *  @test
+   *
+   */
+  public function updateFeedbackFromStudent_invalidFeedbackValue_methodReturnsFalse() {
+
+    $this->_UserModel->findUser("testStudent");
+    $studentId = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("testAuthor");
+    $authorId = $this->_UserModel->getUserData()->userId;
+    $testId = key($this->_DB->read("tests", array("author" => $authorId)));
+    $this->_AssessModel->loadTest(new MongoId($testId), $studentId);
+    $this->_AssessModel->startTestGetJSONData();
+
+    $input = new stdClass();
+    $input->{0} = new stdClass();
+    $input->{0}->{'uq'} = 1;    // this is an incorrect answer to a question...
+    $input->{0}->{'ans'} = 'TRUE';
+    $input->{1} = new stdClass();
+    $input->{1}->{'uq'} = 1;
+    $input->{1}->{'ans'} = 'FALSE';
+    $input->{2} = new stdClass();
+    $input->{2}->{'uq'} = 0;
+    $input->{2}->{'ans'} = 'TRUE';
+    $this->assertTrue($this->_AssessModel->updateTestAnswers($input));
+
+    // simulate feedback from student by creating PHP object, representative of valid, parsed JSON
+    $studentFeedback = new stdClass();
+    $studentFeedback->{0} = 1;
+    $studentFeedback->{1} = -4;
+    $studentFeedback->{2} = 1;
+
+    $this->assertFalse($this->_AssessModel->updateFeedbackFromStudent($studentFeedback));
   }
 
   /**

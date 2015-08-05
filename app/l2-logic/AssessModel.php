@@ -13,8 +13,10 @@ class AssessModel {
     $_testDocument,
     $_studentId,
     $_expectingAnswers,
+    $_expectingStudentFeedback,
     $_questionsFull,
-    $_questionsJSON;
+    $_questionsJSON,
+    $_feedbackJSON;
 
   /**
    *  Constructor
@@ -135,7 +137,7 @@ class AssessModel {
   }
 
   /**
-   *  START TEST
+   *  START TEST / GET QUESTIONS
    *  Change the boolean flag to indicate that the test has been started, or check if the test has already started
    *  @return JSON of test data (questions only), else return false to indicate test was already stated
    *  @throws Exception if test has not been initialised as an instance variable
@@ -165,8 +167,9 @@ class AssessModel {
     if ($this->_expectingAnswers) {
       if (is_object($answers)) {
 
-        // keep track of the number of correctly answered questions
+        // keep track of the number of correctly answered questions and add feedback to root object
         $totalCorrect = 0;
+        $feedbackToStudent = new stdClass();
 
         foreach ($this->_questionsFull as $qNo => $fullQuestion) {
 
@@ -195,6 +198,9 @@ class AssessModel {
               } else {
 
                 $correct = 0;
+                if (isset($fullQuestion["feedback"])) {
+                  $feedbackToStudent->{$qNo} = $fullQuestion["feedback"];
+                }
               }
 
               $convertedResponse = array(
@@ -238,6 +244,12 @@ class AssessModel {
         if (!$this->_DB->update("tests", array("_id" => $this->_testDocument["_id"]), array("taken" => $takenTestArray)))
           throw new Exception("The following test update failed: " . implode($takenTestArray));
 
+        // initialise instance variable of feedback for delivery
+        $this->_feedbackJSON = json_encode($feedbackToStudent);
+
+        // update to not expect any further answers to process
+        $this->_expectingAnswers = false;
+
         return true;
       }
     }
@@ -245,4 +257,53 @@ class AssessModel {
     return false;
   }
 
+  /**
+   *  GET FEEDBACK FOR INCORRECT ANSWERS - TODO consider adding constraints...?
+   *  @return JSON of answer feedback
+   *  @throws Exception if answer feedback has not been initialised as an instance variable
+   */
+  public function issueFeedbackGetJSONData() {
+
+    if (isset($this->_feedbackJSON)){
+
+      return $this->_feedbackJSON;
+    }
+
+    throw new Exception("Feedback for student has not been initialised");
+  }
+
+  /**
+   *  PROCESS FEEDBACK FROM STUDENT
+   *  Update user's understanding of feedback if values are valid
+   *  @return true (boolean) on success, else false
+   */
+  public function updateFeedbackFromStudent($studentFeedback) {
+
+    if (is_object($studentFeedback)) {
+
+      // if student feedback was provided for a specific question
+      foreach ($this->_questionsFull as $qNo => $fullQuestion) {
+        if (isset($studentFeedback->{$qNo})) {
+
+          // fail the operation if an invalid feedback value was provided
+          if ($studentFeedback->{$qNo} !== 0 && $studentFeedback->{$qNo} !== 1) return false;
+
+          // obtain the UPDATED version of the question from MongoDB
+          $updatedQuestion = array_pop($this->_DB->read("questions", array("_id" => $fullQuestion["_id"])));
+
+          // copy the existing question "taken" array and PUSH the feedback value onto it for the student
+          $takenQuestionArray = $updatedQuestion["taken"];
+          $takenQuestionArray[$this->_studentId]["uf"] = $studentFeedback->{$qNo};
+
+          // Update Question: if the operation fails for any question, throw an Exception
+          if (!$this->_DB->update("questions", array("_id" => $fullQuestion["_id"]), array("taken" => $takenQuestionArray)))
+            throw new Exception("The following question update failed: " . implode($takenQuestionArray));
+        }
+      }
+
+      return true;
+    }
+
+    return false;
+  }
 }

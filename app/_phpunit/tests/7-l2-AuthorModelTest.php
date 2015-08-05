@@ -46,8 +46,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
       "author" => $this->_testQuestionAuthorId,
       "statement" => "The capital city of France is Paris.",
       "singleAnswer" => "TRUE",
-      "feedbackCorrect" => "It is indeed, well done.",
-      "feedbackIncorrect" => "Don't worry, it's an easy mistake to make."
+      "feedback" => "Don't worry, it's an easy mistake to make."
     ));
     $this->assertTrue($result);
   }
@@ -135,8 +134,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
       "author" => $this->_testQuestionAuthorId,
       "statement" => "This question appears to be valid, but it is not.",
       "singleAnswer" => "TRUE",
-      "feedbackCorrect" => "You'll see why soon",
-      "feedbackIncorrect" => "See extra junk data below...",
+      "feedback" => "See extra junk data below...",
       "junk" => "r93y02qhfgi3op2hg083qwghbn0o3w2"
     ));
     $this->assertFalse($result);
@@ -205,7 +203,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
 
     $result = $this->_AuthorModel->updateQuestion(
       new MongoId($questionId),
-      array("feedbackIncorrect" => "Okay, it is a bit of a trick question. Sorry.")
+      array("feedback" => "Okay, it is a bit of a trick question. Sorry.")
     );
     $this->assertTrue($result);
   }

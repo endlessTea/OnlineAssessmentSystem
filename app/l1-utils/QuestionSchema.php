@@ -23,8 +23,7 @@ class QuestionSchema {
         "author" => "required",
         "statement" => "required",
         "singleAnswer" => "required",
-        "feedbackCorrect" => "optional",
-        "feedbackIncorrect" => "optional"
+        "feedback" => "optional"
       )
     );
   }

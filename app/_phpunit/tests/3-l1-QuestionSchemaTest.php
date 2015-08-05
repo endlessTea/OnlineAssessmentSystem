@@ -28,8 +28,7 @@ class QuestionSchemaTest extends PHPUnit_Framework_TestCase {
       "author" => "required",
       "statement" => "required",
       "singleAnswer" => "required",
-      "feedbackCorrect" => "optional",
-      "feedbackIncorrect" => "optional"
+      "feedback" => "optional"
     );
   }
 
