@@ -76,12 +76,21 @@ class SG {
       $post = $_POST[$key];
       return htmlentities($post, ENT_QUOTES, 'UTF-8');
 
+    } elseif ($usage === "json") {
+
+      $response = json_decode($_POST[$key]);
+      if (json_last_error() !== JSON_ERROR_NONE) {
+
+        $response = "Invalid JSON: " . json_last_error_msg();
+      }
+      return $response;
+
     } elseif ($usage === "dangerous") {
 
       return $_POST[$key];
     }
 
-    return "Unrecognised usage: please specify 'escape' or 'dangerous'";
+    return "Unrecognised usage: please specify 'escape', 'json' or 'dangerous'";
   }
 
   /**

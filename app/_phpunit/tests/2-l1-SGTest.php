@@ -86,8 +86,6 @@ class SGTest extends PHPUnit_Framework_TestCase {
     );
   }
 
-  // POST TESTS
-
   /**
    *  @test
    *  Request escaped input (POST)
@@ -98,6 +96,41 @@ class SGTest extends PHPUnit_Framework_TestCase {
     $result = $this->_SG->post("test", "escape");
     $this->assertSame(
       "&lt;script&gt;alert(&#039;hello&#039;);&lt;/script&gt;",
+      $result
+    );
+  }
+
+  /**
+   *  @test
+   *  Request parsed JSON input (POST)
+   */
+  public function post_usageEqualsJSON_returnsParsedInput() {
+
+    $_POST["test"] = json_encode(array(
+      "partOne" => array(
+        "apples" => "great",
+        "bananas" => "better",
+        "custard" => "magnificent"
+      ),
+      "partTwo" => array(
+        "toast" => "crispy",
+        "jam" => "best in sandwiches"
+      )
+    ));
+    $result = $this->_SG->post("test", "json");
+    $this->assertObjectHasAttribute('bananas', $result->partOne);
+  }
+
+  /**
+   *  @test
+   *  Request JSON input that is not valid (POST)
+   */
+  public function post_usageEqualsJSONInvalidJSONInput_returnsJSONErrorMessage() {
+
+    $_POST["test"] = "{'This is': 'invalid JSON'}";
+    $result = $this->_SG->post("test", "json");
+    $this->assertSame(
+      "Invalid JSON: Syntax error",
       $result
     );
   }
@@ -124,7 +157,7 @@ class SGTest extends PHPUnit_Framework_TestCase {
 
     $result = $this->_SG->post("test");
     $this->assertSame(
-      "Unrecognised usage: please specify 'escape' or 'dangerous'",
+      "Unrecognised usage: please specify 'escape', 'json' or 'dangerous'",
       $result
     );
   }
