@@ -39,51 +39,27 @@ class URLHandler {
    */
   private function processURL() {
 
-    // No controller provided: take the user to the index of the Home Controller
+    // No controller provided: take the user to the UI for the Dashboard (home)
     if ($this->_URL === "URL parameter not defined") {
 
-      // check for controller: no controller given ? then load start-page
-			require 'app/l3-io/HomeController.php';
-			$controller = new HomeController();
-			$controller->index();
+			require 'app/l3-io/DashboardController.php';
+			$controller = new DashboardController();
+			$controller->loadFrame();
       return;
     }
 
     // Controller parameter provided: check if a file exists
     if (file_exists('app/l3-io/' . $this->_URL["controller"] . 'Controller.php')) {
 
-      // Set Controller
+      // Set Controller and load UI
       require 'app/l3-io/' . $this->_URL["controller"] . 'Controller.php';
       $controller = ucfirst($this->_URL["controller"]) . 'Controller';
       $controller = new $controller();
-
-      // No Action provided: take the user to the index of the above Controller
-      if (empty($this->_URL["action"])) {
-
-        $controller->index();
-        return;
-      }
-
-      // Recognised Action provided: check if additional parameters provided
-      if (method_exists($controller, $this->_URL["action"])) {
-
-        // Additional parameters: call function and pass parameters as arguments
-        if (!empty($this->_URL["parameters"])) {
-
-          call_user_func_array(
-            array($controller, $this->_URL["action"]),
-            $this->_URL["parameters"]
-          );
-          return;
-        }
-
-        // No additional parameters: call function without arguments
-        $controller->{$this->_URL["action"]}();
-        return;
-      }
+      $controller->loadFrame();
+      return;
     }
 
-    // Controller or Action not recognised: take the user to the index of the Error Controller
+    // Controller not recognised: take the user to the "404 not found" page
     $this->_AppModel->redirectTo(404);
   }
 }

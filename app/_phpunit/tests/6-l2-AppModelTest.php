@@ -49,11 +49,7 @@ class AppModelTest extends PHPUnit_Framework_TestCase {
     $result = $this->_AppModel->getURL();
     $this->assertSame(
       array(
-        "controller" => "controller",
-        "action" => "action",
-        "parameters" => array(
-          "param1", "param2", "param3", "param4"
-        )
+        "controller" => "controller"
       ),
       $result
     );

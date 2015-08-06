@@ -8,11 +8,11 @@
 class ErrorController {
 
   /**
-   *  PAGE: index
-   *  Default action of controller
+   *  LOAD PAGE FRAME
+   *  Load the HTML required to display the relevant error page
    */
-  public function index() {
+  public function loadFrame() {
 
-    echo 'error controller, index method';
+    echo "load 404";
   }
 }
