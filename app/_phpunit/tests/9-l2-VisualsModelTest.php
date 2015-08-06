@@ -43,6 +43,7 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
     $this->_UserModel->createUser("testAuthor", "password");
     $this->_UserModel->createUser("studentOne", "password");
     $this->_UserModel->createUser("studentTwo", "password");
+    $this->_UserModel->createUser("studentNoParticipation", "password");
 
     // get user id's
     $this->_UserModel->findUser("testAuthor");
@@ -239,6 +240,175 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
       $this->_VisualsModel->getStudentPerformanceSingleQuestion(new MongoId($questionId), $studentId)
     );
   }
+
+  /**
+   *  @test
+   *  Check the performance of a single student on a single test
+   */
+  public function getStudentPerformanceSingleTest_validRequest_methodReturnsMatchingJSON() {
+
+    // get student two's id and get the second test id (using author id)
+    $this->_UserModel->findUser("studentTwo");
+    $studentId = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("testAuthor");
+    $authorId = $this->_UserModel->getUserData()->userId;
+    foreach ($this->_AuthorModel->getTests($authorId) as $tKey => $t) {
+      $testIds[] = $tKey;
+    }
+
+    $this->assertSame(
+      "{\"{$studentId}\":0}",
+      $this->_VisualsModel->getStudentPerformanceSingleTest(new MongoId($testIds[1]), $studentId)
+    );
+  }
+
+  /**
+   *  @test
+   *  Attempt to get student data for a test they have not taken
+   */
+  public function getStudentPerformanceSingleTest_studentHasntTakenTest_methodReturnsFalse() {
+
+    // get student one's id and get the untaken question id
+    $this->_UserModel->findUser("studentNoParticipation");
+    $studentId = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("testAuthor");
+    $authorId = $this->_UserModel->getUserData()->userId;
+    foreach ($this->_AuthorModel->getTests($authorId) as $tKey => $t) {
+      $testIds[] = $tKey;
+    }
+
+    $this->assertFalse(
+      $this->_VisualsModel->getStudentPerformanceSingleTest(new MongoId($testIds[0]), $studentId)
+    );
+  }
+
+  /**
+   *  @test
+   *  Check the performance of a single student for all tests they have taken
+   */
+  public function getStudentPerformanceAllTests_validRequest_methodReturnsMatchingJSON() {
+
+    // student one: both tests
+    $this->_UserModel->findUser("studentOne");
+    $studentId = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("testAuthor");
+    $authorId = $this->_UserModel->getUserData()->userId;
+    foreach ($this->_AuthorModel->getTests($authorId) as $tKey => $t) {
+      $testIds[] = $tKey;
+    }
+
+    $this->assertSame(
+      "{\"{$testIds[0]}\":2,\"{$testIds[1]}\":1}",
+      $this->_VisualsModel->getStudentPerformanceAllTests($studentId)
+    );
+  }
+
+  /**
+   *  @test
+   *  Attempt to get student data when they have taken no tests
+   */
+  public function getStudentPerformanceAllTests_studentHasntTakenAnyTests_methodReturnsFalse() {
+
+    $this->_UserModel->findUser("studentNoParticipation");
+    $studentId = $this->_UserModel->getUserData()->userId;
+    $this->assertFalse(
+      $this->_VisualsModel->getStudentPerformanceAllTests($studentId)
+    );
+  }
+
+  /**
+   *  @test
+   *  Check the performance of all students (class) for a single question
+   */
+  public function getClassPerformanceSingleQuestion_validRequest_methodReturnsMatchingJSON() {
+
+    // get user and question id's
+    $this->_UserModel->findUser("studentOne");
+    $studentOne = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("studentTwo");
+    $studentTwo = $this->_UserModel->getUserData()->userId;
+    $questionId = key($this->_DB->read("questions", array("statement" => "AngularJS is a front-end web application framework.")));
+    $this->assertSame(
+      "{\"{$studentOne}\":0,\"{$studentTwo}\":0}",
+      $this->_VisualsModel->getClassPerformanceSingleQuestion(new MongoId($questionId))
+    );
+  }
+
+  /**
+   *  @test
+   *  Attempt to get performance information for a question that has not been taken
+   */
+  public function getClassPerformanceSingleQuestion_questionNotTaken_methodReturnsFalse() {
+
+    $questionId = key($this->_DB->read("questions", array("statement" => "This question will not be included in any tests")));
+    $this->assertFalse($this->_VisualsModel->getClassPerformanceSingleQuestion(new MongoId($questionId)));
+  }
+
+  /**
+   *  @test
+   *  Check the performance of all students (class) for a single test
+   */
+  public function getClassPerformanceSingleTest_validRequest_methodReturnsMatchingJSON() {
+
+    // get user and test id's
+    $this->_UserModel->findUser("studentOne");
+    $studentOne = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("studentTwo");
+    $studentTwo = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("testAuthor");
+    $authorId = $this->_UserModel->getUserData()->userId;
+    foreach ($this->_AuthorModel->getTests($authorId) as $tKey => $t) {
+      $testIds[] = $tKey;
+    }
+
+    // check both tests
+    $this->assertSame(
+      "{\"{$studentOne}\":2,\"{$studentTwo}\":1}",
+      $this->_VisualsModel->getClassPerformanceSingleTest(new MongoId($testIds[0]))
+    );
+    $this->assertSame(
+      "{\"{$studentOne}\":1,\"{$studentTwo}\":0}",
+      $this->_VisualsModel->getClassPerformanceSingleTest(new MongoId($testIds[1]))
+    );
+  }
+
+  /**
+   *  @test
+   *  Check the performance of all students for all tests
+   */
+  public function getClassPerformanceAllTests_validRequest_methodReturnsMatchingJSON() {
+
+    // get user and test id's
+    $this->_UserModel->findUser("studentOne");
+    $studentOne = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("studentTwo");
+    $studentTwo = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("testAuthor");
+    $authorId = $this->_UserModel->getUserData()->userId;
+    foreach ($this->_AuthorModel->getTests($authorId) as $tKey => $t) {
+      $testIds[] = $tKey;
+    }
+
+    // check all tests returned
+    $this->assertSame(
+      "{\"{$testIds[0]}\":{\"{$studentOne}\":2,\"{$studentTwo}\":1}," .
+      "\"{$testIds[1]}\":{\"{$studentOne}\":1,\"{$studentTwo}\":0}}",
+      $this->_VisualsModel->getClassPerformanceAllTests()
+    );
+  }
+
+  /*
+   *  @test
+   *  TODO: feedback tests
+   */
+  /*
+   *  @test
+   *  TODO: feedback tests
+   */
+  /*
+   *  @test
+   *  TODO: feedback tests
+   */
 
   /**
    *  @test
