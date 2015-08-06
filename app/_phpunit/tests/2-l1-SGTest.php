@@ -49,7 +49,11 @@ class SGTest extends PHPUnit_Framework_TestCase {
     $result = $this->_SG->get("url");
     $this->assertSame(
       array(
-        "controller" => "home"
+        "controller" => "home",
+        "action" => "login",
+        "parameters" => array(
+          "param1", "param2", "param3"
+        )
       ),
       $result
     );

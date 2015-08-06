@@ -32,4 +32,13 @@ class DashboardController {
 
     $this->_AppModel->renderFrame("Dashboard");
   }
+
+  /**
+   *  AJAX RESPONSE: test
+   *
+   */
+  public function ajaxTest() {
+
+    echo file_get_contents(URL . "app/l4-ui/Dashboard/Test.html");
+  }
 }

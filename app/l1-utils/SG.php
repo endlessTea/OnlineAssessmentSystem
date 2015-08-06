@@ -42,8 +42,17 @@ class SG {
 				$url = filter_var($url, FILTER_SANITIZE_URL);
 				$url = explode('/', $url);
 
-				// return the controller only
-				$response["controller"] = isset($url[0]) ? $url[0] : null;
+        // Put URL parts into according properties
+		    $response['controller'] = isset($url[0]) ? $url[0] : null;
+				$response['action'] = isset($url[1]) ? $url[1] : null;
+
+				// Remove controller and action from the split URL
+				unset($url[0], $url[1]);
+
+				// Rebase array keys and store the URL params
+				$response['parameters'] = array_values($url);
+
+        // return parsed url
         return $response;
 
 			} else {

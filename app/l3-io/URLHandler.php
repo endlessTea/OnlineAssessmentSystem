@@ -55,11 +55,34 @@ class URLHandler {
       require 'app/l3-io/' . $this->_URL["controller"] . 'Controller.php';
       $controller = ucfirst($this->_URL["controller"]) . 'Controller';
       $controller = new $controller();
-      $controller->loadFrame();
-      return;
+
+      // No Action provided: take the user to the index of the above Controller
+      if (empty($this->_URL["action"])) {
+
+        $controller->loadFrame();
+        return;
+      }
+
+      // Recognised Action provided: check if additional parameters provided
+      if (method_exists($controller, $this->_URL["action"])) {
+
+        // Additional parameters: call function and pass parameters as arguments
+        if (!empty($this->_URL["parameters"])) {
+
+          call_user_func_array(
+            array($controller, $this->_URL["action"]),
+            $this->_URL["parameters"]
+          );
+          return;
+        }
+
+        // No additional parameters: call function without arguments
+        $controller->{$this->_URL["action"]}();
+        return;
+      }
     }
 
-    // Controller not recognised: take the user to the "404 not found" page
+    // Controller or Action not recognised: take the user to the UI of the Error Controller
     $this->_AppModel->redirectTo(404);
   }
 }

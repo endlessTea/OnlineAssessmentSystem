@@ -9,9 +9,18 @@
  */
 function ajaxText() {
 
-  //alert('hi');
-
   $.ajax({
-    url: baseURL + "dashboard/fetchYMAFModuleSelection",
+    url: baseURL + "dashboard/ajaxTest",
+    data: {
+      // none
+    },
+    type: "POST",
+    dataType: "html",
+    success: function (response) {
+      $("#dashboardContainer").html(response);
+    },
+    error: function (request, status, error) {
+      alert(request.responseText);
+    }
   });
 }
