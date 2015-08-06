@@ -56,48 +56,18 @@ class AppModel {
   }
 
   /**
-   *  RENDER TEMPLATES
-   *  Render views based on parameter values, extracting resources into scope
-   *  Conceptual inspiration from Harvard University: C$50 Finance (MVC 'render' function)
-   *  @link https://study.cs50.net/mvc
+   *  RENDER FRAME
+   *  Render frame based on controller, extracting resources into scope
    *  @return (test mode only) array of string values representing files that would be 'required'
    */
-  public function renderTemplates($controller, $views = array(), $resources = array()) {
+  public function renderFrame($controller, $resources = array()) {
 
     extract($resources);
+    $frame = "app/l4-ui/" . $controller . "/Frame.php";
 
-    // header string rep.
-    if (array_key_exists("header", $views)) {
-      $header = "app/l4-ui/_headers/" . strtolower($views["header"]) . ".php";
-    } else {
-      $header = "app/l4-ui/_headers/default.php";
-    }
-
-    // main template string rep.
-    if (array_key_exists("main", $views)) {
-      $main = "app/l4-ui/" . strtolower($controller) . "/" . strtolower($views["main"]) . ".php";
-    } else {
-      $main = "app/l4-ui/" . strtolower($controller) . "/index.php";
-    }
-
-    // footer string rep.
-    if (array_key_exists("footer", $views)) {
-      $footer = "app/l4-ui/_footers/" . strtolower($views["footer"]) . ".php";
-    } else {
-      $footer = "app/l4-ui/_footers/default.php";
-    }
-
-    // if testmode is on, return the string representations as an array, else require templates
-    if ($this->_testMode) {
-
-      return array($header, $main, $footer);
-
-    } else {
-
-      require $header;
-      require $main;
-      require $footer;
-    }
+    // if testmode is on, return the string representation of the frame, otherwise load it
+    if ($this->_testMode) return $frame;
+    else require $frame;
   }
 
   /**

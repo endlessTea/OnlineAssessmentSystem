@@ -71,39 +71,25 @@ class AppModelTest extends PHPUnit_Framework_TestCase {
 
   /**
    *  @test
-   *  Check that default templates are used in the absence of key/value pairs
+   *  Check that the correct frames load for corresponding controllers
    */
-  public function renderTemplates_confirmDefaultTemplatesProvided_returnsArrayOfSpecificStrings() {
+  public function renderFrame_testAllControllers_methodsReturnMatchingStrings() {
 
-    $result = $this->_AppModel->renderTemplates("controller");
     $this->assertSame(
-      array(
-        "app/l4-ui/_headers/default.php",
-        "app/l4-ui/controller/index.php",
-        "app/l4-ui/_footers/default.php"
-      ),
-      $result
+      "app/l4-ui/Dashboard/Frame.php",
+      $this->_AppModel->renderFrame("Dashboard")
     );
-  }
-
-  /**
-   *  @test
-   *  Check if requested templates are used when passed as $views array values
-   */
-  public function renderTemplates_confirmRequestedTemplatesProvided_returnsArrayOfSpecificStrings() {
-
-    $result = $this->_AppModel->renderTemplates("controller", array(
-      "header" => "specific_header",
-      "main" => "specific_main_template",
-      "footer" => "specific_footer"
-    ));
     $this->assertSame(
-      array(
-        "app/l4-ui/_headers/specific_header.php",
-        "app/l4-ui/controller/specific_main_template.php",
-        "app/l4-ui/_footers/specific_footer.php"
-      ),
-      $result
+      "app/l4-ui/Author/Frame.php",
+      $this->_AppModel->renderFrame("Author")
+    );
+    $this->assertSame(
+      "app/l4-ui/Assess/Frame.php",
+      $this->_AppModel->renderFrame("Assess")
+    );
+    $this->assertSame(
+      "app/l4-ui/Error/Frame.php",
+      $this->_AppModel->renderFrame("Error")
     );
   }
 

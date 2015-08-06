@@ -29,6 +29,6 @@ class AuthorController {
    */
   public function loadFrame() {
 
-    echo "load authoring platform...";
+    $this->_AppModel->renderFrame("Author");
   }
 }

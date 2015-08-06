@@ -29,6 +29,6 @@ class AssessController {
    */
   public function loadFrame() {
 
-    echo "load assessment platform...";
+    $this->_AppModel->renderFrame("Assess");
   }
 }

@@ -30,6 +30,6 @@ class DashboardController {
    */
   public function loadFrame() {
 
-    echo "load dashboard...";
+    $this->_AppModel->renderFrame("Dashboard");
   }
 }

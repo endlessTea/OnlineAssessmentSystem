@@ -1,0 +1,10 @@
+/**
+ *  _MAINSTYLE.CSS
+ *  Core styling for the whole application
+ *  @author Jonathan Lamb
+ */
+
+body {
+  font-family: Verdana, Geneva, sans-serif;
+  text-align: center;
+}
