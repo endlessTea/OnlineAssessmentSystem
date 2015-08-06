@@ -27,3 +27,15 @@ $GLOBALS['config'] = array(
     'db' => 'msc_v1'
   )
 );
+
+// Load all level 1 and 2 components, plus the URL handler
+require 'app/l1-utils/DB.php';
+require 'app/l1-utils/QuestionSchema.php';
+require 'app/l1-utils/SG.php';
+require 'app/l1-utils/TestSchema.php';
+require 'app/l2-logic/AppModel.php';
+require 'app/l2-logic/AssessModel.php';
+require 'app/l2-logic/AuthorModel.php';
+require 'app/l2-logic/UserModel.php';
+require 'app/l2-logic/VisualsModel.php';
+require 'app/l3-io/URLHandler.php';

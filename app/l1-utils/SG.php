@@ -54,7 +54,11 @@ class SG {
 
         // return parsed url
         return $response;
-			}
+
+			} else {
+
+        return "URL parameter not defined";
+      }
 
     } elseif ($usage === "dangerous") {
 

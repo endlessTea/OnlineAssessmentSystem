@@ -2,7 +2,7 @@
 
 /**
  *  AUTOLOADER.PHP
- *  Load all classes available in requested directories for unit testing
+ *  Load all classes available in requested directories
  *  @author Jess Telford
  *  @link http://jes.st/2011/phpunit-bootstrap-and-autoloading-classes/
  *  @license None
