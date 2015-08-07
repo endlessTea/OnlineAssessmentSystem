@@ -8,7 +8,10 @@
  */
 class AppModel {
 
-  private $_testMode;
+  // store superglobals access, question schema and test mode indicator as inst. var.
+  private $_SG,
+    $_QuestionSchema,
+    $_testMode;
 
   /**
    *  Constructor
@@ -25,7 +28,9 @@ class AppModel {
       $this->_testMode = false;
     }
 
+    // initialise instance variables
     $this->_SG = new SG();
+    $this->_QuestionSchema = new QuestionSchema();
   }
 
   /**
@@ -76,6 +81,7 @@ class AppModel {
    *  @author original: PHP Academy; modified: Jonathan Lamb
    *  @link https://github.com/adamaoc/login_reg
    *  @license None
+   *  @return (test mode only) string representation of the redirection
    */
   public function redirectTo($location) {
 
@@ -110,5 +116,14 @@ class AppModel {
       header($headerString);
   		exit();
     }
+  }
+
+  /**
+   *  GET LIST OF AVAILABLE QUESTION SCHEMAS
+   *  Access method to Question Schema's 'getSchemaList'
+   *  @return array of the names of available question schemas
+   */
+  public function getSchemaList() {
+    return $this->_QuestionSchema->getSchemaList();
   }
 }

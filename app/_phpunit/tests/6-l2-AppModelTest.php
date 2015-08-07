@@ -125,6 +125,18 @@ class AppModelTest extends PHPUnit_Framework_TestCase {
 
   /**
    *  @test
+   *  Check that the access method to return list of available schemas returns matching values
+   */
+  public function getSchemaList_requestValues_methodReturnsMatchingValues() {
+
+    $this->assertSame(
+      array("boolean"),
+      $this->_AppModel->getSchemaList()
+    );
+  }
+
+  /**
+   *  @test
    */
   public function _confirmEnd() {
     print_r("\n  - end of AppModel Test -  \n\n");

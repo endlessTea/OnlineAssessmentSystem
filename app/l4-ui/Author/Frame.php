@@ -17,14 +17,35 @@
 
   <main>
 
-    <p>Main content for the authoring platform goes here</p>
+    <p>Choose a question type:</p>
+
+    <div id="questionSelectBar">
+      <?php
+        // create a button for each question type to allow requests for HTML templates
+        foreach ($questionTypes as $qt) {
+      ?>
+      <button onclick="getQuestionTemplate('<?= $qt; ?>');"><?= strtoupper($qt); ?></button>
+      <?php
+        }
+      ?>
+      <button onclick="getQuestionTemplate('inexistent');">INEXISTENT</button>
+    </div>
 
     <div id="authorContainer"></div>
 
   </main>
 
   <footer>
-    <!-- JS refs <script src="script.js"></script> -->
+
+    <!-- JavaScript: jQuery and custom JS for Ajax/event handling -->
+    <script src="<?= URL; ?>public/js/libs/jquery-1.11.3.min.js" charset="utf-8"></script>
+    <script src="<?= URL; ?>public/js/author.js" charset="utf-8"></script>
+
+    <!-- Define base URL for JavaScript to send Ajax requests -->
+    <script>
+      var baseURL = '<?= URL; ?>';
+    </script>
+
   </footer>
 
 </body>

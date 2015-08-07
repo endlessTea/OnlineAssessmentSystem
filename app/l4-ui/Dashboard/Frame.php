@@ -23,6 +23,9 @@
 
     <button onclick="ajaxText();">Get more HTML via Ajax</button>
 
+    <p><a href="<?= URL; ?>author">Authoring platform</a></p>
+    <p><a href="<?= URL; ?>assess">Assessment platform</a></p>
+
   </main>
 
   <footer>
