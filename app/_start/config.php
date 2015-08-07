@@ -9,6 +9,9 @@
  *  @license http://opensource.org/licenses/MIT MIT License
  */
 
+// enable sessions
+session_start();
+
 // enable error reporting and allow errors to be displayed (remove in production)
 error_reporting(E_ALL);
 ini_set("display_errors", 1);

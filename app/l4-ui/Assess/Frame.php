@@ -19,7 +19,12 @@
 
     <p>Main content for the assessment platform goes here</p>
 
-    <div id="assessContainer"></div>
+    <div id="assessContainer">
+
+    <!-- put the questions here using a PHP foreach loop;
+    on ajax submissionreplace the contents of this container with feedback -->
+
+    </div>
 
   </main>
 

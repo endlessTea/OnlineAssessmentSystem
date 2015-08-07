@@ -38,7 +38,7 @@ class UserModel {
       // attempt to convert to MongoId Object and check if the user exists..
       try {
 
-        $mongoIdObj = new MongoId(SG::session("user", "get"));
+        $mongoIdObj = new MongoId($this->_SG->session("user", "get"));
         if ($this->findUser($mongoIdObj)) {
 
           // indicate that the current user is logged in
@@ -76,11 +76,11 @@ class UserModel {
    *  Contains: MongoID (generated), username, hash and salt
    *  @return true (boolean) on success, otherwise an error String
    */
-  public function createUser($username, $originalPassword) {
+  public function createUser($username, $password) {
 
     // create salt, then create hash of original password
     $salt = $this->makeSalt();
-    $hash = $this->makeHash($originalPassword, $salt);
+    $hash = $this->makeHash($password, $salt);
 
     // create user object to store as BSON document in DB
     $user = array(

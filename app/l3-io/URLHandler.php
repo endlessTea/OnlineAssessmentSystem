@@ -21,15 +21,43 @@ class URLHandler {
 	 */
   public function __construct() {
 
-    // initialise application and user model
+    // initialise application, user model and set URL instance var.
     $this->_AppModel = new AppModel();
     $this->_UserModel = new UserModel();
-
-    // TODO - handle user not logged in
-
-    // get current URL values and process them
     $this->_URL = $this->_AppModel->getURL();
-    $this->processURL();
+
+    // User is not logged in: redirect to UI of Login controller
+    if (!$this->_UserModel->getLoginStatus()) {
+
+      $this->processLogin();
+
+    } else {
+
+      // process URL values as user will be logged in
+      $this->processURL();
+    }
+  }
+
+  /**
+   *  PROCESS LOGIN REQUEST
+   *  Either load UI for Login Controller, or call login method of the controller
+   */
+  public function processLogin() {
+
+    require 'app/l3-io/LoginController.php';
+    $controller = new LoginController();
+
+    // check if the request was to log a user in
+    if (isset($this->_URL["action"])) {
+      if ($this->_URL["action"] === "logUserIn") {
+
+        $controller->logUserIn();
+        return;
+      }
+    }
+
+    // otherwise direct to landing page
+    $controller->loadFrame();
   }
 
   /**

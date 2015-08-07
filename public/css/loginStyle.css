@@ -1,0 +1,20 @@
+/**
+ *  LOGINSTYLE.CSS
+ *  Additional styling for the login page
+ *  @author Jonathan Lamb
+ */
+
+h1 {
+  color: orange;
+}
+
+input[type="submit"] {
+  padding: 4px;
+  margin: 10px;
+}
+
+input[type="text"], input[type="password"] {
+  padding: 5px;
+  margin: 10px;
+  width: 180px;
+}
