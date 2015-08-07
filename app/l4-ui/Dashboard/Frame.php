@@ -13,18 +13,20 @@
 
   <header>
     <h1>Dashboard</h1>
+    <p>Welcome, user <?= $userId; ?></p>
   </header>
 
   <main>
 
-    <p>Main content for the dashboard goes here</p>
+    <ul>
+      <li><a href="<?= URL; ?>author">Authoring</a></li>
+      <li><a href="<?= URL; ?>assess">Assessment</a></li>
+      <li><a href="<?= URL; ?>dashboard/logout">Logout</a></li>
+    </ul>
 
-    <div id="dashboardContainer"></div>
+    <h2>Data Visualisations</h2>
 
-    <button onclick="ajaxText();">Get more HTML via Ajax</button>
-
-    <p><a href="<?= URL; ?>author">Authoring platform</a></p>
-    <p><a href="<?= URL; ?>assess">Assessment platform</a></p>
+    <div id="visualisations"></div>
 
   </main>
 

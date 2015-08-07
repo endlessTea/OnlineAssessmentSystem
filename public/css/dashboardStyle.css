@@ -4,6 +4,32 @@
  *  @author Jonathan Lamb
  */
 
-h1 {
+h1, h2 {
   color: blue;
+}
+
+ul {
+  list-style-type: none;
+  margin: 30px 0 40px 0;
+  padding: 0;
+}
+
+li {
+  display: inline;
+}
+
+a {
+  text-decoration: none;
+  color: #000;
+  padding: 10px 20px;
+  margin: 15px 20px;
+  text-transform: uppercase;
+  font-weight: bold;
+  border: 2px solid #000;
+  background: #fff;
+}
+
+a:hover {
+  background: blue;
+  color: #fff;
 }

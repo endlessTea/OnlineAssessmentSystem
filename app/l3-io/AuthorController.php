@@ -38,7 +38,7 @@ class AuthorController {
   }
 
   /**
-   *  AJAX: GET HTML TEMPLATE FOR A QUESTION
+   *  AJAX: GET NEW QUESTION TEMPLATE
    *  Returns the HTML template of a question
    */
   public function getQuestionTemplate() {
@@ -62,12 +62,88 @@ class AuthorController {
     // load question details and return the result of the operation
     $question = array(
       "schema" => "boolean",
-      "author" => "f39082hnf3902nf3029",         // $this->_UserModel->getUserData()->userId
+      "author" => $this->_UserModel->getUserData()->userId,
       "statement" => $this->_AppModel->getPOSTData("st"),
       "singleAnswer" => $this->_AppModel->getPOSTData("sa"),
       "feedback" => $this->_AppModel->getPOSTData("fb")
     );
 
     echo ($this->_AuthorModel->createQuestion($question)) ? "<p>Question created!</p>" : "<p>Error creating question</p>";
+  }
+
+  /**
+   *  AJAX: MANAGE QUESTIONS
+   *  Returns JSON of user data to manage user questions
+   */
+  public function getQuestions() {
+
+    // change the header to indicate that JSON data is being returned
+		header('Content-Type: application/json');
+
+    echo json_encode($this->_AuthorModel->getQuestions(
+      $this->_UserModel->getUserData()->userId
+    ));
+  }
+
+  /**
+   *  AJAX: DELETE QUESTION
+   *  Request to delete a question; returns an indication of success/failure
+   */
+  public function deleteQuestion() {
+
+    echo ($this->_AuthorModel->deleteQuestion(
+      new MongoId($this->_AppModel->getPOSTData("qId")),
+      $this->_UserModel->getUserData()->userId
+    )) ? "<p>Question deleted!</p>" : "<p>Error deleting question</p>";
+  }
+
+  /**
+   *  AJAX: CREATE TEST
+   *  Process question Id's and create a new document
+   */
+  public function createTest() {
+
+    $test = array(
+      "schema" => "standard",
+      "author" => $this->_UserModel->getUserData()->userId,
+      "questions" => $this->_AppModel->getPOSTData("qs", "getJSON")
+    );
+
+    echo ($this->_AuthorModel->createTest($test)) ? "<p>Test created!</p>" : "<p>Error creating test</p>";
+  }
+
+  /**
+   *  AJAX: MANAGE TESTS
+   *  Returns JSON of user data to manage user tests
+   */
+  public function getTests() {
+
+    // change the header to indicate that JSON data is being returned
+		header('Content-Type: application/json');
+
+    echo json_encode($this->_AuthorModel->getTests(
+      $this->_UserModel->getUserData()->userId
+    ));
+  }
+
+  /**
+   *  AJAX: DELETE TEST
+   *  Request to delete a test; returns an indication of success/failure
+   */
+  public function deleteTest() {
+
+    echo ($this->_AuthorModel->deleteTest(
+      new MongoId($this->_AppModel->getPOSTData("tId")),
+      $this->_UserModel->getUserData()->userId
+    )) ? "<p>Test deleted!</p>" : "<p>Error deleting test</p>";
+  }
+
+  /**
+   *  AJAX: ISSUE TEST TO ANOTHER USER
+   *  Register another user to be eligible to take a test
+   */
+  public function issueTest() {
+
+
   }
 }

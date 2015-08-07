@@ -53,10 +53,14 @@ class AppModel {
 
   /**
    *  GET '$_POST' DATA
-   *  Get escaped data sent via POST request
+   *  Get escaped data sent via POST request (JSON option)
    *  @return escaped data from $_POST
    */
-  public function getPOSTData($key) {
+  public function getPOSTData($key, $JSON = null) {
+
+    if ($JSON === "getJSON") {
+      return $this->_SG->post($key, "json");
+    }
     return $this->_SG->post($key, "escape");
   }
 

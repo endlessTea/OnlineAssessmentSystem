@@ -55,3 +55,217 @@ function createQuestion(questionType) {
     }
   });
 }
+
+/**
+ *  MANAGE QUESTIONS
+ *  Allow questions to be deleted - TODO: refactor to allow questions to be updated
+ */
+function manageQuestions() {
+
+  $.ajax({
+    url: baseURL + "author/getQuestions",
+    type: "GET",
+    dataType: "json",
+    success: function (response) {
+
+      // set container header
+      $("#authorContainer").html("<h2>Manage Questions</h2>");
+
+      // create and append a representation of each question to the container
+      for (var question in response) {
+        $("#authorContainer").append(
+          "<p>" + question + ": " + response[question]["statement"] +
+          "&nbsp;<button onclick=\"deleteQuestion('" +
+          question + "')\">DELETE</button></p>"
+        );
+      }
+    },
+    error: function (request, status, error) {
+      $("#authorContainer").html(
+        "<p>There was a problem with the request, please contact the system administrator: <br>" +
+        request.responseText + "</p>"
+      );
+    }
+  });
+}
+
+/**
+ *  DELETE QUESTION
+ *  Request to delete a question based on MongoId
+ */
+function deleteQuestion(questionId) {
+
+  $.ajax({
+    url: baseURL + "author/deleteQuestion",
+    data: {
+      qId: questionId
+    },
+    type: "POST",
+    dataType: "html",
+    success: function (response) {
+      $("#authorContainer").html(response);
+    },
+    error: function (request, status, error) {
+      $("#authorContainer").html(
+        "<p>There was a problem with the request, please contact the system administrator: <br>" +
+        request.responseText + "</p>"
+      );
+    }
+  });
+}
+
+/**
+ *  LOAD QUESTIONS FOR NEW TEST
+ *  Get the user's questions ready to create a new test
+ */
+function loadQuestionsForTestCreation() {
+
+  $.ajax({
+    url: baseURL + "author/getQuestions",
+    type: "GET",
+    dataType: "json",
+    success: function (response) {
+
+      // set container header
+      $("#authorContainer").html("<h2>Create Test</h2>");
+
+      // create a form
+      $("#authorContainer").append(
+        "<form id=\"testForm\" onsubmit=\"createTest(); return false;\"></form>"
+      );
+
+      // append each question to the form with checkbox input
+      for (var question in response) {
+        $("#testForm").append(
+          "<div class=\"qField\">" +
+            "<p>" + question + ": " + response[question]["statement"] +
+            "&nbsp;<input type=\"checkbox\" name=\"" + question + "\">" +
+          "</div>"
+        );
+      }
+
+      // append form submission button
+      $("#testForm").append(
+        "<input type=\"submit\" value=\"Create Test\">"
+      );
+    },
+    error: function (request, status, error) {
+      $("#authorContainer").html(
+        "<p>There was a problem with the request, please contact the system administrator: <br>" +
+        request.responseText + "</p>"
+      );
+    }
+  });
+}
+
+/**
+ *  CREATE TEST
+ *  Create test using existing questions
+ */
+function createTest() {
+
+  // prepare an array of selected question id's and convert to JSON
+  var questions = [];
+  $('#testForm input:checked').each(function() {
+    questions.push($(this).attr('name'));
+  });
+  questions = JSON.stringify(questions);   //.replace("[", "{").replace("]", "}")
+
+  // create a test if at least one question was selected
+  if (questions !== '[]') {
+
+    $.ajax({
+      url: baseURL + "author/createTest",
+      data: {
+        qs: questions
+      },
+      type: "POST",
+      dataType: "html",
+      success: function (response) {
+        $("#authorContainer").html(response);
+      },
+      error: function (request, status, error) {
+        $("#authorContainer").html(
+          "<p>There was a problem with the request, please contact the system administrator: <br>" +
+          request.responseText + "</p>"
+        );
+      }
+    });
+  }
+}
+
+/**
+ *  MANAGE TESTS
+ *  Allow tests to be deleted - TODO: refactor to allow tests to be updated
+ */
+function getTests() {
+
+  $.ajax({
+    url: baseURL + "author/getTests",
+    type: "GET",
+    dataType: "json",
+    success: function (response) {
+
+      // set container header
+      $("#authorContainer").html("<h2>Manage Tests</h2>");
+
+      // create and append a representation of each question to the container
+      for (var test in response) {
+        $("#authorContainer").append(
+          "<p>" + test + ": " + response[test]["questions"].length +
+          " questions &nbsp;<button onclick=\"deleteTest('" +
+          test + "')\">DELETE</button></p>"
+        );
+      }
+    },
+    error: function (request, status, error) {
+      $("#authorContainer").html(
+        "<p>There was a problem with the request, please contact the system administrator: <br>" +
+        request.responseText + "</p>"
+      );
+    }
+  });
+}
+
+/**
+ *  DELETE TEST
+ *  Request to delete a question based on MongoId
+ */
+function deleteTest(testId) {
+
+  $.ajax({
+    url: baseURL + "author/deleteTest",
+    data: {
+      tId: testId
+    },
+    type: "POST",
+    dataType: "html",
+    success: function (response) {
+      $("#authorContainer").html(response);
+    },
+    error: function (request, status, error) {
+      $("#authorContainer").html(
+        "<p>There was a problem with the request, please contact the system administrator: <br>" +
+        request.responseText + "</p>"
+      );
+    }
+  });
+}
+
+/**
+ *  ISSUE TEST
+ *  Issue a tests to another user
+ */
+function issueTest() {
+
+
+}
+
+/**
+ *  EXIT AUTHORING PLATFORM
+ *  Return to the dashboard
+ */
+function exitPlatform() {
+
+  window.location.replace(baseURL + "dashboard");
+}

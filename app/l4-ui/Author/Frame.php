@@ -17,19 +17,15 @@
 
   <main>
 
-    <p>Choose a question type:</p>
-
-    <div id="questionSelectBar">
-      <?php
-        // create a button for each question type to allow requests for HTML templates
-        foreach ($questionTypes as $qt) {
-      ?>
-      <button onclick="getQuestionTemplate('<?= $qt; ?>');"><?= strtoupper($qt); ?></button>
-      <?php
-        }
-      ?>
-      <button onclick="getQuestionTemplate('inexistent');">INEXISTENT</button>
-    </div>
+    <!-- refactor this -->
+    <p>
+      Create a new <button onclick="getQuestionTemplate('boolean');">BOOLEAN</button> question,
+      <button onclick="manageQuestions();">MANAGE</button> existing questions,
+      create a <button onclick="loadQuestionsForTestCreation();">NEW TEST</button>,
+      <button  onclick="getTests();">MANAGE</button> existing tests or
+      <button>ISSUE</button> a test to another user.
+      <button onclick="exitPlatform();">EXIT</button> when you are finished.
+    </p>
 
     <div id="authorContainer"></div>
 

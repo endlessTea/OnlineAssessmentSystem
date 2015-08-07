@@ -30,15 +30,16 @@ class DashboardController {
    */
   public function loadFrame() {
 
-    $this->_AppModel->renderFrame("Dashboard");
+    $resources["userId"] = $this->_UserModel->getUserData()->userId;
+    $this->_AppModel->renderFrame("Dashboard", $resources);
   }
 
   /**
-   *  AJAX RESPONSE: test
-   *
+   *  LOG USER OUT
    */
-  public function ajaxTest() {
+  public function logout() {
 
-    echo file_get_contents(URL . "app/l4-ui/Dashboard/Test.html");
+    $this->_UserModel->logUserOut();
+    $this->_AppModel->redirectTo(URL);
   }
 }
