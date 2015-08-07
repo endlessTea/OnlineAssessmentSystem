@@ -52,4 +52,22 @@ class AuthorController {
 
     echo file_get_contents(URL . "app/l4-ui/Author/" . ucfirst($template) . ".html");
   }
+
+  /**
+   *  AJAX: PROCESS NEW QUESTION
+   *  Create boolean question - TODO: refactor this method to work with new types
+   */
+  public function createQuestion() {
+
+    // load question details and return the result of the operation
+    $question = array(
+      "schema" => "boolean",
+      "author" => "f39082hnf3902nf3029",         // $this->_UserModel->getUserData()->userId
+      "statement" => $this->_AppModel->getPOSTData("st"),
+      "singleAnswer" => $this->_AppModel->getPOSTData("sa"),
+      "feedback" => $this->_AppModel->getPOSTData("fb")
+    );
+
+    echo ($this->_AuthorModel->createQuestion($question)) ? "<p>Question created!</p>" : "<p>Error creating question</p>";
+  }
 }

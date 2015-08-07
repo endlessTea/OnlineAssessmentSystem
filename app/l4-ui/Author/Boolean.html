@@ -1,5 +1,34 @@
-<h2>Boolean question template</h2>
-<p>Statement</p>
-<p>Answer</p>
-<p>Feedback</p>
-<button>Create</button>
+<h2>Boolean question</h2>
+<form onsubmit="createQuestion('boolean'); return false;">
+  <div class="qField">
+    <label for="statement">Provide a statement that is true or false:</label>
+    <br>
+    <input id="statement"
+      type="text"
+      required
+      pattern="[a-zA-Z0-9\s]+"
+      placeholder="e.g. CSMA/CD stands for 'Carrier Sense Multiple Access with Collision Detection'">
+  </div>
+  <div class="qField">
+    <input id="singleAnswer"
+      name="singleAnswer"
+      type="radio"
+      value="TRUE"
+      checked> TRUE
+    <input id="singleAnswer"
+      name="singleAnswer"
+      type="radio"
+      value="FALSE"> FALSE
+  </div>
+  <div class="qField">
+    <label for="feedback">Provide optional feedback for this question:</label>
+    <br>
+    <input id="feedback"
+      type="text"
+      required
+      pattern="[a-zA-Z0-9\s]+"
+      placeholder="e.g. CSMA/CD is a Media Access Control method">
+  </div>
+  <br>
+  <input type="submit" value="Create">
+</form>
