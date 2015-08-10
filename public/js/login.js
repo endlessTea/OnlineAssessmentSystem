@@ -35,3 +35,35 @@ function logUserIn() {
     }
   });
 }
+
+function registerNewUser() {
+
+  $.ajax({
+    url: baseURL + "login/registerNewUser",
+    data: {
+      u: $('#username').val(),
+      p: $('#password').val()
+    },
+    type: "POST",
+    dataType: "html",
+    success: function (response) {
+      if (response === "userRegistered") {
+        $("#loginUpdates").html(
+          "<p>The new user has been registered<br>" +
+          "Please log in with the details provided</p>"
+        );
+      } else if (response === "invalid") {
+        $("#loginUpdates").html(
+          "<p>The username or password provided was not valid<br>" +
+          "Please try again.</p>"
+        );
+      }
+    },
+    error: function (request, status, error) {
+      $("#loginUpdates").html(
+        "<p>There was a problem with the request, please contact the system administrator: <br>" +
+        request.responseText + "</p>"
+      );
+    }
+  });
+}

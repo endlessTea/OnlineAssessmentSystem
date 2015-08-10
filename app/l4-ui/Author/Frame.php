@@ -23,7 +23,7 @@
       <button onclick="manageQuestions();">MANAGE</button> existing questions,
       create a <button onclick="loadQuestionsForTestCreation();">NEW TEST</button>,
       <button  onclick="getTests();">MANAGE</button> existing tests or
-      <button>ISSUE</button> a test to another user.
+      <button onclick="loadUsersForTestIssuing();">ISSUE</button> a test to another user.
       <button onclick="exitPlatform();">EXIT</button> when you are finished.
     </p>
 

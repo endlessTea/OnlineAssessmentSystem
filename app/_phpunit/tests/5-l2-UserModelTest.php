@@ -321,6 +321,32 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
 
   /**
    *  @test
+   *  Confirm list of users matches limited subset of values
+   */
+  public function getListOfUsers_validRequest_methodReturnsMatchingValues() {
+
+    // add 2x additional users to check function works as expected
+    $this->_UserModel->createUser("captaincrunch", "password");
+    $this->_UserModel->createUser("notarobot", "password");
+
+    // get user id's for comparison
+    $this->_UserModel->findUser("sample");
+    $userIdOne = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("captaincrunch");
+    $userIdTwo = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("notarobot");
+    $userIdThree = $this->_UserModel->getUserData()->userId;
+
+    $this->assertSame(
+      "{\"{$userIdOne}\":\"sample\"," .
+      "\"{$userIdTwo}\":\"captaincrunch\"," .
+      "\"{$userIdThree}\":\"notarobot\"}",
+      $this->_UserModel->getListOfUsers()
+    );
+  }
+
+  /**
+   *  @test
    *  Drop Users collection (reset for later testing)
    */
   public function _dropUserCollection_methodReturnsTrue() {

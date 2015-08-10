@@ -42,4 +42,17 @@ class LoginController {
       $this->_AppModel->getPOSTData("p")
     )) ? "sessionSet" : "invalid";
   }
+
+  /**
+   *  AJAX: REGISTER NEW USER
+   *  Process username and password, register as new user if no issues with data
+   *  On success, return indicator that the new user was registered otherwise an indicator of failure
+   */
+  public function registerNewUser() {
+    
+    echo ($this->_UserModel->createUser(
+      $this->_AppModel->getPOSTData("u"),
+      $this->_AppModel->getPOSTData("p")
+    )) ? "userRegistered" : "invalid";
+  }
 }

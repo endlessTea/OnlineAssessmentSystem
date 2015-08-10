@@ -42,6 +42,10 @@
       <div class="loginField">
         <input type="submit" value="Log In">
       </div>
+      <p>OR</p>
+      <div class="loginField">
+        <button onclick="registerNewUser();">Register</button>
+      </div>
     </div>
 
   </main>

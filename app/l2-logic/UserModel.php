@@ -201,4 +201,25 @@ class UserModel {
   public function getLoginStatus() {
     return $this->_loginStatus;
   }
+
+  /**
+   *  GET LIST OF REGISTERED USERS - TODO: refactor to restrict access to data
+   *  Return limited details about all users as JSON
+   *  @return subset of details about registered users (JSON)
+   */
+  public function getListOfUsers() {
+
+    // get full user documents and create root object
+    $users = $this->_DB->read("users", "ALL DOCUMENTS");
+    $userRoot = new stdClass();
+
+    // take the id as a string and username of each user
+    foreach($users as $uId => $details) {
+
+      $userRoot->{$uId} = new stdClass();
+      $userRoot->{$uId}->{'username'} = $details["username"];
+    }
+
+    return json_encode($userRoot);
+  }
 }

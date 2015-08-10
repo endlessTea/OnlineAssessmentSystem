@@ -53,6 +53,11 @@ class URLHandler {
 
         $controller->logUserIn();
         return;
+        
+      } elseif ($this->_URL["action"] === "registerNewUser") {
+
+        $controller->registerNewUser();
+        return;
       }
     }
 

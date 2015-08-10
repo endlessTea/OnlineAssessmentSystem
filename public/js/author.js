@@ -253,12 +253,57 @@ function deleteTest(testId) {
 }
 
 /**
+ *  LOAD USERS FOR TEST ISSUING
+ *  Get limited subset of user details to allow tests to be issued
+ */
+function loadUsersForTestIssuing() {
+
+  $.ajax({
+    url: baseURL + "author/getUsers",
+    type: "GET",
+    dataType: "json",
+    success: function (response) {
+
+      // set container header
+      $("#authorContainer").html("<h2>Issue Test</h2>");
+
+      // create a form
+      $("#authorContainer").append(
+        "<form id=\"testForm\" onsubmit=\"issueTest(); return false;\"></form>"
+      );
+
+      // append each question to the form with checkbox input
+      for (var user in response) {
+        // $("#testForm").append(
+        //   "<div class=\"qField\">" +
+        //     "<p>" + question + ": " + response[question]["statement"] +
+        //     "&nbsp;<input type=\"checkbox\" name=\"" + question + "\">" +
+        //   "</div>"
+        // );
+        console.log(user);
+      }
+
+      // append form submission button
+      $("#testForm").append(
+        "<input type=\"submit\" value=\"Issue Test\">"
+      );
+    },
+    error: function (request, status, error) {
+      $("#authorContainer").html(
+        "<p>There was a problem with the request, please contact the system administrator: <br>" +
+        request.responseText + "</p>"
+      );
+    }
+  });
+}
+
+/**
  *  ISSUE TEST
  *  Issue a tests to another user
  */
 function issueTest() {
 
-
+  alert('hi');
 }
 
 /**
