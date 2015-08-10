@@ -33,3 +33,23 @@ a:hover {
   background: blue;
   color: #fff;
 }
+
+/**
+ *  http://bl.ocks.org/mbostock/3887118
+ *  Scatterplot, multiple tests
+ */
+
+#visLeft {
+  font-size: .7em;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.dot {
+  stroke: #000;
+}
