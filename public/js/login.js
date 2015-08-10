@@ -69,13 +69,20 @@ function getRegistrationForm() {
  */
 function registerNewUser() {
 
+  var accountType;
+  if ($('form input:checked').length > 0) {
+    accountType = "assessor";
+  } else {
+    accountType = "student";
+  }
+
   $.ajax({
     url: baseURL + "login/registerNewUser",
     data: {
       u: $('#username').val(),
       p: $('#password').val(),
       n: $('#fullname').val(),
-      at: $('form input:checked').length === 1
+      at: accountType
     },
     type: "POST",
     dataType: "html",

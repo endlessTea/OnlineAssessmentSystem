@@ -142,40 +142,34 @@ class AuthorController {
    *  AJAX: GET STUDENTS FOR TEST
    *  Return a list of students that can take the test, have taken the test or have already been assigned
    */
-  public function getStudentsForTest($testIdStr) {
+  public function getStudentsForTest() {
 
     // check that the user requesting data has a valid assessor account
     if ($this->_UserModel->getUserData()->accountType !== "assessor") {
+      print_r($this->_UserModel->getUserData()->accountType);
       echo "Invalid account type to request data";
-      return;
+      exit;
     }
 
-    // check that the test exists
-    $test = $this->_AuthorModel->getSingleTest(
-      new MongoId($testIdStr),
-      $this->_UserModel->getUserData()->userId
-    );
+    // attempt to convert test identifier to MongoId
+    try {
 
-    if ($test === false || empty($test)) {
-      echo "Invalid test identifer";
-      return;
-    }
+      $testIdObj = new MongoId($this->_AppModel->getPOSTData("tId"));
 
-    // TODO
+    } catch (Exception $e) {
 
-    // get a list of students, check if any have already been registered for, or have taken the test
-    $students = $this->_UserModel->getListOfStudents();
-    foreach ($students as $sId => $details) {
-
-
+      echo "Invalid test identifier";
+      exit;
     }
 
     // change the header to indicate that JSON data is being returned
 		header('Content-Type: application/json');
 
-    //
-
-    echo "erm";
+    // get students for test
+    echo $this->_AuthorModel->getStudentsForTest(
+      $testIdObj,
+      $this->_UserModel->getUserData()->userId
+    );
   }
 
   /**
@@ -184,6 +178,21 @@ class AuthorController {
    */
   public function issueTest() {
 
+    // attempt to convert test and user id identifier to MongoIds
+    try {
 
+      $testIdObj = new MongoId($this->_AppModel->getPOSTData("tId"));
+      $userIdObj = new MongoId($this->_AppModel->getPOSTData("sId"));
+
+    } catch (Exception $e) {
+
+      echo "Invalid test identifier";
+      exit;
+    }
+
+    echo ($this->_AuthorModel->makeTestAvailableToUser(
+      $testIdObj,
+      $userIdObj
+    )) ? "<p>Test issued!</p>" : "<p>Error issuing test</p>";
   }
 }

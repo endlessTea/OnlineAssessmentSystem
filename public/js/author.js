@@ -271,7 +271,7 @@ function loadTests() {
       for (var test in response) {
         $("#authorContainer").append(
           "<p>" + test + " &nbsp;<button onclick=\"loadUsersForTest('" +
-          test + "')\">ISSUE</button></p>"
+          test + "')\">SELECT</button></p>"
         );
       }
     },
@@ -290,54 +290,65 @@ function loadTests() {
  */
 function loadUsersForTest(testId) {
 
-  alert(testId);
+  $.ajax({
+    url: baseURL + "author/getStudentsForTest",
+    data: {
+      tId: testId
+    },
+    type: "POST",
+    dataType: "json",
+    success: function (response) {
 
-  // $.ajax({
-  //   url: baseURL + "author/getUsers",
-  //   type: "GET",
-  //   dataType: "json",
-  //   success: function (response) {
-  //
-  //     // set container header
-  //     $("#authorContainer").html("<h2>Issue Test</h2>");
-  //
-  //     // create a form
-  //     $("#authorContainer").append(
-  //       "<form id=\"testForm\" onsubmit=\"issueTest(); return false;\"></form>"
-  //     );
-  //
-  //     // append each question to the form with checkbox input
-  //     for (var user in response) {
-  //       // $("#testForm").append(
-  //       //   "<div class=\"qField\">" +
-  //       //     "<p>" + question + ": " + response[question]["statement"] +
-  //       //     "&nbsp;<input type=\"checkbox\" name=\"" + question + "\">" +
-  //       //   "</div>"
-  //       // );
-  //       console.log(user);
-  //     }
-  //
-  //     // append form submission button
-  //     $("#testForm").append(
-  //       "<input type=\"submit\" value=\"Issue Test\">"
-  //     );
-  //   },
-  //   error: function (request, status, error) {
-  //     $("#authorContainer").html(
-  //       "<p>There was a problem with the request, please contact the system administrator: <br>" +
-  //       request.responseText + "</p>"
-  //     );
-  //   }
-  // });
+      // set container header
+      $("#authorContainer").html("<h2>Issue Test</h2>");
+
+      // create a form
+      $("#authorContainer").append(
+        "<p>Test '" + testId + "' is available to issue to:</p>"
+      );
+
+      // create an entry for each available user
+      for (var user in response) {
+        $("#authorContainer").append(
+          "<p>" + user + ": " + response[user]
+          + " &nbsp;<button onclick=\"issueTest('" +
+          testId + "', '" + user + "')\">ISSUE</button></p>"
+        );
+      }
+    },
+    error: function (request, status, error) {
+      $("#authorContainer").html(
+        "<p>There was a problem with the request, please contact the system administrator: <br>" +
+        request.responseText + "</p>"
+      );
+    }
+  });
 }
 
 /**
  *  ISSUE TEST
  *  Issue a tests to another user
  */
-function issueTest() {
+function issueTest(testId, userId) {
 
-  alert('hi');
+  $.ajax({
+    url: baseURL + "author/issueTest",
+    data: {
+      tId: testId,
+      sId: userId
+    },
+    type: "POST",
+    dataType: "html",
+    success: function (response) {
+      $("#authorContainer").html(response);
+    },
+    error: function (request, status, error) {
+      $("#authorContainer").html(
+        "<p>There was a problem with the request, please contact the system administrator: <br>" +
+        request.responseText + "</p>"
+      );
+    }
+  });
 }
 
 /**

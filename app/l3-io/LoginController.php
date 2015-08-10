@@ -59,8 +59,11 @@ class LoginController {
    */
   public function registerNewUser() {
 
-    if ($this->_AppModel->getPOSTData("at") === true) $accountType = "assessor";
-    else $accountType = "student";
+    $accountType = $this->_AppModel->getPOSTData("at");
+    if (!$accountType === "assessor" || !$accountType === "student") {
+      echo "Invalid account type";
+      exit;
+    }
 
     echo ($this->_UserModel->createUser(
       $this->_AppModel->getPOSTData("u"),

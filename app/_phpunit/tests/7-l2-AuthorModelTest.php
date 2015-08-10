@@ -408,7 +408,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
 
     // get test id
     $testId = key($this->_DB->read("tests", array("author" => $this->_testTestAuthorId)));
-
+    
     $this->assertEquals(
       1,
       count($this->_AuthorModel->getSingleTest(new MongoId($testId), $this->_testTestAuthorId))
@@ -539,6 +539,8 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
     );
     $this->assertFalse($result);
   }
+
+  // TODO check that getStudentsForTest returns correct JSON
 
   /**
    *  @test

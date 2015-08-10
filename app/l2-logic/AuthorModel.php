@@ -248,6 +248,37 @@ class AuthorModel {
   }
 
   /**
+   *  GET STUDENTS THAT CAN OR HAVE TAKEN A TEST
+   *  Get an array of student id's and names that are eligible to take a test
+   *  @return JSON of values on success, otherwise returns false (boolean)
+   */
+  public function getStudentsForTest($testIdObj, $userIdStr) {
+
+    // get test
+    $test = $this->getSingleTest($testIdObj, $userIdStr);
+    $test = array_pop($test);
+    if ($test === false) return false;
+
+    // get list of students
+    $users = $this->_DB->read("users", array("account_type" => "student"));
+    $userRoot = new stdClass();
+
+    foreach($users as $uId => $details) {
+
+      if (isset($test["taken"]))
+        if (array_key_exists($uId, $test["taken"])) continue;
+
+      if (isset($test["available"]))
+        if (in_array($uId, $test["available"])) continue;
+
+      // only add users that have not taken the test or have not been registered
+      $userRoot->{$uId} = $details["full_name"];
+    }
+
+    return json_encode($userRoot);
+  }
+
+  /**
    *  MAKE A TEST AVAILABLE TO A USER
    *  Register a user id with a test so they may take it
    *  @return true (boolean) on success, else false
