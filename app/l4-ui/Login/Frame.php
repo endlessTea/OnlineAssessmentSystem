@@ -17,35 +17,35 @@
 
   <main>
 
-    <p>Please provide your username and password</p>
+    <p id="prompt">Please provide your username and password</p>
 
-    <div id="loginUpdates"></div>
+    <div id="NotificationsFromServer"></div>
 
-    <form onsubmit="logUserIn(); return false;">
-      <div class="loginField">
-        <label for="username">Username</label>
-        <input type="text"
-          id="username"
-          autocomplete="off"
-          autofocus
-          pattern="[a-zA-Z0-9]+"
-          required>
-      </div>
-      <div class="loginField">
-        <label for="password">Password</label>
-        <input type="password"
-          id="password"
-          autocomplete="off"
-          pattern="[a-zA-Z0-9]+"
-          required>
-      </div>
-      <div class="loginField">
-        <input type="submit" value="Log In">
-      </div>
+    <div id="UIForm">
+      <form onsubmit="logUserIn(); return false;">
+        <div class="loginField">
+          <label for="username">Username</label>
+          <input type="text"
+            id="username"
+            autocomplete="off"
+            autofocus
+            pattern="[a-zA-Z0-9]+"
+            required>
+        </div>
+        <div class="loginField">
+          <label for="password">Password</label>
+          <input type="password"
+            id="password"
+            autocomplete="off"
+            pattern="[a-zA-Z0-9]+"
+            required>
+        </div>
+        <div class="loginField">
+          <input type="submit" value="Log In">
+        </div>
+      </form>
       <p>OR</p>
-      <div class="loginField">
-        <button onclick="registerNewUser();">Register</button>
-      </div>
+      <button onclick="getRegistrationForm();">Register</button>
     </div>
 
   </main>

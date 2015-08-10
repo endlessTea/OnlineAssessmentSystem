@@ -108,7 +108,8 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
 
     $username = "sample";
     $originalPassword = "password";
-    $result = $this->_UserModel->createUser($username, $originalPassword);
+    $fullName = "Sample User";
+    $result = $this->_UserModel->createUser($username, $originalPassword, $fullName);
     $this->assertTrue($result);
   }
 
@@ -120,9 +121,10 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
 
     $username = "sample";
     $originalPassword = "password";
-    $result = $this->_UserModel->createUser($username, $originalPassword);
+    $fullName = "Sample User";
+    $result = $this->_UserModel->createUser($username, $originalPassword, $fullName);
     $this->assertSame(
-      "Duplicate key: The username 'sample' already exists.",
+      "Duplicate key: The user name 'sample' already exists.",
       $result
     );
   }
@@ -133,7 +135,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
    */
   public function findUser_findSampleUserByMongoId_methodReturnsTrue() {
 
-    $user = $this->_DB->read("users", array("username" => "sample"));
+    $user = $this->_DB->read("users", array("user_name" => "sample"));
     $mongoIdObj = new MongoId(key($user));
     $result = $this->_UserModel->findUser($mongoIdObj);
     $this->assertTrue($result);
@@ -166,13 +168,13 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
    */
   public function constructAndGetUserData_checkDataMatch_methodReturnsMatchingData() {
 
-    $user = $this->_DB->read("users", array("username" => "sample"));
+    $user = $this->_DB->read("users", array("user_name" => "sample"));
     $this->_SG->session("user", "put", key($user));
     $user = array_pop($user);
     $newUserModel = new UserModel();
     $this->assertSame(
-      $user["username"],
-      $newUserModel->getUserData()->username
+      $user["user_name"],
+      $newUserModel->getUserData()->userName
     );
   }
 
@@ -182,7 +184,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
    */
   public function constructAndGetLoginStatus_checkLoginStatus_methodReturnsTrue() {
 
-    $user = $this->_DB->read("users", array("username" => "sample"));
+    $user = $this->_DB->read("users", array("user_name" => "sample"));
     $this->_SG->session("user", "put", key($user));
     $newUserModel = new UserModel();
     $this->assertTrue($newUserModel->getLoginStatus());
@@ -205,7 +207,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   public function updateUser_changePassword_methodReturnsTrue() {
 
     // get sample user and update session superglobal
-    $user = $this->_DB->read("users", array("username" => "sample"));
+    $user = $this->_DB->read("users", array("user_name" => "sample"));
     $this->_SG->session("user", "put", key($user));
     $user = array_pop($user);
 
@@ -225,10 +227,10 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
    */
   public function updateUser_attemptUsernameChange_methodReturnsFalse() {
 
-    $user = $this->_DB->read("users", array("username" => "sample"));
+    $user = $this->_DB->read("users", array("user_name" => "sample"));
     $this->_SG->session("user", "put", key($user));
     $newUserModel = new UserModel();
-    $result = $newUserModel->updateUser("username", "newUsername");
+    $result = $newUserModel->updateUser("user_name", "newUsername");
     $this->assertFalse($result);
   }
 
@@ -302,7 +304,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
    */
   public function logUserOut_logOutAfterObjectConstructionUsingSession_methodReturnsTrue() {
 
-    $user = $this->_DB->read("users", array("username" => "sample"));
+    $user = $this->_DB->read("users", array("user_name" => "sample"));
     $this->_SG->session("user", "put", key($user));
     $newUserModel = new UserModel();
     $result = $newUserModel->logUserOut();
@@ -325,23 +327,13 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
    */
   public function getListOfUsers_validRequest_methodReturnsMatchingValues() {
 
-    // add 2x additional users to check function works as expected
-    $this->_UserModel->createUser("captaincrunch", "password");
-    $this->_UserModel->createUser("notarobot", "password");
-
     // get user id's for comparison
     $this->_UserModel->findUser("sample");
     $userIdOne = $this->_UserModel->getUserData()->userId;
-    $this->_UserModel->findUser("captaincrunch");
-    $userIdTwo = $this->_UserModel->getUserData()->userId;
-    $this->_UserModel->findUser("notarobot");
-    $userIdThree = $this->_UserModel->getUserData()->userId;
 
     $this->assertSame(
-      "{\"{$userIdOne}\":\"sample\"," .
-      "\"{$userIdTwo}\":\"captaincrunch\"," .
-      "\"{$userIdThree}\":\"notarobot\"}",
-      $this->_UserModel->getListOfUsers()
+      "{\"{$userIdOne}\":{\"user_name\":\"sample\"}}",
+      $this->_UserModel->getListOfStudents()
     );
   }
 

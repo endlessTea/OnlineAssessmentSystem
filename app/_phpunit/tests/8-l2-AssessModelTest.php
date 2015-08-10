@@ -36,10 +36,10 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   public function _createMongoDBentries_methodsReturnTrue() {
 
     // create users
-    $this->_UserModel->createUser("testAuthor", "password");
-    $this->_UserModel->createUser("testStudent", "password");
-    $this->_UserModel->createUser("testStudent2", "password");
-    $this->_UserModel->createUser("testStudent3", "password");
+    $this->_UserModel->createUser("testAuthor", "password", "Test Author");
+    $this->_UserModel->createUser("testStudent", "password", "Test Student One");
+    $this->_UserModel->createUser("testStudent2", "password", "Test Student Two");
+    $this->_UserModel->createUser("testStudent3", "password", "Test Student Three");
 
     // get user id's
     $this->_UserModel->findUser("testAuthor");

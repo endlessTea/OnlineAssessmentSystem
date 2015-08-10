@@ -40,10 +40,10 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
   public function _createMongoDBentries_methodsReturnTrue() {
 
     // create users
-    $this->_UserModel->createUser("testAuthor", "password");
-    $this->_UserModel->createUser("studentOne", "password");
-    $this->_UserModel->createUser("studentTwo", "password");
-    $this->_UserModel->createUser("studentNoParticipation", "password");
+    $this->_UserModel->createUser("testAuthor", "password", "Test Author");
+    $this->_UserModel->createUser("studentOne", "password", "Test Student");
+    $this->_UserModel->createUser("studentTwo", "password", "Test Student Two");
+    $this->_UserModel->createUser("studentNoParticipation", "password", "Non-participating Student");
 
     // get user id's
     $this->_UserModel->findUser("testAuthor");

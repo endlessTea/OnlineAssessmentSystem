@@ -30,7 +30,7 @@ class DashboardController {
    */
   public function loadFrame() {
 
-    $resources["userId"] = $this->_UserModel->getUserData()->userId;
+    $resources["fullName"] = $this->_UserModel->getUserData()->fullName;
     $this->_AppModel->renderFrame("Dashboard", $resources);
   }
 

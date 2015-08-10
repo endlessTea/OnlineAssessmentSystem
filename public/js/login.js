@@ -21,14 +21,14 @@ function logUserIn() {
       if (response === "sessionSet") {
         window.location.replace(baseURL);
       } else if (response === "invalid") {
-        $("#loginUpdates").html(
+        $("#NotificationsFromServer").html(
           "<p>The username or password provided was not valid<br>" +
           "Please try again.</p>"
         );
       }
     },
     error: function (request, status, error) {
-      $("#loginUpdates").html(
+      $("#NotificationsFromServer").html(
         "<p>There was a problem with the request, please contact the system administrator: <br>" +
         request.responseText + "</p>"
       );
@@ -36,31 +36,67 @@ function logUserIn() {
   });
 }
 
+/**
+ *  GET REGISTRATION FORM
+ *  Send a request for HTML template, change fields
+ */
+function getRegistrationForm() {
+
+  $.ajax({
+    url: baseURL + "login/getRegistrationForm",
+    type: "GET",
+    dataType: "html",
+    success: function (response) {
+
+      // update page details
+      $('h1').html("Register New User");
+      $('#prompt').html("Please provide new user details below");
+      $('#UIForm').html(response);
+
+    },
+    error: function (request, status, error) {
+      $("#NotificationsFromServer").html(
+        "<p>There was a problem with the request, please contact the system administrator: <br>" +
+        request.responseText + "</p>"
+      );
+    }
+  });
+}
+
+/**
+ *
+ *
+ */
 function registerNewUser() {
 
   $.ajax({
     url: baseURL + "login/registerNewUser",
     data: {
       u: $('#username').val(),
-      p: $('#password').val()
+      p: $('#password').val(),
+      n: $('#fullname').val(),
+      at: $('form input:checked').length === 1
     },
     type: "POST",
     dataType: "html",
     success: function (response) {
       if (response === "userRegistered") {
-        $("#loginUpdates").html(
+        $('#UIForm').html();
+        $("#NotificationsFromServer").html(
           "<p>The new user has been registered<br>" +
-          "Please log in with the details provided</p>"
+          "Please " +
+          "<a href=\"" + baseURL + "\">log in</a> " + 
+          "with the details provided</p>"
         );
       } else if (response === "invalid") {
-        $("#loginUpdates").html(
+        $("#NotificationsFromServer").html(
           "<p>The username or password provided was not valid<br>" +
           "Please try again.</p>"
         );
       }
     },
     error: function (request, status, error) {
-      $("#loginUpdates").html(
+      $("#NotificationsFromServer").html(
         "<p>There was a problem with the request, please contact the system administrator: <br>" +
         request.responseText + "</p>"
       );

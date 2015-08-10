@@ -374,7 +374,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
    *  @test
    *  Get test created earlier
    */
-  public function getTests_checkTestReturnedContainsQuestionIds_arrayValuesMatch() {
+  public function getTests_validRequest_methodReturnsTest() {
 
     $document = $this->_AuthorModel->getTests($this->_testTestAuthorId);
     $this->assertEquals(1, count($document));
@@ -398,6 +398,48 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
 
     $result = $this->_AuthorModel->getTests("<script>alert();</script>");
     $this->assertFalse($result);
+  }
+
+  /**
+   *  @test
+   *  Request a single test, providing test id and author id
+   */
+  public function getSingleTest_validRequest_methodReturnsTest() {
+
+    // get test id
+    $testId = key($this->_DB->read("tests", array("author" => $this->_testTestAuthorId)));
+
+    $this->assertEquals(
+      1,
+      count($this->_AuthorModel->getSingleTest(new MongoId($testId), $this->_testTestAuthorId))
+    );
+  }
+
+  /**
+   *  @test
+   *  Return false for test id that is not a MongoId object
+   */
+  public function getSingleTest_testIdNotMongoIdObject_methodReturnsFalse() {
+
+    $this->assertFalse($this->_AuthorModel->getSingleTest(
+      "nfie39h9f032nf3p2nf3f3f",
+      $this->_testTestAuthorId
+    ));
+  }
+
+  /**
+   *  @test
+   *  Attempt to get tests where the author id isn't hexadecimal characters
+   */
+  public function getSingleTest_authorIdNotHexadecimalString_methodReturnsFalse() {
+
+    // get test id
+    $testId = key($this->_DB->read("tests", array("author" => $this->_testTestAuthorId)));
+
+    $this->assertFalse($this->_AuthorModel->getSingleTest(
+      new MongoId($testId),
+      "<script>alert();</script>"
+    ));
   }
 
   /**
@@ -512,9 +554,9 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
 
     // create a user & turn into MongoId
     $userModel = new UserModel();
-    $userModel->createUser("jeeves", "password123");
+    $userModel->createUser("jeeves", "password123", "Jeeves");
     $user = $this->_DB->read("users", array(
-      "username" => "jeeves"
+      "user_name" => "jeeves"
     ));
     $studentId = new MongoId(key($user));
 
@@ -556,7 +598,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
 
     // get user that would have already taken the test
     $user = $this->_DB->read("users", array(
-      "username" => "jeeves"
+      "user_name" => "jeeves"
     ));
     $studentId = new MongoId(key($user));
 

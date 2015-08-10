@@ -196,6 +196,27 @@ class AuthorModel {
   }
 
   /**
+   *  GET A SINGLE TEST
+   *  Get a single test matching a test ID and user String
+   *  @return document as PHP array, or empty if no match
+   */
+  public function getSingleTest($testIdObj, $userIdStr) {
+
+    // if test ID object is MongoId and userId string is hexadecimal chars
+    if (is_a($testIdObj, 'MongoId') &&
+      preg_match('/^([a-z0-9])+$/', $userIdStr) === 1) {
+
+      // return data
+      return $this->_DB->read("tests", array(
+        "_id" => $testIdObj,
+        "author" => $userIdStr
+      ));
+    }
+
+    return false;
+  }
+
+  /**
    *  UPDATE A TEST
    *  Update the value of a test (expects MongoId object)
    *  If key exists in schema and operation is permitted

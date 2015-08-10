@@ -44,15 +44,29 @@ class LoginController {
   }
 
   /**
+   *  AJAX: FETCH REGISTRATION TEMPLATE
+   *  Return the HTML fields to allow new user registration
+   */
+  public function getRegistrationForm() {
+
+    echo file_get_contents(URL . "app/l4-ui/Login/Register.html");
+  }
+
+  /**
    *  AJAX: REGISTER NEW USER
    *  Process username and password, register as new user if no issues with data
    *  On success, return indicator that the new user was registered otherwise an indicator of failure
    */
   public function registerNewUser() {
-    
+
+    if ($this->_AppModel->getPOSTData("at")) $accountType = "assessor";
+    else $accountType = "student";
+
     echo ($this->_UserModel->createUser(
       $this->_AppModel->getPOSTData("u"),
-      $this->_AppModel->getPOSTData("p")
+      $this->_AppModel->getPOSTData("p"),
+      $this->_AppModel->getPOSTData("n"),
+      $accountType
     )) ? "userRegistered" : "invalid";
   }
 }

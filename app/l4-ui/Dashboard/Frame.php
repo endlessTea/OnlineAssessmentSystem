@@ -13,7 +13,7 @@
 
   <header>
     <h1>Dashboard</h1>
-    <p>Welcome, user <?= $userId; ?></p>
+    <p>Welcome, user <?= $fullName; ?></p>
   </header>
 
   <main>

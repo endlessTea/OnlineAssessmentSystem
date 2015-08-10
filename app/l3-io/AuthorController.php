@@ -139,17 +139,43 @@ class AuthorController {
   }
 
   /**
-   *  AJAX: GET USERS - TODO: refactor to limit to assessor accounts
-   *  Get a list of users
+   *  AJAX: GET STUDENTS FOR TEST
+   *  Return a list of students that can take the test, have taken the test or have already been assigned
    */
-  public function getUsers($testIdStr) {
+  public function getStudentsForTest($testIdStr) {
+
+    // check that the user requesting data has a valid assessor account
+    if ($this->_UserModel->getUserData()->accountType !== "assessor") {
+      echo "Invalid account type to request data";
+      return;
+    }
+
+    // check that the test exists
+    $test = $this->_AuthorModel->getSingleTest(
+      new MongoId($testIdStr),
+      $this->_UserModel->getUserData()->userId
+    );
+
+    if ($test === false || empty($test)) {
+      echo "Invalid test identifer";
+      return;
+    }
+
+    // TODO
+
+    // get a list of students, check if any have already been registered for, or have taken the test
+    $students = $this->_UserModel->getListOfStudents();
+    foreach ($students as $sId => $details) {
+
+
+    }
 
     // change the header to indicate that JSON data is being returned
 		header('Content-Type: application/json');
 
-    // 
+    //
 
-    echo $this->_UserModel->getListOfUsers();
+    echo "erm";
   }
 
   /**

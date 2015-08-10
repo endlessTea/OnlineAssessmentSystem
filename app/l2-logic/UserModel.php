@@ -29,7 +29,7 @@ class UserModel {
 
     // define which fields may be updated
     $this->_updateProperties = array(
-      "hash", "salt"
+      "hash", "salt", "full_name"
     );
 
     // if an existing session exists..
@@ -76,17 +76,24 @@ class UserModel {
    *  Contains: MongoID (generated), username, hash and salt
    *  @return true (boolean) on success, otherwise an error String
    */
-  public function createUser($username, $password) {
+  public function createUser($user_name, $password, $full_name, $account_type = '') {
 
     // create salt, then create hash of original password
     $salt = $this->makeSalt();
     $hash = $this->makeHash($password, $salt);
 
+    // check if request made to create an assessor account, otherwise set as student acc.
+    if ($account_type !== "assessor") {
+      $account_type = "student";
+    }
+
     // create user object to store as BSON document in DB
     $user = array(
-      "username" => $username,
+      "user_name" => $user_name,
       "hash" => $hash,
-      "salt" => $salt
+      "salt" => $salt,
+      "full_name" => $full_name,
+      "account_type" => $account_type
     );
 
     // attempt to create user
@@ -94,7 +101,7 @@ class UserModel {
 
     if (preg_match("/E11000/", $result) === 1) {
 
-      return "Duplicate key: The username '{$username}' already exists.";
+      return "Duplicate key: The user name '{$user_name}' already exists.";
     }
 
     return $result;
@@ -115,7 +122,7 @@ class UserModel {
 
     } elseif ($userIdentifier !== null) {
 
-      $data = $this->_DB->read("users", array("username" => $userIdentifier));
+      $data = $this->_DB->read("users", array("user_name" => $userIdentifier));
     }
 
     // if the user exists, change $_userData values and return true
@@ -123,9 +130,11 @@ class UserModel {
       $this->_userData = new stdClass();
       $this->_userData->userId = key($data);
       $data = array_pop($data);
-      $this->_userData->username = $data["username"];
+      $this->_userData->userName = $data["user_name"];
       $this->_userData->hash = $data["hash"];
       $this->_userData->salt = $data["salt"];
+      $this->_userData->fullName = $data["full_name"];
+      $this->_userData->accountType = $data["account_type"];
       return true;
     }
 
@@ -203,21 +212,21 @@ class UserModel {
   }
 
   /**
-   *  GET LIST OF REGISTERED USERS - TODO: refactor to restrict access to data
+   *  GET LIST OF STUDENTS
    *  Return limited details about all users as JSON
    *  @return subset of details about registered users (JSON)
    */
-  public function getListOfUsers() {
+  public function getListOfStudents() {
 
     // get full user documents and create root object
-    $users = $this->_DB->read("users", "ALL DOCUMENTS");
+    $users = $this->_DB->read("users", array("account_type" => "student"));
     $userRoot = new stdClass();
 
     // take the id as a string and username of each user
     foreach($users as $uId => $details) {
 
       $userRoot->{$uId} = new stdClass();
-      $userRoot->{$uId}->{'username'} = $details["username"];
+      $userRoot->{$uId}->{'user_name'} = $details["user_name"];
     }
 
     return json_encode($userRoot);
