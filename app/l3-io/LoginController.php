@@ -59,7 +59,7 @@ class LoginController {
    */
   public function registerNewUser() {
 
-    if ($this->_AppModel->getPOSTData("at")) $accountType = "assessor";
+    if ($this->_AppModel->getPOSTData("at") === true) $accountType = "assessor";
     else $accountType = "student";
 
     echo ($this->_UserModel->createUser(
@@ -67,6 +67,6 @@ class LoginController {
       $this->_AppModel->getPOSTData("p"),
       $this->_AppModel->getPOSTData("n"),
       $accountType
-    )) ? "userRegistered" : "invalid";
+    ) === true) ? "userRegistered" : "invalid";
   }
 }

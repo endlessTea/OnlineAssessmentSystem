@@ -34,7 +34,7 @@ class DB {
 
       // create unique index for users based on username
       $this->_mongo->users->createIndex(
-        array("username" => 1),
+        array("user_name" => 1),
         array("unique" => true)
       );
 

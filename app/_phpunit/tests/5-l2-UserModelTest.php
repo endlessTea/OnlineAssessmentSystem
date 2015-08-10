@@ -115,6 +115,30 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
 
   /**
    *  @test
+   *  Create multiple users, operations return true
+   */
+  public function createUser_createMultipleUsers_methodsReturnTrue() {
+
+    $this->assertTrue($this->_UserModel->createUser(
+      "jeremy",
+      "password",
+      "Jeremy Bentham",
+      "assessor"
+    ));
+    $this->assertTrue($this->_UserModel->createUser(
+      "alan",
+      "password",
+      "Alan Partridge"
+    ));
+    $this->assertTrue($this->_UserModel->createUser(
+      "custard",
+      "password",
+      "Custard Distributor"
+    ));
+  }
+
+  /**
+   *  @test
    *  Test username uniqueness
    */
   public function createUser_attemptCreateDuplicateUser_returnsSpecificString() {
@@ -325,14 +349,20 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
    *  @test
    *  Confirm list of users matches limited subset of values
    */
-  public function getListOfUsers_validRequest_methodReturnsMatchingValues() {
+  public function getListOfStudents_validRequest_methodReturnsMatchingValues() {
 
     // get user id's for comparison
     $this->_UserModel->findUser("sample");
     $userIdOne = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("alan");
+    $userIdTwo = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("custard");
+    $userIdThree = $this->_UserModel->getUserData()->userId;
 
     $this->assertSame(
-      "{\"{$userIdOne}\":{\"user_name\":\"sample\"}}",
+      "{\"{$userIdOne}\":{\"user_name\":\"sample\"}," .
+      "\"{$userIdTwo}\":{\"user_name\":\"alan\"}," .
+      "\"{$userIdThree}\":{\"user_name\":\"custard\"}}",
       $this->_UserModel->getListOfStudents()
     );
   }

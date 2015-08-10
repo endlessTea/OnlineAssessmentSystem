@@ -81,11 +81,11 @@ function registerNewUser() {
     dataType: "html",
     success: function (response) {
       if (response === "userRegistered") {
-        $('#UIForm').html();
+        $('#UIForm').html('');
         $("#NotificationsFromServer").html(
           "<p>The new user has been registered<br>" +
           "Please " +
-          "<a href=\"" + baseURL + "\">log in</a> " + 
+          "<a href=\"" + baseURL + "\">log in</a> " +
           "with the details provided</p>"
         );
       } else if (response === "invalid") {
