@@ -198,7 +198,7 @@ function createTest() {
  *  MANAGE TESTS
  *  Allow tests to be deleted - TODO: refactor to allow tests to be updated
  */
-function getTests() {
+function manageTests() {
 
   $.ajax({
     url: baseURL + "author/getTests",
@@ -253,40 +253,27 @@ function deleteTest(testId) {
 }
 
 /**
- *  LOAD USERS FOR TEST ISSUING
- *  Get limited subset of user details to allow tests to be issued
+ *  LOAD TESTS TO ALLOW TEST ISSUING
+ *  Load the users tests - allows an ID to be specified, returned to the server and availability to be returned
  */
-function loadUsersForTestIssuing() {
+function loadTests() {
 
   $.ajax({
-    url: baseURL + "author/getUsers",
+    url: baseURL + "author/getTests",
     type: "GET",
     dataType: "json",
     success: function (response) {
 
       // set container header
-      $("#authorContainer").html("<h2>Issue Test</h2>");
+      $("#authorContainer").html("<h2>Select Test</h2>");
 
-      // create a form
-      $("#authorContainer").append(
-        "<form id=\"testForm\" onsubmit=\"issueTest(); return false;\"></form>"
-      );
-
-      // append each question to the form with checkbox input
-      for (var user in response) {
-        // $("#testForm").append(
-        //   "<div class=\"qField\">" +
-        //     "<p>" + question + ": " + response[question]["statement"] +
-        //     "&nbsp;<input type=\"checkbox\" name=\"" + question + "\">" +
-        //   "</div>"
-        // );
-        console.log(user);
+      // create and append a representation of each question to the container
+      for (var test in response) {
+        $("#authorContainer").append(
+          "<p>" + test + " &nbsp;<button onclick=\"loadUsersForTest('" +
+          test + "')\">ISSUE</button></p>"
+        );
       }
-
-      // append form submission button
-      $("#testForm").append(
-        "<input type=\"submit\" value=\"Issue Test\">"
-      );
     },
     error: function (request, status, error) {
       $("#authorContainer").html(
@@ -295,6 +282,53 @@ function loadUsersForTestIssuing() {
       );
     }
   });
+}
+
+/**
+ *  LOAD USERS FOR TEST ISSUING
+ *  Get limited subset of user details to allow tests to be issued
+ */
+function loadUsersForTest(testId) {
+
+  alert(testId);
+
+  // $.ajax({
+  //   url: baseURL + "author/getUsers",
+  //   type: "GET",
+  //   dataType: "json",
+  //   success: function (response) {
+  //
+  //     // set container header
+  //     $("#authorContainer").html("<h2>Issue Test</h2>");
+  //
+  //     // create a form
+  //     $("#authorContainer").append(
+  //       "<form id=\"testForm\" onsubmit=\"issueTest(); return false;\"></form>"
+  //     );
+  //
+  //     // append each question to the form with checkbox input
+  //     for (var user in response) {
+  //       // $("#testForm").append(
+  //       //   "<div class=\"qField\">" +
+  //       //     "<p>" + question + ": " + response[question]["statement"] +
+  //       //     "&nbsp;<input type=\"checkbox\" name=\"" + question + "\">" +
+  //       //   "</div>"
+  //       // );
+  //       console.log(user);
+  //     }
+  //
+  //     // append form submission button
+  //     $("#testForm").append(
+  //       "<input type=\"submit\" value=\"Issue Test\">"
+  //     );
+  //   },
+  //   error: function (request, status, error) {
+  //     $("#authorContainer").html(
+  //       "<p>There was a problem with the request, please contact the system administrator: <br>" +
+  //       request.responseText + "</p>"
+  //     );
+  //   }
+  // });
 }
 
 /**

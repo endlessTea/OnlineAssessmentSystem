@@ -142,10 +142,12 @@ class AuthorController {
    *  AJAX: GET USERS - TODO: refactor to limit to assessor accounts
    *  Get a list of users
    */
-  public function getUsers() {
+  public function getUsers($testIdStr) {
 
     // change the header to indicate that JSON data is being returned
 		header('Content-Type: application/json');
+
+    // 
 
     echo $this->_UserModel->getListOfUsers();
   }

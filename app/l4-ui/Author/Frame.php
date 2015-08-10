@@ -22,8 +22,8 @@
       Create a new <button onclick="getQuestionTemplate('boolean');">BOOLEAN</button> question,
       <button onclick="manageQuestions();">MANAGE</button> existing questions,
       create a <button onclick="loadQuestionsForTestCreation();">NEW TEST</button>,
-      <button  onclick="getTests();">MANAGE</button> existing tests or
-      <button onclick="loadUsersForTestIssuing();">ISSUE</button> a test to another user.
+      <button  onclick="manageTests();">MANAGE</button> existing tests or
+      <button onclick="loadTests();">ISSUE</button> a test to another user.
       <button onclick="exitPlatform();">EXIT</button> when you are finished.
     </p>
 

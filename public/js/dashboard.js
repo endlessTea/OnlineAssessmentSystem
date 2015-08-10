@@ -145,4 +145,81 @@ var drawScatterplot = function() {
 
 var drawDonut = function() {
 
+  // http://bl.ocks.org/mbostock/32bd93b1cc0fbccc9bf9
+  var width = 300,
+    height = 300;
+
+  var outerRadius = height / 2 - 20,
+    innerRadius = outerRadius / 3,
+    cornerRadius = 10;
+
+  var pie = d3.layout.pie()
+    .padAngle(.02);
+
+  var arc = d3.svg.arc()
+    .padRadius(outerRadius)
+    .innerRadius(innerRadius);
+
+  d3.json("public/js/donut_ex1.json", function(error, data) {
+    if (error) throw error;
+
+    // refactor this?
+    newData = [0, 0, 0, 0, 0, 0, 0, 0];
+    data.forEach(function(row) {
+      if (row.uq == 1) {
+        if (row.ca == 1) {
+          if (row.uf == 1) {
+            newData[0]++;
+          } else {
+            newData[1]++;
+          }
+        } else {
+          if (row.uf == 1) {
+            newData[2]++;
+          } else {
+            newData[4]++;
+          }
+        }
+      } else {
+        if (row.ca == 1) {
+          if (data.uf == 1) {
+            newData[3]++;
+          } else {
+            newData[6]++;
+          }
+        } else {
+          if (row.uf == 1) {
+            newData[5]++;
+          } else {
+            newData[7]++;
+          }
+        }
+      }
+    });
+
+    var svg = d3.select("#visRight").append("svg")
+      .attr("width", width)
+      .attr("height", height)
+      .append("g")
+        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+    svg.selectAll("path")
+      .data(pie(newData))
+      .enter().append("path")
+        .each(function(d) {
+          d.outerRadius = outerRadius - 20;
+        })
+        .attr("d", arc)
+        .on("mouseover", arcTween(outerRadius, 0))
+        .on("mouseout", arcTween(outerRadius - 20, 150));
+
+    function arcTween(outerRadius, delay) {
+      return function() {
+        d3.select(this).transition().delay(delay).attrTween("d", function(d) {
+          var i = d3.interpolate(d.outerRadius, outerRadius);
+          return function(t) { d.outerRadius = i(t); return arc(d); };
+        });
+      };
+    }
+  });
 }
