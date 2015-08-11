@@ -18,15 +18,15 @@ $(function() {
   });
   $('#visLeft').css({
     'border' : '2px dashed #000',
-    'max-width' : '300px',
-    'min-width' : '300px',
-    'height' : '300px'
+    'max-width' : '400px',
+    'min-width' : '400px',
+    'height' : '400px'
   });
   $('#visRight').css({
     'border' : '2px dashed #000',
-    'max-width' : '300px',
-    'min-width' : '300px',
-    'height' : '300px'
+    'max-width' : '400px',
+    'min-width' : '400px',
+    'height' : '400px'
   });
   $('.floatBox').css({
     '-webkit-flex' : '1 1 auto',
@@ -35,7 +35,7 @@ $(function() {
   });
 
   drawScatterplot();
-  drawDonut();
+  drawArcCorners();
 });
 
 /**
@@ -44,9 +44,9 @@ $(function() {
 var drawScatterplot = function() {
 
   // http://bl.ocks.org/mbostock/3887118
-  var margin = {top: 5, right: 5, bottom: 7, left: 9},
-    width = 300 - margin.left - margin.right,
-    height = 300 - margin.top - margin.bottom;
+  var margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = 400 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
 
   var x = d3.scale.linear()
     .range([0, width]);
@@ -143,11 +143,97 @@ var drawScatterplot = function() {
   });
 }
 
+/**
+ *  DRAW ARC CORNERS
+ */
+var drawArcCorners = function() {
+
+  // http://bl.ocks.org/mbostock/c501f6cae402ab5e90c9
+  var width = 400,
+    height = 400,
+    radius = height / 2 - 10;
+
+  var arc = d3.svg.arc()
+    .innerRadius(radius - 80)
+    .outerRadius(radius)
+    .cornerRadius(20);
+
+  var pie = d3.layout.pie()
+    .padAngle(.03);
+
+  var color = d3.scale.category10();
+
+  var svg = d3.select("#visRight").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .append("g")
+      .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+  d3.json("public/js/donut_ex1.json", function(error, data) {
+    if (error) throw error;
+
+    // refactor this?
+    newData = [0, 0, 0, 0, 0, 0, 0, 0];
+    data.forEach(function(row) {
+      if (row.uq == 1) {
+        if (row.ca == 1) {
+          if (row.uf == 1) {
+            newData[0]++;
+          } else {
+            newData[1]++;
+          }
+        } else {
+          if (row.uf == 1) {
+            newData[2]++;
+          } else {
+            newData[4]++;
+          }
+        }
+      } else {
+        if (row.ca == 1) {
+          if (data.uf == 1) {
+            newData[3]++;
+          } else {
+            newData[6]++;
+          }
+        } else {
+          if (row.uf == 1) {
+            newData[5]++;
+          } else {
+            newData[7]++;
+          }
+        }
+      }
+    });
+
+    // http://bl.ocks.org/mbostock/3887193
+    var g = svg.selectAll(".arc")
+      .data(pie(newData))
+      .enter().append("g")
+        .attr("class", "arc");
+
+    g.append("path")
+        .style("fill", function(d, i) { return color(i); })
+        .attr("d", arc);
+
+    g.append("text")
+      .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")" })
+      .attr("dy", ".35em")
+      .style("text-anchor", "middle")
+      .text(function(d) { return (d.data / 20 * 100) + "%"; });
+
+  });
+}
+
+/**
+ *  DRAW DONUT
+ *  Making inactive (vis_3)
+
 var drawDonut = function() {
 
   // http://bl.ocks.org/mbostock/32bd93b1cc0fbccc9bf9
-  var width = 300,
-    height = 300;
+  var width = 400,
+    height = 400;
 
   var outerRadius = height / 2 - 20,
     innerRadius = outerRadius / 3,
@@ -215,6 +301,7 @@ var drawDonut = function() {
 
     function arcTween(outerRadius, delay) {
       return function() {
+        // console.log(this);
         d3.select(this).transition().delay(delay).attrTween("d", function(d) {
           var i = d3.interpolate(d.outerRadius, outerRadius);
           return function(t) { d.outerRadius = i(t); return arc(d); };
@@ -223,3 +310,4 @@ var drawDonut = function() {
     }
   });
 }
+ */
