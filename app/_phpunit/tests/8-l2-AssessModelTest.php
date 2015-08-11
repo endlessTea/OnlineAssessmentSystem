@@ -102,6 +102,46 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
 
   /**
    *  @test
+   *  Check that the list of available tests returns user
+   */
+  public function getListOfAvailableTests_checkWithValidStudent_methodReturnsMatchingValue() {
+
+    // get test and student id
+    $this->_UserModel->findUser("testAuthor");
+    $authorId = $this->_UserModel->getUserData()->userId;
+    $testId = key($this->_DB->read("tests", array("author" => $authorId)));
+    $this->_UserModel->findUser("testStudent");
+    $studentId = $this->_UserModel->getUserData()->userId;
+
+    $this->assertSame(
+      "{\"{$testId}\":\"available\"}",
+      $this->_AssessModel->getListOfAvailableTests($studentId)
+    );
+  }
+
+  /**
+   *  @test
+   *  Check that a user not enrolled on any tests returns false
+   */
+  public function getListOfAvailableTests_checkWithStudentNoTests_methodReturnsFalse() {
+
+    $this->_UserModel->findUser("testStudent2");
+    $studentId = $this->_UserModel->getUserData()->userId;
+
+    $this->assertFalse($this->_AssessModel->getListOfAvailableTests($studentId));
+  }
+
+  /**
+   *  @test
+   *  Check that a user string that doesn't match hexadecimal returns false
+   */
+  public function getListOfAvailableTests_checkWithInvalidUserId_methodReturnsFalse() {
+
+    $this->assertFalse($this->_AssessModel->getListOfAvailableTests("<script>alert('hi');</script>"));
+  }
+
+  /**
+   *  @test
    *  Check if a user is eligible to take a test
    */
   public function checkTestAvailability_checkWithValidStudent_methodReturnsTrue() {

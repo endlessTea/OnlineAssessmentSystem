@@ -36,6 +36,46 @@ class AssessModel {
   }
 
   /**
+   *  INTERNAL METHOD: CHECK IF AN OBJECT HAS NO CHILDREN
+   *  http://stackoverflow.com/questions/9412126/how-to-check-that-an-object-is-empty-in-php
+   *  @return true (boolean) if an object has no children, otherwise false
+   */
+  private function objectHasNoChildren($object) {
+
+    foreach($object as $child) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   *  GET A LIST OF AVAILABLE TESTS
+   *  Check if any tests have been made available to a user by comparing the string rep. of their ID
+   *  @return JSON of data on success, otherwise false if no tests are available
+   */
+  public function getListOfAvailableTests($studentIdStr) {
+
+    // check userId contains hexadecimal characters only (fail if otherwise)
+    if (preg_match('/^([a-z0-9])+$/', $studentIdStr) === 0) return false;
+
+    // fetch all tests, if none exist return false
+    $tests = $this->_DB->read("tests", "ALL DOCUMENTS");
+    if (empty($tests)) return false;
+
+    $response = new stdClass();
+    foreach ($tests as $tId => $details) {
+
+      if (!isset($details["available"])) continue;
+      if (in_array($studentIdStr, $details["available"]))
+        $response->{$tId} = "available";
+    }
+
+    // if the response does not have children, the user is not enrolled on any tests
+    if ($this->objectHasNoChildren($response)) return false;
+    return json_encode($response);
+  }
+
+  /**
    *  CHECK TEST AVAILABILITY
    *  Check if a user is eligible to take a test (expects Mongo Id and String params)
    *  @return true (boolean) on success, else false

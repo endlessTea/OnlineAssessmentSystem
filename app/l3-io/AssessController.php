@@ -29,6 +29,11 @@ class AssessController {
    */
   public function loadFrame() {
 
+    // fetch the id's of any tests that the user is enrolled on
+    $tests = $this->_AssessModel->getListOfAvailableTests(
+      $this->_UserModel->getUserData()->userId
+    );
+
     $this->_AppModel->renderFrame("Assess");
   }
 }

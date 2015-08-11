@@ -17,19 +17,26 @@
 
   <main>
 
-    <p>Main content for the assessment platform goes here</p>
+    <p>If tests have been made available to you, they will appear below.
+    Otherwise click <button onclick="exitPlatform();">EXIT</button> to leave the platform.</p>
 
     <div id="assessContainer">
-
-    <!-- put the questions here using a PHP foreach loop;
-    on ajax submissionreplace the contents of this container with feedback -->
 
     </div>
 
   </main>
 
   <footer>
-    <!-- JS refs <script src="script.js"></script> -->
+
+    <!-- JavaScript: jQuery and custom JS for Ajax/event handling -->
+    <script src="<?= URL; ?>public/js/libs/jquery-1.11.3.min.js" charset="utf-8"></script>
+    <script src="<?= URL; ?>public/js/assess.js" charset="utf-8"></script>
+
+    <!-- Define base URL for JavaScript to send Ajax requests -->
+    <script>
+      var baseURL = '<?= URL; ?>';
+    </script>
+
   </footer>
 
 </body>
