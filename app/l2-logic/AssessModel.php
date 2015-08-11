@@ -36,43 +36,35 @@ class AssessModel {
   }
 
   /**
-   *  INTERNAL METHOD: CHECK IF AN OBJECT HAS NO CHILDREN
-   *  http://stackoverflow.com/questions/9412126/how-to-check-that-an-object-is-empty-in-php
-   *  @return true (boolean) if an object has no children, otherwise false
-   */
-  private function objectHasNoChildren($object) {
-
-    foreach($object as $child) {
-      return false;
-    }
-    return true;
-  }
-
-  /**
    *  GET A LIST OF AVAILABLE TESTS
    *  Check if any tests have been made available to a user by comparing the string rep. of their ID
-   *  @return JSON of data on success, otherwise false if no tests are available
+   *  @return PHP array of data on success, otherwise return specific string
    */
   public function getListOfAvailableTests($studentIdStr) {
 
-    // check userId contains hexadecimal characters only (fail if otherwise)
-    if (preg_match('/^([a-z0-9])+$/', $studentIdStr) === 0) return false;
+    // check userId contains hexadecimal characters only
+    if (preg_match('/^([a-z0-9])+$/', $studentIdStr) === 1) {
 
-    // fetch all tests, if none exist return false
-    $tests = $this->_DB->read("tests", "ALL DOCUMENTS");
-    if (empty($tests)) return false;
+      // fetch all tests
+      $tests = $this->_DB->read("tests", "ALL DOCUMENTS");
+      if (!empty($tests)) {
 
-    $response = new stdClass();
-    foreach ($tests as $tId => $details) {
+        $availableTests = array();
+        foreach ($tests as $tId => $details) {
 
-      if (!isset($details["available"])) continue;
-      if (in_array($studentIdStr, $details["available"]))
-        $response->{$tId} = "available";
+          if (!isset($details["available"])) continue;
+          if (in_array($studentIdStr, $details["available"]))
+            $availableTests[] = $tId;
+        }
+
+        if (!empty($availableTests)) {
+
+          return $availableTests;
+        }
+      }
     }
 
-    // if the response does not have children, the user is not enrolled on any tests
-    if ($this->objectHasNoChildren($response)) return false;
-    return json_encode($response);
+    return "There are no tests available for you to take right now. Please try again later.";
   }
 
   /**
@@ -85,7 +77,8 @@ class AssessModel {
     if (is_a($testIdObj, 'MongoId')) {
 
       // get the specified test
-      $test = array_pop($this->_DB->read("tests", array("_id" => $testIdObj)));
+      $test = $this->_DB->read("tests", array("_id" => $testIdObj));
+      $test = array_pop($test);
 
       // check if the student has already taken the test
       if (isset($test["taken"]))
@@ -111,7 +104,8 @@ class AssessModel {
     if (is_a($testIdObj, 'MongoId')) {
 
       // get the specified test and store as instance variable
-      $this->_testDocument = array_pop($this->_DB->read("tests", array("_id" => $testIdObj)));
+      $test = $this->_DB->read("tests", array("_id" => $testIdObj));
+      $this->_testDocument = array_pop($test);
 
       // store student id for reference, initialise test start variable and
       $this->_studentId = $studentIdStr;
@@ -121,7 +115,8 @@ class AssessModel {
       foreach ($this->_testDocument["questions"] as $questionId) {
 
         // get the corresponding document from MongoDB and add to 'full questions' array
-        $document = array_pop($this->_DB->read("questions", array("_id" => new MongoId($questionId))));
+        $document = $this->_DB->read("questions", array("_id" => new MongoId($questionId)));
+        $document = array_pop($document);
         $this->_questionsFull[] = $document;
       }
 
@@ -356,5 +351,11 @@ class AssessModel {
     }
 
     return false;
+  }
+
+  // TODO: DELETE ME
+  public function _checkInitialised() {
+
+    return $this->_testDocument;
   }
 }

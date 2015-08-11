@@ -113,31 +113,41 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
     $this->_UserModel->findUser("testStudent");
     $studentId = $this->_UserModel->getUserData()->userId;
 
+    // "{\"{$testId}\":\"available\"}",
+
     $this->assertSame(
-      "{\"{$testId}\":\"available\"}",
+      array(
+        "{$testId}"
+      ),
       $this->_AssessModel->getListOfAvailableTests($studentId)
     );
   }
 
   /**
    *  @test
-   *  Check that a user not enrolled on any tests returns false
+   *  Check that a user not enrolled on any tests
    */
-  public function getListOfAvailableTests_checkWithStudentNoTests_methodReturnsFalse() {
+  public function getListOfAvailableTests_checkWithStudentNoTests_methodReturnsSpecificString() {
 
     $this->_UserModel->findUser("testStudent2");
     $studentId = $this->_UserModel->getUserData()->userId;
 
-    $this->assertFalse($this->_AssessModel->getListOfAvailableTests($studentId));
+    $this->assertSame(
+      "There are no tests available for you to take right now. Please try again later.",
+      $this->_AssessModel->getListOfAvailableTests($studentId)
+    );
   }
 
   /**
    *  @test
    *  Check that a user string that doesn't match hexadecimal returns false
    */
-  public function getListOfAvailableTests_checkWithInvalidUserId_methodReturnsFalse() {
+  public function getListOfAvailableTests_checkWithInvalidUserId_methodReturnsSpecificString() {
 
-    $this->assertFalse($this->_AssessModel->getListOfAvailableTests("<script>alert('hi');</script>"));
+    $this->assertSame(
+      "There are no tests available for you to take right now. Please try again later.",
+      $this->_AssessModel->getListOfAvailableTests("<script>alert('hi');</script>")
+    );
   }
 
   /**

@@ -17,10 +17,27 @@
 
   <main>
 
-    <p>If tests have been made available to you, they will appear below.
-    Otherwise click <button onclick="exitPlatform();">EXIT</button> to leave the platform.</p>
+    <p>
+      <span id="selectTestPrompt">If tests have been made available to you, they will appear below.</span>
+      Click <button onclick="exitPlatform();">EXIT</button> to leave the platform.
+    </p>
 
     <div id="assessContainer">
+
+      <?php
+        if (!is_array($tests)) {
+          echo "<p>" . $tests . "</p>";
+        } else {
+          foreach ($tests as $test) {
+      ?>
+
+      <p><?= $test; ?>
+      <button onclick="loadTest('<?= $test; ?>');">LOAD</button></p>
+
+      <?php
+          }
+        }
+      ?>
 
     </div>
 
