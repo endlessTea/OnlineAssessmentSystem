@@ -86,9 +86,9 @@ var buildTest = function(data) {
   // check the schema for each question and insert appropriate HTML with question values
   for (var question in questionsJSON) {
 
-    // title
+    // title: present question "0" as question "1" etc.
     $("#testForm").append(
-      "<h2>Question " + question + ":</h2>"
+      "<h2>Question " + (parseInt(question) + 1) + ":</h2>"
     );
 
     switch (questionsJSON[question]["schema"]) {
@@ -111,7 +111,7 @@ var buildTest = function(data) {
 
     // obtain 'understanding of question' from the user
     $("#testForm").append(
-      "<h4>Did you understand Question " + question + "?</h4>" +
+      "<h4>Did you understand Question " + (parseInt(question) + 1) + "?</h4>" +
       "<input name=\"" + question + "-uq\"" +
         "type=\"radio\" value=\"1\" checked> YES" +
       "<br>" +
@@ -183,8 +183,55 @@ function submitAnswers() {
 var buildFeedbackResponse = function(data) {
 
   feedbackJSON = data;
-  alert(JSON.stringify(feedbackJSON));
 
+  // inform user of their score
+  $("#assessContainer").html(
+    "<h2>Results</h2>" +
+    "<p>Your score is:</p>" +
+    "<h3>" + feedbackJSON.score + " / " + Object.keys(questionsJSON).length + "</h3>"
+  );
+
+  // check if feedback is available
+  if ($.isEmptyObject(feedbackJSON.feedback)) {
+
+    $("#assessContainer").append(
+      "<h2>Congratulations!</h2>" +
+      "<p>You achieved full marks: there is no further feedback from the assessor.<br>" +
+      "Please click 'Exit' to leave the assessment platform.</p>"
+    );
+
+  } else {
+
+    $("#assessContainer").append(
+      "<h2>Feedback</h2>" +
+      "<p>The assessor provided the following feedback for questions guessed incorrectly.<br>" +
+      "Please review this feedback and provide an indication of its usefulness to you:</p>"
+    );
+
+    // create form element
+    $("#assessContainer").append(
+      "<form id=\"feedForm\" onsubmit=\"submitFeedback(); return false;\"></form>"
+    );
+
+    for (var item in feedbackJSON.feedback) {
+
+      $("#feedForm").append(
+        "<h3>Question " + (parseInt(item) + 1) + ":</h3>" +
+        "<h4>" + feedbackJSON.feedback[item] + "</h4>" +
+        "<p>Do you understand the feedback?</p>" +
+        "<input name=\"" + item + "-uf\"" +
+          "type=\"radio\" value=\"1\" checked> YES" +
+        "<br>" +
+        "<input name=\"" + item + "-uf\"" +
+          "type=\"radio\" value=\"0\"> NO"
+      );
+    }
+
+    // append form submission button
+    $("#feedForm").append(
+      "<br><br><input type=\"submit\" value=\"SUBMIT\">"
+    );
+  }
 }
 
 /**
@@ -193,10 +240,41 @@ var buildFeedbackResponse = function(data) {
  */
 function submitFeedback() {
 
-  // process form values
+  // process form values: create root object
+  var feedback = {};
+
+  for (var item in feedbackJSON.feedback) {
+
+    feedback[item] = $('input[type="radio"][name="' + item + '-uf"]:checked').val();
+  }
 
   // send feedback via Ajax
-
+  $.ajax({
+    url: baseURL + "assess/submitFeedback",
+    data: {
+      tId: testId,
+      feed: JSON.stringify(feedback)
+    },
+    type: "POST",
+    dataType: "html",
+    success: function(response) {
+      if (response === "ok") {
+        $("#assessContainer").html(
+          "<h2>Thanks!</h2>" +
+          "<p>Your feedback has been received and processed by the application.<br>" +
+          "Please click 'Exit' to leave the assessment platform.</p>"
+        );
+      } else {
+        $("#assessContainer").html(response);
+      }
+    },
+    error: function (request, status, error) {
+      $("#assessContainer").html(
+        "<p>There was a problem with the request, please contact the system administrator: <br>" +
+        request.responseText + "</p>"
+      );
+    }
+  });
 }
 
 /**

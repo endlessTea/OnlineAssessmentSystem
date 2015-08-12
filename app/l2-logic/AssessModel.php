@@ -179,9 +179,10 @@ class AssessModel {
         $questions[] = $document;
       }
 
-      // keep track of the number of correctly answered questions and add feedback to root object
-      $totalCorrect = 0;
-      $feedbackToStudent = new stdClass();
+      // add score and feedback to response root object
+      $response = new stdClass();
+      $response->{'score'} = 0;
+      $response->{'feedback'} = new stdClass();
 
       foreach ($questions as $qNo => $fullQuestion) {
 
@@ -206,13 +207,13 @@ class AssessModel {
             if ($answers->{$qNo}->{'ans'} === $fullQuestion["singleAnswer"]) {
 
               $correct = 1;
-              $totalCorrect++;
+              $response->{'score'}++;
 
             } else {
 
               $correct = 0;
               if (isset($fullQuestion["feedback"])) {
-                $feedbackToStudent->{$qNo} = $fullQuestion["feedback"];
+                $response->{'feedback'}->{$qNo} = $fullQuestion["feedback"];
               }
             }
 
@@ -239,24 +240,24 @@ class AssessModel {
         }
 
         // Update Question: if the operation fails for any question, throw an Exception
-        // if (!$this->_DB->update("questions", array("_id" => $fullQuestion["_id"]), array("taken" => $takenQuestionArray)))
-        //   throw new Exception("The following question update failed: " . implode($takenQuestionArray));
+        if (!$this->_DB->update("questions", array("_id" => $fullQuestion["_id"]), array("taken" => $takenQuestionArray)))
+          throw new Exception("The following question update failed: " . implode($takenQuestionArray));
       }
 
       // copy and update the tests's "taken" array if it exists, otherwise create a new one to insert
       if (isset($test["taken"])) {
 
         $takenTestArray = $test["taken"];
-        $takenTestArray[$studentIdStr] = $totalCorrect;
+        $takenTestArray[$studentIdStr] = $response->{'score'};
 
       } else {
 
-        $takenTestArray = array($studentIdStr => $totalCorrect);
+        $takenTestArray = array($studentIdStr => $response->{'score'});
       }
 
       // Update Test: if the operation fails for any question, throw an Exception
-      // if (!$this->_DB->update("tests", array("_id" => $test["_id"]), array("taken" => $takenTestArray)))
-      //   throw new Exception("The following test update failed: " . implode($takenTestArray));
+      if (!$this->_DB->update("tests", array("_id" => $test["_id"]), array("taken" => $takenTestArray)))
+        throw new Exception("The following test update failed: " . implode($takenTestArray));
 
       // remove student from 'available array'
       // http://stackoverflow.com/questions/7225070/php-array-delete-by-value-not-key
@@ -265,10 +266,10 @@ class AssessModel {
       unset($availableTestArray[$key]);
 
       // Update 'available' array in Test: if the operation fails for any question, throw an Exception
-      // if (!$this->_DB->update("tests", array("_id" => $test["_id"]), array("available" => $availableTestArray)))
-      //   throw new Exception("The following test update failed: " . implode($availableTestArray));
+      if (!$this->_DB->update("tests", array("_id" => $test["_id"]), array("available" => $availableTestArray)))
+        throw new Exception("The following test update failed: " . implode($availableTestArray));
 
-      return json_encode($feedbackToStudent);
+      return json_encode($response);
     }
 
     return false;
@@ -302,10 +303,11 @@ class AssessModel {
         if (isset($feedback->{$qNo})) {
 
           // fail the operation if an invalid feedback value was provided
-          if ($feedback->{$qNo} !== 0 && $feedback->{$qNo} !== 1) return false;
+          if ($feedback->{$qNo} != 0 && $feedback->{$qNo} != 1) return false;
 
           // obtain the UPDATED version of the question from MongoDB
-          $updatedQuestion = array_pop($this->_DB->read("questions", array("_id" => $fullQuestion["_id"])));
+          $updatedQuestion = $this->_DB->read("questions", array("_id" => $fullQuestion["_id"]));
+          $updatedQuestion = array_pop($updatedQuestion);
 
           // copy the existing question "taken" array and PUSH the feedback value onto it for the student
           $takenQuestionArray = $updatedQuestion["taken"];

@@ -305,8 +305,9 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
     $input->{2}->{'ans'} = 'FALSE';
 
     $this->assertSame(
+      "{\"score\":1,\"feedback\":" .
       "{\"0\":\"The sentence contains 2x 'i', 4x 'e', 3x 'o' and 1x 'a'\"," .
-      "\"1\":\"Count the instances of 'a', 'e', 'i', 'o' and 'u'\"}",
+      "\"1\":\"Count the instances of 'a', 'e', 'i', 'o' and 'u'\"}}",
       $this->_AssessModel->updateAnswers(new MongoId($testId), $studentId, $input)
     );
 

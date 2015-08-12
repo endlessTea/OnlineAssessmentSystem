@@ -132,4 +132,32 @@ class AssessController {
 
     echo $data;
   }
+
+  /**
+   *  AJAX: HANDLE FEEDBACK SUBMITTED BY STUDENT
+   *  Process user's feedback in response to incorrectly answered questions
+   */
+  public function submitFeedback() {
+
+    // attempt to convert test identifier to MongoId
+    try {
+      $testIdObj = new MongoId($this->_AppModel->getPOSTData("tId"));
+    } catch (Exception $e) {
+      echo "Invalid test identifier.";
+      exit;
+    }
+
+    // pass data to model, store feedback or result in variable
+    $data = $this->_AssessModel->updateFeedback(
+      $testIdObj,
+      $this->_UserModel->getUserData()->userId,
+      $this->_AppModel->getPOSTData("feed", "getJSON")
+    );
+    if ($data === false) {
+      echo "There was an issue processing your feedback. Please contact the system administrator.";
+      exit;
+    }
+
+    echo "ok";
+  }
 }

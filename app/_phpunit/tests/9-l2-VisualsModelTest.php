@@ -145,7 +145,7 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
     $s1t1answers->{1}->{'uq'} = 1;
     $s1t1answers->{1}->{'ans'} = 'FALSE';
     $this->assertSame(
-      "{}",
+      "{\"score\":2,\"feedback\":{}}",
       $this->_AssessModel->updateAnswers(new MongoId($testIds[0]), $studentOne, $s1t1answers)
     );
 
@@ -158,7 +158,7 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
     $s2t1answers->{1}->{'uq'} = 1;
     $s2t1answers->{1}->{'ans'} = 'TRUE';
     $this->assertSame(
-      "{\"1\":\"D3.js is a data visualisation library created by Mike Bostock.\"}",
+      "{\"score\":1,\"feedback\":{\"1\":\"D3.js is a data visualisation library created by Mike Bostock.\"}}",
       $this->_AssessModel->updateAnswers(new MongoId($testIds[0]), $studentTwo, $s2t1answers)
     );
 
@@ -176,7 +176,7 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
     $s1t2answers->{1}->{'uq'} = 0;
     $s1t2answers->{1}->{'ans'} = 'FALSE';
     $this->assertSame(
-      "{\"0\":\"AngularJS is maintained by Google.\"}",
+      "{\"score\":1,\"feedback\":{\"0\":\"AngularJS is maintained by Google.\"}}",
       $this->_AssessModel->updateAnswers(new MongoId($testIds[1]), $studentOne, $s1t2answers)
     );
 
@@ -194,7 +194,7 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
     $s2t2answers->{1}->{'uq'} = 1;
     $s2t2answers->{1}->{'ans'} = 'TRUE';
     $this->assertSame(
-      "{\"0\":\"AngularJS is maintained by Google.\",\"1\":\"Ask Richard Stallman for further details.\"}",
+      "{\"score\":0,\"feedback\":{\"0\":\"AngularJS is maintained by Google.\",\"1\":\"Ask Richard Stallman for further details.\"}}",
       $this->_AssessModel->updateAnswers(new MongoId($testIds[1]), $studentTwo, $s2t2answers)
     );
 

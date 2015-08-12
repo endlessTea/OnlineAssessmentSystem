@@ -39,7 +39,7 @@ function createQuestion(questionType) {
     data: {
       qt: questionType,
       st: $('#statement').val(),
-      sa: $('#singleAnswer').val(),
+      sa: $('input[type="radio"][name="singleAnswer"]:checked').val(),
       fb: $('#feedback').val()
     },
     type: "POST",
