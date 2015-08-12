@@ -87,6 +87,6 @@ class AssessController {
     // change the header to indicate that JSON data is being returned
 		header('Content-Type: application/json');
 
-    echo $this->_AssessModel->_checkInitialised();
+    echo $this->_AssessModel->startTestGetJSONData();
   }
 }

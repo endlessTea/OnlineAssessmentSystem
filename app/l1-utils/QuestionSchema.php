@@ -24,6 +24,21 @@ class QuestionSchema {
         "statement" => "required",
         "singleAnswer" => "required",
         "feedback" => "optional"
+      ),
+      "multiple" => array(
+        "schema" => "required",
+        "author" => "required",
+        "question" => "required",
+        "options" => "required",
+        "correctAnswers" => "required",
+        "feedback" => "optional"
+      ),
+      "pattern" => array(
+        "schema" => "required",
+        "author" => "required",
+        "question" => "required",
+        "correctPattern" => "required",
+        "feedback" => "optional"
       )
     );
   }

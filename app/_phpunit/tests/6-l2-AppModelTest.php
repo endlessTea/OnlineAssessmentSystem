@@ -130,7 +130,7 @@ class AppModelTest extends PHPUnit_Framework_TestCase {
   public function getSchemaList_requestValues_methodReturnsMatchingValues() {
 
     $this->assertSame(
-      array("boolean"),
+      array("boolean", "multiple", "pattern"),
       $this->_AppModel->getSchemaList()
     );
   }
