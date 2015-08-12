@@ -10,14 +10,7 @@ class AssessModel {
 
   // store DB utility as instance variable
   private $_DB,
-    $_QuestionSchema,
-    $_testDocument,
-    $_studentId,
-    $_expectingAnswers,
-    $_expectingStudentFeedback,
-    $_questionsFull,
-    $_questionsJSON,
-    $_feedbackJSON;
+    $_QuestionSchema;
 
   /**
    *  Constructor
@@ -30,9 +23,6 @@ class AssessModel {
 
     // import schema
     $this->_QuestionSchema = new QuestionSchema();
-
-    // do not anticipate answers unless set by defined methods
-    $this->_expectingAnswers = false;
   }
 
   /**
@@ -68,22 +58,18 @@ class AssessModel {
   }
 
   /**
-   *  CHECK TEST AVAILABILITY
+   *  CHECK IF TEST IS AVAILABLE TO USER
    *  Check if a user is eligible to take a test (expects Mongo Id and String params)
-   *  @return true (boolean) on success, else false
+   *  @return true (boolean) if test is available, else false
    */
-  public function checkTestAvailability($testIdObj, $studentIdStr) {
+  public function checkTestAvailable($testIdObj, $studentIdStr) {
 
     if (is_a($testIdObj, 'MongoId')) {
 
-      // get the specified test
+      // get the specified test, return false if test doesn't exist
       $test = $this->_DB->read("tests", array("_id" => $testIdObj));
+      if (empty($test)) return false;
       $test = array_pop($test);
-
-      // check if the student has already taken the test
-      if (isset($test["taken"]))
-        if (array_key_exists($studentIdStr, $test["taken"]))
-          return "User '{$studentIdStr}' has already taken this test.";
 
       // check if the test is available to the student
       if (isset($test["available"]))
@@ -94,71 +80,68 @@ class AssessModel {
   }
 
   /**
-   *  LOAD TEST
-   *  Update instance variable 'testDocument'
-   *  @return true (boolean) on success
-   *  @throws Exception if test cannot be loaded
+   *  CHECK IF TEST HAS BEEN TAKEN BY A USER
+   *  Check if a user has taken a test (expects Mongo Id and String params)
+   *  @return true (boolean) if test has been taken, else false
    */
-  public function loadTest($testIdObj, $studentIdStr) {
+  public function checkTestTaken($testIdObj, $studentIdStr) {
 
     if (is_a($testIdObj, 'MongoId')) {
 
-      // get the specified test and store as instance variable
+      // get the specified test, return false if test doesn't exist
       $test = $this->_DB->read("tests", array("_id" => $testIdObj));
-      $this->_testDocument = array_pop($test);
+      if (empty($test)) return false;
+      $test = array_pop($test);
 
-      // store student id for reference, initialise test start variable and
-      $this->_studentId = $studentIdStr;
-      $this->_testStarted = false;
-      $this->_questionsFull = array();
-
-      foreach ($this->_testDocument["questions"] as $questionId) {
-
-        // get the corresponding document from MongoDB and add to 'full questions' array
-        $document = $this->_DB->read("questions", array("_id" => new MongoId($questionId)));
-        $document = array_pop($document);
-        $this->_questionsFull[] = $document;
-      }
-
-      // covert question set into JSON format for assessment; store as instance variable
-      $this->_questionsJSON = $this->convertQuestionsToJSON();
-
-      if ($this->_testDocument != null
-        && !empty($this->_questionsFull)
-        && $this->_questionsJSON !== false) return true;
+      // check if the test has already been taken by the student
+      if (isset($test["taken"]))
+        if (array_key_exists($studentIdStr, $test["taken"])) return true;
     }
 
-    throw new Exception("Invalid test identifier / MongoId");
+    return false;
   }
 
   /**
-   *  CONVERT QUESTIONS
-   *  Convert full questions into presentable JSON format to return to student
-   *  @return true (boolean) on success
-   *  @throws Exception if questions have not been initialised before attempted conversion
+   *  GET JSON OF QUESTIONS
+   *  Start the test by returning JSON representation of questions
+   *  @return JSON of data on success, else false on failure
    */
-  public function convertQuestionsToJSON() {
+  public function getQuestionsJSON($testIdObj) {
 
-    if (isset($this->_questionsFull)) {
+    if (is_a($testIdObj, 'MongoId')) {
 
-      // create a base object and question counter
+      // get the specified test, return false if test doesn't exist
+      $test = $this->_DB->read("tests", array("_id" => $testIdObj));
+      if (empty($test)) return false;
+      $test = array_pop($test);
+
+      // loop through question Ids and add the corresponding question to an array
+      $questions = array();
+      foreach ($test["questions"] as $questionId) {
+
+        $document = $this->_DB->read("questions", array("_id" => new MongoId($questionId)));
+        $document = array_pop($document);
+        $questions[] = $document;
+      }
+
+      // convert appropriate values of questions to JSON
       $questionRoot = new stdClass();
       $questionNo = 0;
 
-      foreach ($this->_questionsFull as $fullQuestion) {
+      foreach($questions as $q) {
 
         $questionRoot->{$questionNo} = new stdClass();
-        $questionRoot->{$questionNo}->schema = $fullQuestion["schema"];
+        $questionRoot->{$questionNo}->schema = $q["schema"];
 
         // create additional object properties based on recognised schemas
-        switch ($fullQuestion["schema"]) {
+        switch ($q["schema"]) {
 
           case "boolean":
-            $questionRoot->{$questionNo}->statement = $fullQuestion["statement"];
+            $questionRoot->{$questionNo}->statement = $q["statement"];
             break;
 
           default:
-            throw new Exception("The question schema '{$fullQuestion["schema"]}' has not been implemented");
+            return false;
         }
 
         // increment question number
@@ -169,177 +152,163 @@ class AssessModel {
       return json_encode($questionRoot);
     }
 
-    throw new Exception("Test questions have not been initialised");
+    return false;
   }
 
   /**
-   *  START TEST / GET QUESTIONS
-   *  Change the boolean flag to indicate that the test has been started, or check if the test has already started
-   *  @return JSON of test data (questions only), else return false to indicate test was already stated
-   *  @throws Exception if test has not been initialised as an instance variable
+   *  UPDATE ANSWERS TO QUESTIONS
+   *  Expects JSON to parse and validate
+   *  @return JSON of feeback on success, else false (boolean)
    */
-  public function startTestGetJSONData() {
+  public function updateAnswers($testIdObj, $studentIdStr, $answers) {
 
-    if (isset($this->_testDocument)) {
+    // fail the operation if the user is not eligible to take the test
+    if (!$this->checkTestAvailable($testIdObj, $studentIdStr)) return false;
 
-      // stop operation if the test has been started already, otherwise change the start indicator
-      if ($this->_expectingAnswers) return false;
-      $this->_expectingAnswers = true;
+    // check if answers are a valid object
+    if (is_object($answers)) {
 
-      return $this->_questionsJSON;
-    }
+      // get the test and questions from MongoDB
+      $test = $this->_DB->read("tests", array("_id" => $testIdObj));
+      $test = array_pop($test);
+      $questions = array();
+      foreach ($test["questions"] as $questionId) {
 
-    throw new Exception("Test has not been initialised");
-  }
+        $document = $this->_DB->read("questions", array("_id" => new MongoId($questionId)));
+        $document = array_pop($document);
+        $questions[] = $document;
+      }
 
-  /**
-   *  PROCESS QUESTION ANSWERS
-   *  Update answers to questions if the user's input is valid, test has been started and answers are expected
-   *  @return true (boolean) on success, else false
-   */
-  public function updateTestAnswers($answers) {
+      // keep track of the number of correctly answered questions and add feedback to root object
+      $totalCorrect = 0;
+      $feedbackToStudent = new stdClass();
 
-    // check if answers are expect and if variable is valid object that can be processed
-    if ($this->_expectingAnswers) {
-      if (is_object($answers)) {
+      foreach ($questions as $qNo => $fullQuestion) {
 
-        // keep track of the number of correctly answered questions and add feedback to root object
-        $totalCorrect = 0;
-        $feedbackToStudent = new stdClass();
+        // fail the operation if the question doesn't exist
+        if (!isset($answers->{$qNo})) return false;
 
-        foreach ($this->_questionsFull as $qNo => $fullQuestion) {
+        // check if an 'understanding of question' was provided and if the values are valid
+        if (!isset($answers->{$qNo}->{'uq'})) return false;
+        if ($answers->{$qNo}->{'uq'} !== 0 && $answers->{$qNo}->{'uq'} !== 1) return false;
 
-          // fail the operation if the question doesn't exist
-          if (!isset($answers->{$qNo})) return false;
+        // check if an answer was provided at all
+        if (!isset($answers->{$qNo}->{'ans'})) return false;
 
-          // check if an 'understanding of question' was provided and if the values are valid
-          if (!isset($answers->{$qNo}->{'uq'})) return false;
-          if ($answers->{$qNo}->{'uq'} !== 0 && $answers->{$qNo}->{'uq'} !== 1) return false;
+        // Check value of and mark answer
+        switch ($fullQuestion["schema"]) {
 
-          // check if an answer was provided at all
-          if (!isset($answers->{$qNo}->{'ans'})) return false;
+          case "boolean":
 
-          // Check value of and mark answer
-          switch ($fullQuestion["schema"]) {
+            // answer must be 'TRUE' or 'FALSE' only; mark according to $fullQuestion's 'singleAnswer'
+            if ($answers->{$qNo}->{'ans'} !== 'TRUE' && $answers->{$qNo}->{'ans'} !== 'FALSE') return false;
+            if ($answers->{$qNo}->{'ans'} === $fullQuestion["singleAnswer"]) {
 
-            case "boolean":
+              $correct = 1;
+              $totalCorrect++;
 
-              // answer must be 'TRUE' or 'FALSE' only; mark according to $fullQuestion's 'singleAnswer'
-              if ($answers->{$qNo}->{'ans'} !== 'TRUE' && $answers->{$qNo}->{'ans'} !== 'FALSE') return false;
-              if ($answers->{$qNo}->{'ans'} === $fullQuestion["singleAnswer"]) {
+            } else {
 
-                $correct = 1;
-                $totalCorrect++;
-
-              } else {
-
-                $correct = 0;
-                if (isset($fullQuestion["feedback"])) {
-                  $feedbackToStudent->{$qNo} = $fullQuestion["feedback"];
-                }
+              $correct = 0;
+              if (isset($fullQuestion["feedback"])) {
+                $feedbackToStudent->{$qNo} = $fullQuestion["feedback"];
               }
+            }
 
-              $convertedResponse = array(
-                "uq" => $answers->{$qNo}->{'uq'},
-                "ca" => $correct
-              );
-              break;
+            $convertedResponse = array(
+              "uq" => $answers->{$qNo}->{'uq'},
+              "ca" => $correct
+            );
+            break;
 
-            default:
-              throw new Exception("The question schema '{$fullQuestion["schema"]}' has not been implemented");
-          }
-
-          // copy and update the question's "taken" array if it exists, otherwise create a new one to insert
-          if (isset($fullQuestion["taken"])) {
-
-            $takenQuestionArray = $fullQuestion["taken"];
-            $takenQuestionArray[$this->_studentId] = $convertedResponse;
-
-          } else {
-
-            $takenQuestionArray = array($this->_studentId => $convertedResponse);
-          }
-
-          // Update Question: if the operation fails for any question, throw an Exception
-          if (!$this->_DB->update("questions", array("_id" => $fullQuestion["_id"]), array("taken" => $takenQuestionArray)))
-            throw new Exception("The following question update failed: " . implode($takenQuestionArray));
+          default:
+            // this should never execute: left in just in case of internal document error
+            throw new Exception("The question schema '{$fullQuestion["schema"]}' has not been implemented");
         }
 
-        // copy and update the tests's "taken" array if it exists, otherwise create a new one to insert
-        if (isset($this->_testDocument["taken"])) {
+        // copy and update the question's "taken" array if it exists, otherwise create a new one to insert
+        if (isset($fullQuestion["taken"])) {
 
-          $takenTestArray = $this->_testDocument["taken"];
-          $takenTestArray[$this->_studentId] = $totalCorrect;
+          $takenQuestionArray = $fullQuestion["taken"];
+          $takenQuestionArray[$studentIdStr] = $convertedResponse;
 
         } else {
 
-          $takenTestArray = array($this->_studentId => $totalCorrect);
+          $takenQuestionArray = array($studentIdStr => $convertedResponse);
         }
 
-        // Update Test: if the operation fails for any question, throw an Exception
-        if (!$this->_DB->update("tests", array("_id" => $this->_testDocument["_id"]), array("taken" => $takenTestArray)))
-          throw new Exception("The following test update failed: " . implode($takenTestArray));
-
-        // remove student from 'available array'
-        // http://stackoverflow.com/questions/7225070/php-array-delete-by-value-not-key
-        $availableTestArray = $this->_testDocument["available"];
-        $key = array_search($this->_studentId, $availableTestArray);
-        unset($availableTestArray[$key]);
-
-        // Update 'available' array in Test: if the operation fails for any question, throw an Exception
-        if (!$this->_DB->update("tests", array("_id" => $this->_testDocument["_id"]), array("available" => $availableTestArray)))
-          throw new Exception("The following test update failed: " . implode($availableTestArray));
-
-        // initialise instance variable of feedback for delivery
-        $this->_feedbackJSON = json_encode($feedbackToStudent);
-
-        // update to not expect any further answers to process
-        $this->_expectingAnswers = false;
-
-        return true;
+        // Update Question: if the operation fails for any question, throw an Exception
+        if (!$this->_DB->update("questions", array("_id" => $fullQuestion["_id"]), array("taken" => $takenQuestionArray)))
+          throw new Exception("The following question update failed: " . implode($takenQuestionArray));
       }
+
+      // copy and update the tests's "taken" array if it exists, otherwise create a new one to insert
+      if (isset($test["taken"])) {
+
+        $takenTestArray = $test["taken"];
+        $takenTestArray[$studentIdStr] = $totalCorrect;
+
+      } else {
+
+        $takenTestArray = array($studentIdStr => $totalCorrect);
+      }
+
+      // Update Test: if the operation fails for any question, throw an Exception
+      if (!$this->_DB->update("tests", array("_id" => $test["_id"]), array("taken" => $takenTestArray)))
+        throw new Exception("The following test update failed: " . implode($takenTestArray));
+
+      // remove student from 'available array'
+      // http://stackoverflow.com/questions/7225070/php-array-delete-by-value-not-key
+      $availableTestArray = $test["available"];
+      $key = array_search($studentIdStr, $availableTestArray);
+      unset($availableTestArray[$key]);
+
+      // Update 'available' array in Test: if the operation fails for any question, throw an Exception
+      if (!$this->_DB->update("tests", array("_id" => $test["_id"]), array("available" => $availableTestArray)))
+        throw new Exception("The following test update failed: " . implode($availableTestArray));
+
+      return json_encode($feedbackToStudent);
     }
 
     return false;
   }
 
   /**
-   *  GET FEEDBACK FOR INCORRECT ANSWERS - TODO consider adding constraints...?
-   *  @return JSON of answer feedback
-   *  @throws Exception if answer feedback has not been initialised as an instance variable
-   */
-  public function issueFeedbackGetJSONData() {
-
-    if (isset($this->_feedbackJSON)){
-
-      return $this->_feedbackJSON;
-    }
-
-    throw new Exception("Feedback for student has not been initialised");
-  }
-
-  /**
-   *  PROCESS FEEDBACK FROM STUDENT
-   *  Update user's understanding of feedback if values are valid
+   *  UPDATE QUESTIONS WITH FEEDBACK-FROM-STUDENT
+   *  Expects JSON to parse and validate
    *  @return true (boolean) on success, else false
    */
-  public function updateFeedbackFromStudent($studentFeedback) {
+  public function updateFeedback($testIdObj, $studentIdStr, $feedback) {
 
-    if (is_object($studentFeedback)) {
+    // fail the operation if the user has not taken the test
+    if (!$this->checkTestTaken($testIdObj, $studentIdStr)) return false;
+
+    if (is_object($feedback)) {
+
+      // get the test and questions from MongoDB
+      $test = $this->_DB->read("tests", array("_id" => $testIdObj));
+      $test = array_pop($test);
+      $questions = array();
+      foreach ($test["questions"] as $questionId) {
+
+        $document = $this->_DB->read("questions", array("_id" => new MongoId($questionId)));
+        $document = array_pop($document);
+        $questions[] = $document;
+      }
 
       // if student feedback was provided for a specific question
-      foreach ($this->_questionsFull as $qNo => $fullQuestion) {
-        if (isset($studentFeedback->{$qNo})) {
+      foreach ($questions as $qNo => $fullQuestion) {
+        if (isset($feedback->{$qNo})) {
 
           // fail the operation if an invalid feedback value was provided
-          if ($studentFeedback->{$qNo} !== 0 && $studentFeedback->{$qNo} !== 1) return false;
+          if ($feedback->{$qNo} !== 0 && $feedback->{$qNo} !== 1) return false;
 
           // obtain the UPDATED version of the question from MongoDB
           $updatedQuestion = array_pop($this->_DB->read("questions", array("_id" => $fullQuestion["_id"])));
 
           // copy the existing question "taken" array and PUSH the feedback value onto it for the student
           $takenQuestionArray = $updatedQuestion["taken"];
-          $takenQuestionArray[$this->_studentId]["uf"] = $studentFeedback->{$qNo};
+          $takenQuestionArray[$studentIdStr]["uf"] = $feedback->{$qNo};
 
           // Update Question: if the operation fails for any question, throw an Exception
           if (!$this->_DB->update("questions", array("_id" => $fullQuestion["_id"]), array("taken" => $takenQuestionArray)))
@@ -351,11 +320,5 @@ class AssessModel {
     }
 
     return false;
-  }
-
-  // TODO: DELETE ME
-  public function _checkInitialised() {
-
-    return $this->_testDocument;
   }
 }

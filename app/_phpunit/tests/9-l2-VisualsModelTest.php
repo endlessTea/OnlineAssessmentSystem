@@ -80,7 +80,7 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
       "author" => $authorId,
       "statement" => "Open-source software is the same as 'free' software.",
       "singleAnswer" => "FALSE",
-      "feedback" => "Ask Richard Stallman for futher details."
+      "feedback" => "Ask Richard Stallman for further details."
     ));
     $resultFive = $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
@@ -137,8 +137,6 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
     $this->assertTrue($resultOne && $resultTwo && $resultThree && $resultFour);
 
     // simulate first student taking first test
-    $resultOne = $this->_AssessModel->loadTest(new MongoId($testIds[0]), $studentOne);
-    $this->_AssessModel->startTestGetJSONData();
     $s1t1answers = new stdClass();
     $s1t1answers->{0} = new stdClass();
     $s1t1answers->{0}->{'uq'} = 1;
@@ -146,12 +144,12 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
     $s1t1answers->{1} = new stdClass();
     $s1t1answers->{1}->{'uq'} = 1;
     $s1t1answers->{1}->{'ans'} = 'FALSE';
-    $resultTwo = $this->_AssessModel->updateTestAnswers($s1t1answers);
-    $this->assertTrue($resultOne && $resultTwo);
+    $this->assertSame(
+      "{}",
+      $this->_AssessModel->updateAnswers(new MongoId($testIds[0]), $studentOne, $s1t1answers)
+    );
 
     // simulate second student taking first test
-    $resultOne = $this->_AssessModel->loadTest(new MongoId($testIds[0]), $studentTwo);
-    $this->_AssessModel->startTestGetJSONData();
     $s2t1answers = new stdClass();
     $s2t1answers->{0} = new stdClass();
     $s2t1answers->{0}->{'uq'} = 0;
@@ -159,17 +157,17 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
     $s2t1answers->{1} = new stdClass();
     $s2t1answers->{1}->{'uq'} = 1;
     $s2t1answers->{1}->{'ans'} = 'TRUE';
-    $resultTwo = $this->_AssessModel->updateTestAnswers($s2t1answers);
-    $this->assertTrue($resultOne && $resultTwo);
+    $this->assertSame(
+      "{\"1\":\"D3.js is a data visualisation library created by Mike Bostock.\"}",
+      $this->_AssessModel->updateAnswers(new MongoId($testIds[0]), $studentTwo, $s2t1answers)
+    );
 
     // submit feedback for test
     $s2t1feedback = new stdClass();
     $s2t1feedback->{1} = 1;
-    $this->assertTrue($this->_AssessModel->updateFeedbackFromStudent($s2t1feedback));
+    $this->assertTrue($this->_AssessModel->updateFeedback(new MongoId($testIds[0]), $studentOne, $s2t1feedback));
 
     // simulate first student taking second test
-    $resultOne = $this->_AssessModel->loadTest(new MongoId($testIds[1]), $studentOne);
-    $this->_AssessModel->startTestGetJSONData();
     $s1t2answers = new stdClass();
     $s1t2answers->{0} = new stdClass();
     $s1t2answers->{0}->{'uq'} = 1;
@@ -177,17 +175,17 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
     $s1t2answers->{1} = new stdClass();
     $s1t2answers->{1}->{'uq'} = 0;
     $s1t2answers->{1}->{'ans'} = 'FALSE';
-    $resultTwo = $this->_AssessModel->updateTestAnswers($s1t2answers);
-    $this->assertTrue($resultOne && $resultTwo);
+    $this->assertSame(
+      "{\"0\":\"AngularJS is maintained by Google.\"}",
+      $this->_AssessModel->updateAnswers(new MongoId($testIds[1]), $studentOne, $s1t2answers)
+    );
 
     // submit feedback for test
     $s1t2feedback = new stdClass();
     $s1t2feedback->{0} = 0;
-    $this->assertTrue($this->_AssessModel->updateFeedbackFromStudent($s1t2feedback));
+    $this->assertTrue($this->_AssessModel->updateFeedback(new MongoId($testIds[1]), $studentOne, $s1t2feedback));
 
     // simulate second student taking second test
-    $resultOne = $this->_AssessModel->loadTest(new MongoId($testIds[1]), $studentTwo);
-    $this->_AssessModel->startTestGetJSONData();
     $s2t2answers = new stdClass();
     $s2t2answers->{0} = new stdClass();
     $s2t2answers->{0}->{'uq'} = 0;
@@ -195,14 +193,16 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
     $s2t2answers->{1} = new stdClass();
     $s2t2answers->{1}->{'uq'} = 1;
     $s2t2answers->{1}->{'ans'} = 'TRUE';
-    $resultTwo = $this->_AssessModel->updateTestAnswers($s2t2answers);
-    $this->assertTrue($resultOne && $resultTwo);
+    $this->assertSame(
+      "{\"0\":\"AngularJS is maintained by Google.\",\"1\":\"Ask Richard Stallman for further details.\"}",
+      $this->_AssessModel->updateAnswers(new MongoId($testIds[1]), $studentTwo, $s2t2answers)
+    );
 
     // submit feedback for test
     $s2t2feedback = new stdClass();
     $s2t2feedback->{0} = 1;
     $s2t2feedback->{1} = 0;
-    $this->assertTrue($this->_AssessModel->updateFeedbackFromStudent($s2t2feedback));
+    $this->assertTrue($this->_AssessModel->updateFeedback(new MongoId($testIds[1]), $studentTwo, $s2t2feedback));
 
     //print_r($this->_AuthorModel->getTests($authorId));
     //print_r($this->_AuthorModel->getQuestions($authorId));
