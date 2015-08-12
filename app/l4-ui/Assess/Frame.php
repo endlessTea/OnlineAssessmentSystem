@@ -32,7 +32,7 @@
       ?>
 
       <p><?= $test; ?>
-      <button onclick="loadTest('<?= $test; ?>');">LOAD</button></p>
+      <button onclick="checkAndLoadDisclaimer('<?= $test; ?>');">LOAD</button></p>
 
       <?php
           }

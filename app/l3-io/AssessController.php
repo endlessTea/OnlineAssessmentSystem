@@ -38,39 +38,26 @@ class AssessController {
   }
 
   /**
-   *  AJAX: RESPONSE TO REQUEST TO LOAD TEST
-   *  Check if a user is able to take a test, return test data if request is valid
+   *  GET TEST DISCLAIMER (CHECK USER ALLOWED TO TAKE TEST SPECIFIED)
+   *  Return an HTML template to the user for the test disclaimer
    */
-  public function loadTest() {
+  public function checkAndLoadDisclaimer() {
 
     // attempt to convert test identifier to MongoId
     try {
-
       $testIdObj = new MongoId($this->_AppModel->getPOSTData("tId"));
-
     } catch (Exception $e) {
-
       echo "Invalid test identifier";
       exit;
     }
 
     // check if the user is eligible to take the test
-    $check = $this->_AssessModel->checkTestAvailability(
+    $check = $this->_AssessModel->checkTestAvailable(
       $testIdObj,
       $this->_UserModel->getUserData()->userId
     );
     if ($check !== true) {
-      echo $check;
-      exit;
-    }
-
-    // load test (Assess Model instance variable will be updated)
-    $check = $this->_AssessModel->loadTest(
-      $testIdObj,
-      $this->_UserModel->getUserData()->userId
-    );
-    if ($check !== true) {
-      echo $check;
+      echo "The specified test is not available";
       exit;
     }
 
@@ -84,9 +71,34 @@ class AssessController {
    */
   public function startTest() {
 
+    // attempt to convert test identifier to MongoId
+    try {
+      $testIdObj = new MongoId($this->_AppModel->getPOSTData("tId"));
+    } catch (Exception $e) {
+      echo "Invalid test identifier.";
+      exit;
+    }
+
+    // check if the user is eligible to take the test
+    $check = $this->_AssessModel->checkTestAvailable(
+      $testIdObj,
+      $this->_UserModel->getUserData()->userId
+    );
+    if ($check !== true) {
+      echo "The specified test is not available.";
+      exit;
+    }
+
+    // get data, check if json returned (not false (boolean))
+    $data = $this->_AssessModel->getQuestionsJSON($testIdObj);
+    if ($data === false) {
+      echo "There was an issue loading the test. Please contact the system administrator.";
+      exit;
+    }
+
     // change the header to indicate that JSON data is being returned
 		header('Content-Type: application/json');
 
-    echo $this->_AssessModel->startTestGetJSONData();
+    echo $data;
   }
 }
