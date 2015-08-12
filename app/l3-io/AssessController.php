@@ -103,7 +103,33 @@ class AssessController {
   }
 
   /**
-   *
-   *
+   *  AJAX: HANDLE ANSWERS SUBMITTED FOR A TEST
+   *  Process user's answers to a test, return feedback on success
    */
+  public function submitAnswers() {
+
+    // attempt to convert test identifier to MongoId
+    try {
+      $testIdObj = new MongoId($this->_AppModel->getPOSTData("tId"));
+    } catch (Exception $e) {
+      echo "Invalid test identifier.";
+      exit;
+    }
+
+    // pass data to model, store feedback or result in variable
+    $data = $this->_AssessModel->updateAnswers(
+      $testIdObj,
+      $this->_UserModel->getUserData()->userId,
+      $this->_AppModel->getPOSTData("ans", "getJSON")
+    );
+    if ($data === false) {
+      echo "There was an issue processing your answers. Please contact the system administrator.";
+      exit;
+    }
+
+    // change the header to indicate that JSON data is being returned
+		header('Content-Type: application/json');
+
+    echo $data;
+  }
 }

@@ -190,7 +190,8 @@ class AssessModel {
 
         // check if an 'understanding of question' was provided and if the values are valid
         if (!isset($answers->{$qNo}->{'uq'})) return false;
-        if ($answers->{$qNo}->{'uq'} !== 0 && $answers->{$qNo}->{'uq'} !== 1) return false;
+
+        if ($answers->{$qNo}->{'uq'} != 0 && $answers->{$qNo}->{'uq'} != 1) return false;
 
         // check if an answer was provided at all
         if (!isset($answers->{$qNo}->{'ans'})) return false;
@@ -238,8 +239,8 @@ class AssessModel {
         }
 
         // Update Question: if the operation fails for any question, throw an Exception
-        if (!$this->_DB->update("questions", array("_id" => $fullQuestion["_id"]), array("taken" => $takenQuestionArray)))
-          throw new Exception("The following question update failed: " . implode($takenQuestionArray));
+        // if (!$this->_DB->update("questions", array("_id" => $fullQuestion["_id"]), array("taken" => $takenQuestionArray)))
+        //   throw new Exception("The following question update failed: " . implode($takenQuestionArray));
       }
 
       // copy and update the tests's "taken" array if it exists, otherwise create a new one to insert
@@ -254,8 +255,8 @@ class AssessModel {
       }
 
       // Update Test: if the operation fails for any question, throw an Exception
-      if (!$this->_DB->update("tests", array("_id" => $test["_id"]), array("taken" => $takenTestArray)))
-        throw new Exception("The following test update failed: " . implode($takenTestArray));
+      // if (!$this->_DB->update("tests", array("_id" => $test["_id"]), array("taken" => $takenTestArray)))
+      //   throw new Exception("The following test update failed: " . implode($takenTestArray));
 
       // remove student from 'available array'
       // http://stackoverflow.com/questions/7225070/php-array-delete-by-value-not-key
@@ -264,8 +265,8 @@ class AssessModel {
       unset($availableTestArray[$key]);
 
       // Update 'available' array in Test: if the operation fails for any question, throw an Exception
-      if (!$this->_DB->update("tests", array("_id" => $test["_id"]), array("available" => $availableTestArray)))
-        throw new Exception("The following test update failed: " . implode($availableTestArray));
+      // if (!$this->_DB->update("tests", array("_id" => $test["_id"]), array("available" => $availableTestArray)))
+      //   throw new Exception("The following test update failed: " . implode($availableTestArray));
 
       return json_encode($feedbackToStudent);
     }

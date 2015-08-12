@@ -3,9 +3,10 @@
  *  @author Jonathan Lamb
  */
 
-// Store current test ID and JSON representation of Questions for sharing among methods
+// Store current test ID and JSON representation of Questions and Feedback for sharing among methods
 var testId;
 var questionsJSON;
+var feedbackJSON;
 
 /**
  *  LOAD TEST
@@ -164,7 +165,7 @@ function submitAnswers() {
     type: "POST",
     dataType: "json",
     success: function(response) {
-      $("#assessContainer").html(response);
+      buildFeedbackResponse(response);
     },
     error: function (request, status, error) {
       $("#assessContainer").html(
@@ -173,6 +174,29 @@ function submitAnswers() {
       );
     }
   });
+}
+
+/**
+ *  BUILD FEEDBACK RESPONSE / UPDATE CONTAINER
+ *  Use JSON data returned from server to build HTML for feedback delivery / student response
+ */
+var buildFeedbackResponse = function(data) {
+
+  feedbackJSON = data;
+  alert(JSON.stringify(feedbackJSON));
+
+}
+
+/**
+ *  SUBMIT STUDENT FEEDBACK TO THE SERVER
+ *  Submit feedback from the student to the server for each question incorrectly answered
+ */
+function submitFeedback() {
+
+  // process form values
+
+  // send feedback via Ajax
+
 }
 
 /**
