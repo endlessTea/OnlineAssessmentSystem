@@ -3,16 +3,20 @@
  *  @author Jonathan Lamb
  */
 
+// Store current test ID and JSON representation of Questions for sharing among methods
+var testId;
+var questionsJSON;
+
 /**
  *  LOAD TEST
  *  Send a request to load a specific test
  */
-function checkAndLoadDisclaimer(testId) {
+function checkAndLoadDisclaimer(tIdArg) {
 
   $.ajax({
     url: baseURL + "assess/checkAndLoadDisclaimer",
     data: {
-      tId: testId
+      tId: tIdArg
     },
     type: "POST",
     dataType: "html",
@@ -20,9 +24,11 @@ function checkAndLoadDisclaimer(testId) {
       $('#selectTestPrompt').html('');
       $("#assessContainer").html(response);
       if (response !== "Invalid test identifier" && response !== "The specified test is not available") {
+
+        // set 'testId' variable and assume disclaimer was provided; set start button
+        testId = tIdArg;
         $("#assessContainer").append(
-          "<button onclick=\"startTest('" +
-          testId + "');\">START TEST</button>"
+          "<button onclick=\"startTest();\">START TEST</button>"
         );
       }
     },
@@ -40,7 +46,7 @@ function checkAndLoadDisclaimer(testId) {
  *  Send a confirmation to the server to start the test
  *  Server will return JSON of data on success
  */
-function startTest(testId) {
+function startTest() {
 
   $.ajax({
     url: baseURL + "assess/startTest",
@@ -51,7 +57,7 @@ function startTest(testId) {
     dataType: "json",
     success: function(response) {
       $("#assessContainer").html('');
-      buildTest(testId, response);
+      buildTest(response);
     },
     error: function (request, status, error) {
       $("#assessContainer").html(
@@ -66,33 +72,35 @@ function startTest(testId) {
  *  BUILD TEST / UPDATE CONTAINER
  *  Use JSON data returned from server to build HTML for test taking
  */
-var buildTest = function (testId, data) {
+var buildTest = function(data) {
+
+  // set variable to share JSON data among methods
+  questionsJSON = data;
 
   // create form element
   $("#assessContainer").html(
-    "<form id=\"testForm\" onsubmit=\"submitAnswers('" +
-    testId + "', '" + Object.keys(data).length + "'); return false;\"></form>"
+    "<form id=\"testForm\" onsubmit=\"submitAnswers(); return false;\"></form>"
   );
 
   // check the schema for each question and insert appropriate HTML with question values
-  for (var question in data) {
+  for (var question in questionsJSON) {
 
     // title
     $("#testForm").append(
       "<h2>Question " + question + ":</h2>"
     );
 
-    switch (data[question]["schema"]) {
+    switch (questionsJSON[question]["schema"]) {
 
       case "boolean":
         $("#testForm").append(
-          "<h3>\"" + data[question]["statement"] + "\"</h3>" +
+          "<h3>\"" + questionsJSON[question]["statement"] + "\"</h3>" +
           "<p>Is this TRUE or FALSE?</p>" +
-          "<input id=\"" + question + "-ans\" name=\"" + question + "-ans\"" +
-            "type=\"radio\" value=\"TRUE\" checked> TRUE" +
+          "<input name=\"" + question + "-ans\"" +
+          "type=\"radio\" value=\"TRUE\" checked> TRUE" +
           "<br>" +
-          "<input id=\"" + question + "-ans\" name=\"" + question + "-ans\"" +
-            "type=\"radio\" value=\"FALSE\"> FALSE"
+          "<input name=\"" + question + "-ans\"" +
+          "type=\"radio\" value=\"FALSE\"> FALSE"
         );
         break;
 
@@ -103,10 +111,10 @@ var buildTest = function (testId, data) {
     // obtain 'understanding of question' from the user
     $("#testForm").append(
       "<h4>Did you understand Question " + question + "?</h4>" +
-      "<input id=\"" + question + "-uq\" name=\"" + question + "-uq\"" +
+      "<input name=\"" + question + "-uq\"" +
         "type=\"radio\" value=\"1\" checked> YES" +
       "<br>" +
-      "<input id=\"" + question + "-uq\" name=\"" + question + "-uq\"" +
+      "<input name=\"" + question + "-uq\"" +
         "type=\"radio\" value=\"0\"> NO"
     );
   }
@@ -121,11 +129,50 @@ var buildTest = function (testId, data) {
  *  SUBMIT TEST ANSWERS
  *  Submit answers to the server
  */
-function submitAnswers(testId, numQuestions) {
+function submitAnswers() {
 
+  // create root object
+  var answers = {};
 
+  for (var question in questionsJSON) {
 
-  alert(numQuestions);
+    // create child object for each question
+    answers[question] = {};
+
+    // get 'understanding of question'
+    answers[question]['uq'] = $('input[type="radio"][name="' + question + '-uq"]:checked').val();
+
+    // check question schema to determine what values to retrieve
+    switch (questionsJSON[question]["schema"]) {
+
+      case "boolean":
+        answers[question]['ans'] = $('input[type="radio"][name="' + question + '-ans"]:checked').val();
+        break;
+
+      default:
+        alert("Question Schema not recognised. Please contact the system administrator.");
+    }
+  }
+
+  // send answers via Ajax
+  $.ajax({
+    url: baseURL + "assess/submitAnswers",
+    data: {
+      tId: testId,
+      ans: JSON.stringify(answers)
+    },
+    type: "POST",
+    dataType: "json",
+    success: function(response) {
+      $("#assessContainer").html(response);
+    },
+    error: function (request, status, error) {
+      $("#assessContainer").html(
+        "<p>There was a problem with the request, please contact the system administrator: <br>" +
+        request.responseText + "</p>"
+      );
+    }
+  });
 }
 
 /**
