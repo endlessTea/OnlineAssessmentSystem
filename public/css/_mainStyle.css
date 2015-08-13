@@ -4,8 +4,10 @@
  *  @author Jonathan Lamb
  */
 
+@import url(http://fonts.googleapis.com/css?family=Roboto:400,100);
+
 body {
-  font-family: Verdana, Geneva, sans-serif;
+  font-family: 'Roboto', Verdana, sans-serif;
   text-align: center;
 }
 
@@ -13,4 +15,12 @@ body {
   padding: 5px;
   margin: 8px;
   width: 600px;
+}
+
+input:invalid {
+  box-shadow: none;
+}
+
+input:required {
+  box-shadow: none;
 }

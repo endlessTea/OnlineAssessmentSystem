@@ -91,9 +91,9 @@ function registerNewUser() {
         $('#UIForm').html('');
         $("#NotificationsFromServer").html(
           "<p>The new user has been registered<br>" +
-          "Please " +
-          "<a href=\"" + baseURL + "\">log in</a> " +
-          "with the details provided</p>"
+          "Please &nbsp;   " +
+          "<a href=\"" + baseURL + "\">LOG IN</a> " +
+          "    &nbsp;with the details provided</p>"
         );
       } else if (response === "invalid") {
         $("#NotificationsFromServer").html(

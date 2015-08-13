@@ -11,41 +11,37 @@
 </head>
 <body>
 
-  <header>
-    <h1>Login</h1>
-  </header>
-
   <main>
 
-    <p id="prompt">Please provide your username and password</p>
-
-    <div id="NotificationsFromServer"></div>
-
-    <div id="UIForm">
-      <form onsubmit="logUserIn(); return false;">
-        <div class="loginField">
-          <label for="username">Username</label>
+    <!-- CSS selectors adapted from 'Login Container' by 'Ayu' (see loginStyle.css) -->
+    <div class="login-card">
+      <h1>Log In</h1><br>
+      <div id="NotificationsFromServer"></div>
+      <div id="UIForm">
+        <form onsubmit="logUserIn(); return false;">
           <input type="text"
             id="username"
             autocomplete="off"
             autofocus
             pattern="[a-zA-Z0-9]+"
+            title="Alphanumeric characters only"
+            placeholder="Username"
             required>
-        </div>
-        <div class="loginField">
-          <label for="password">Password</label>
           <input type="password"
             id="password"
             autocomplete="off"
             pattern="[a-zA-Z0-9]+"
+            title="Alphanumeric characters only"
+            placeholder="Password"
             required>
+          <input type="submit" class="login login-submit" value="Log In">
+        </form>
+        <div class="login-help">
+          Or&nbsp;
+          <span onclick="getRegistrationForm();">REGISTER</span>
+          &nbsp;a new user
         </div>
-        <div class="loginField">
-          <input type="submit" value="Log In">
-        </div>
-      </form>
-      <p>OR</p>
-      <button onclick="getRegistrationForm();">Register</button>
+      </div>
     </div>
 
   </main>

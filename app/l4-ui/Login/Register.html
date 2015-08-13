@@ -1,36 +1,31 @@
 <form onsubmit="registerNewUser(); return false;">
-  <div class="loginField">
-    <label for="username">Username</label>
-    <input type="text"
-      id="username"
-      autocomplete="off"
-      autofocus
-      pattern="[a-zA-Z0-9]+"
-      required>
-  </div>
-  <div class="loginField">
-    <label for="password">Password</label>
-    <input type="password"
-      id="password"
-      autocomplete="off"
-      pattern="[a-zA-Z0-9]+"
-      required>
-  </div>
-  <div class="loginField">
-    <label for="fullname">Full Name</label>
-    <input type="text"
-      id="fullname"
-      autocomplete="off"
-      pattern="[a-zA-Z0-9\s]+"
-      required>
-  </div>
-  <div class="loginField">
-    <label for="assessor">Assessor account?</label>
+  <input type="text"
+    id="username"
+    autocomplete="off"
+    autofocus
+    pattern="[a-zA-Z0-9]+"
+    title="Alphanumeric characters only"
+    placeholder="Username"
+    required>
+  <input type="password"
+    id="password"
+    autocomplete="off"
+    pattern="[a-zA-Z0-9]+"
+    title="Alphanumeric characters only"
+    placeholder="Password"
+    required>
+  <input type="text"
+    id="fullname"
+    autocomplete="off"
+    pattern="[a-zA-Z0-9\s]+"
+    placeholder="Full name"
+    required>
+  <div class="login-assessor-select">
+    Select for an Assessor account
     <input type="checkbox"
       id="assessor"
       name="assessor">
   </div>
-  <div class="loginField">
-    <input type="submit" value="Register New User">
-  </div>
+  <!-- CSS selector for submit button to match theme of 'Login Container' by 'Ayu' (see loginStyle.css) -->
+  <input type="submit" class="login login-submit" value="Register">
 </form>
