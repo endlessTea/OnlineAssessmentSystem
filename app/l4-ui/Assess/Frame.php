@@ -20,10 +20,6 @@
 
   <main>
 
-    <p>
-      <span id="selectTestPrompt">If tests have been made available to you, they will appear below.</span>
-    </p>
-
     <div id="assessContainer">
 
       <?php

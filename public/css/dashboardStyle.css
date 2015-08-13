@@ -47,6 +47,7 @@ ul {
   max-width: 250px;
   max-height: 52px;
   transition: all .10s ease;
+  border-radius: 10px;
 }
 
 .student-button {

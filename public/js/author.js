@@ -357,5 +357,8 @@ function issueTest(testId, userId) {
  */
 function exitPlatform() {
 
-  window.location.replace(baseURL + "dashboard");
+  if (confirm("Are you sure you want to leave the platform?\n" +
+    "Make sure you have saved your questions or tests before leaving.")) {
+    window.location.replace(baseURL + "dashboard");
+  }
 }

@@ -283,5 +283,8 @@ function submitFeedback() {
  */
 function exitPlatform() {
 
-  window.location.replace(baseURL + "dashboard");
+  if (confirm("Are you sure you want to leave the platform?\n" +
+    "If you have not submitted any answers for a test they will be lost.")) {
+    window.location.replace(baseURL + "dashboard");
+  }
 }

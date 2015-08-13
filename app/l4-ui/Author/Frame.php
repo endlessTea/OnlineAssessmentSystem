@@ -14,22 +14,43 @@
   <header>
     <h1>Authoring Platform</h1>
     <div id="exit-author-platform" onclick="exitPlatform();">X</div>
+    <div id="clear-buffer"></div>
   </header>
-
-  <div id="clear-buffer"></div>
 
   <main>
 
-    <!-- refactor this -->
-    <p>
-      Create a new <button onclick="getQuestionTemplate('boolean');">BOOLEAN</button> question,
-      <button onclick="manageQuestions();">MANAGE</button> existing questions,
-      create a <button onclick="loadQuestionsForTestCreation();">NEW TEST</button>,
-      <button  onclick="manageTests();">MANAGE</button> existing tests or
-      <button onclick="loadTests();">ISSUE</button> a test to another user.
-    </p>
+    <div class="author-level">
+      <div class="author-question-description">
+        <p>CREATE NEW<br>QUESTION:</p>
+      </div>
+      <div class="author-question-container">
+        <div class="author-control" onclick="getQuestionTemplate('boolean');">
+          <p>BOOLEAN</p>
+        </div>
+        <div class="author-control" onclick="alert('multiple');">
+          <p>MULTIPLE CHOICE</p>
+        </div>
+        <div class="author-control" onclick="alert('pattern');">
+          <p>PATTERN</p>
+        </div>
+      </div>
+      <div class="author-control" onclick="manageQuestions();">
+        <p>MANAGE<br>QUESTIONS</p>
+      </div>
+      <div class="author-control" onclick="loadQuestionsForTestCreation();">
+        <p>CREATE NEW<br>TEST</p>
+      </div>
+      <div class="author-control" onclick="manageTests();">
+        <p>MANAGE<br>TESTS</p>
+      </div>
+      <div class="author-control" onclick="loadTests();">
+        <p>ISSUE<br>TEST</p>
+      </div>
+    </div>
 
-    <div id="authorContainer"></div>
+    <div id="authorContainer">
+      <p>Select one of the menu options above to begin.</p>
+    </div>
 
   </main>
 
