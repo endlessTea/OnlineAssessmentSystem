@@ -118,7 +118,7 @@ class AppModelTest extends PHPUnit_Framework_TestCase {
 
     $result = $this->_AppModel->redirectTo(403);
     $this->assertSame(
-      "Location: http://localhost/msc/forbidden",
+      "Location: http://localhost/msc/error/forbidden",
       $result
     );
   }

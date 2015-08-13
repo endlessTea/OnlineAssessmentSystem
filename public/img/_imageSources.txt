@@ -1,5 +1,8 @@
-bw_shapes.jpg
-http://il8.picdn.net/shutterstock/videos/2667881/thumb/1.jpg?i10c=img.resize(height:160)
+blue_pencil.png
+https://cdn0.iconfinder.com/data/icons/Vibrant-Stickers-Tutorial9/256/Blue-Pencil.png
+
+create_assess.png
+http://aspnethosting2go.com/wp-content/uploads/2014/07/feature2.png
 
 ideas_background.jpg
 http://il3.picdn.net/shutterstock/videos/4008184/thumb/3.jpg
@@ -7,8 +10,11 @@ http://il3.picdn.net/shutterstock/videos/4008184/thumb/3.jpg
 lionel_richtea.jpg:
 http://thumbs3.ebaystatic.com/d/l225/m/mJ49FO8ZafPng5xrYIvxZPw.jpg
 
+logout.png
+http://www.prod-link.co.uk/IMGs/LogOut-Big.png
+
 not_approving.png
 http://freeiconbox.com/icon/256/31148.png
 
-shrug_full.png:
-http://cliparts.co/cliparts/rTj/dx4/rTjdx4kTR.png
+stats.png
+http://am2.athena-testbed.com/wp-content/uploads/2013/08/Icon-Marketing-Analysis-mD-DC-VA.png

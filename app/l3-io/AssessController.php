@@ -20,6 +20,12 @@ class AssessController {
 
     $this->_AppModel = new AppModel();
     $this->_UserModel = new UserModel();
+
+    // check that the current user has an assessor account
+    if ($this->_UserModel->getUserData()->accountType !== "student") {
+      throw new Exception("User does not have a student account");
+    }
+
     $this->_AssessModel = new AssessModel();
   }
 

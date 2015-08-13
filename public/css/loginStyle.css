@@ -91,6 +91,7 @@ body {
   display: inline-block;
   opacity: 0.6;
   transition: all ease 0.25s;
+  cursor: pointer;
 }
 
 /* Text that performs an action when clicked should provide feedback to the user: grow in size */

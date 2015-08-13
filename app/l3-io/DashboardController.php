@@ -21,7 +21,16 @@ class DashboardController {
 
     $this->_AppModel = new AppModel();
     $this->_UserModel = new UserModel();
-    $this->_VisualsModel = new VisualsModel();
+
+    // initialise visualisation model only if assessor account is logged in
+    if ($this->_UserModel->getUserData()->accountType === "assessor") {
+
+      $this->_VisualsModel = new VisualsModel();
+
+    } else {
+
+      $this->_VisualsModel = "student";
+    }
   }
 
   /**
@@ -31,6 +40,7 @@ class DashboardController {
   public function loadFrame() {
 
     $resources["fullName"] = $this->_UserModel->getUserData()->fullName;
+    $resources["accountType"] = $this->_UserModel->getUserData()->accountType;
     $this->_AppModel->renderFrame("Dashboard", $resources);
   }
 

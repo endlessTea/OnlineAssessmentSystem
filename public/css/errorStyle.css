@@ -1,0 +1,55 @@
+/**
+ *
+ *  ERRORSTYLE.CSS
+ *  Additional styling for error landing pages
+ *  @author Jonathan Lamb
+ */
+
+html {
+  background-color: #E6E6E6;
+}
+
+body {
+  max-width: 1000px;
+	min-width: 800px;
+	margin: 10px auto 10px auto;
+  border-radius: 2px;
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+  background-color: #fff;
+  border: 1px solid #fff;
+}
+
+h1 {
+  font-size: 90px;
+}
+
+main {
+  display: inline;
+}
+
+#forbidden-page-image {
+  width: 300px;
+  height: 280px;
+  float: left;
+  background-image: url(../img/not_approving.png);
+  -webkit-background-size: contain;
+  -moz-background-size: contain;
+  -o-background-size: contain;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+#error-image {
+  width: 300px;
+  height: 300px;
+  float: left;
+  background-image: url(../img/lionel_richtea.jpg);
+  -webkit-background-size: contain;
+  -moz-background-size: contain;
+  -o-background-size: contain;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+#error-text {
+}

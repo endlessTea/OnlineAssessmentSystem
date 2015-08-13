@@ -8,6 +8,16 @@ html {
   background-color: #CEDFF8;
 }
 
+body {
+  max-width: 1000px;
+	min-width: 800px;
+	margin: 10px auto 10px auto;
+  border-radius: 2px;
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+  background-color: #F7F7F7;
+  border: 1px solid #F7F7F7;
+}
+
 h1, h2 {
   color: blue;
 }
@@ -20,11 +30,6 @@ ul {
 
 li {
   display: inline;
-}
-
-a {
-  text-decoration: none;
-  color: #000;
   padding: 10px 20px;
   margin: 15px 20px;
   text-transform: uppercase;
@@ -33,9 +38,15 @@ a {
   background: #fff;
 }
 
-a:hover {
+a {
+  text-decoration: none;
+  color: #000;
+}
+
+a:hover, li:hover {
   background: blue;
   color: #fff;
+  cursor: pointer;
 }
 
 /**

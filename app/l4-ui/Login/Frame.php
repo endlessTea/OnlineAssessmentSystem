@@ -11,8 +11,6 @@
 </head>
 <body>
 
-  <main>
-
     <!-- CSS selectors adapted from 'Login Container' by 'Ayu' (see loginStyle.css) -->
     <div class="login-card">
       <h1>Log In</h1><br>
@@ -43,8 +41,6 @@
         </div>
       </div>
     </div>
-
-  </main>
 
   <footer>
 

@@ -92,7 +92,17 @@ class URLHandler {
       // Set Controller and load UI
       require 'app/l3-io/' . $this->_URL["controller"] . 'Controller.php';
       $controller = ucfirst($this->_URL["controller"]) . 'Controller';
-      $controller = new $controller();
+
+      // attempt to instantiate controller
+      try {
+
+        $controller = new $controller();
+
+      } catch (Exception $e) {
+
+        //if exception occurs, user does not have the correct account permissions
+        $this->_AppModel->redirectTo(403);
+      }
 
       // No Action provided: take the user to the index of the above Controller
       if (empty($this->_URL["action"])) {

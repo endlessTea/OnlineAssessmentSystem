@@ -100,7 +100,7 @@ class AppModel {
 					break;
 
         case 403:
-          $headerString = "Location: " . URL . "forbidden";
+          $headerString = "Location: " . URL . "error/forbidden";
           break;
 			}
 

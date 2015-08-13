@@ -8,6 +8,16 @@ html {
   background-color: #F6D1D1;
 }
 
+body {
+  max-width: 1000px;
+	min-width: 800px;
+	margin: 10px auto 10px auto;
+  border-radius: 2px;
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+  background-color: #F7F7F7;
+  border: 1px solid #F7F7F7;
+}
+
 h1 {
   color: red;
 }

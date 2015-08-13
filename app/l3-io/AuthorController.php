@@ -21,6 +21,12 @@ class AuthorController {
 
     $this->_AppModel = new AppModel();
     $this->_UserModel = new UserModel();
+
+    // check that the current user has an assessor account
+    if ($this->_UserModel->getUserData()->accountType !== "assessor") {
+      throw new Exception("User does not have an assessor account");
+    }
+
     $this->_AuthorModel = new AuthorModel();
     $this->_questionTypes = $this->_AppModel->getSchemaList();
   }

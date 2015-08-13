@@ -27,4 +27,14 @@ class ErrorController {
 
     $this->_AppModel->renderFrame("Error");
   }
+
+  /**
+   *  LOAD PAGE FRAME WITH 403 MESSAGE
+   *  Load the HTML required to display a 403 forbidden page
+   */
+  public function forbidden() {
+
+    $resources["forbidden"] = true;
+    $this->_AppModel->renderFrame("Error", $resources);
+  }
 }
