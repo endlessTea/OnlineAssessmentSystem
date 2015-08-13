@@ -5,12 +5,12 @@
  */
 
 html {
-  background-color: #F6D1D1;
+  background-color: #C08080;
 }
 
 body {
   max-width: 1000px;
-	min-width: 800px;
+	min-width: 950px;
 	margin: 10px auto 10px auto;
   border-radius: 2px;
   box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
@@ -19,5 +19,38 @@ body {
 }
 
 h1 {
-  color: red;
+  color: #990000;
+  float: left;
+  width: 96%;
+  height: 60px;
+  margin: 0;
+  padding-top: 20px;
+  padding-bottom: -20px;
+}
+
+#clear-buffer {
+  width: auto;
+  height: 4px;
+  float: clear;
+}
+
+main {
+  padding-bottom: 20px;
+}
+
+main p {
+  margin-top: 4px;
+}
+
+#exit-assess-platform {
+  float: right;
+  font-size: 50px;
+  color: #990000;
+  height: 60px;
+  padding-bottom: 20px;
+  margin-right: 5px;
+}
+
+#exit-assess-platform:hover {
+  cursor: pointer;
 }

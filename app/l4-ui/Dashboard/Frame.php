@@ -8,26 +8,48 @@
   <link rel="stylesheet" href="<?= URL; ?>public/css/_mainStyle.css">
   <link rel="stylesheet" href="<?= URL; ?>public/css/dashboardStyle.css">
 
+  <?php
+    if ($accountType === "assessor") {
+  ?>
+  <link rel="stylesheet" href="<?= URL; ?>public/css/visualisationStyle.css">
+  <?php
+    }
+  ?>
+
 </head>
 <body>
 
   <header>
-    <ul>
+    <div class="dash-level">
       <?php
         if ($accountType === "assessor") {
       ?>
-      <li><a href="<?= URL; ?>author">Authoring</a></li>
-      <li>Toggle Reports</li>
+      <a href="<?= URL; ?>author">
+        <div class="dash-control" id="author-button">
+          <p>AUTHOR QUESTIONS/TESTS</p>
+        </div>
+      </a>
+      <div class="dash-control" id="vis-toggle-button" onclick="toggleVisualisations();">
+        <p>TOGGLE DATA VISUALISATIONS</p>
+      </div>
       <?php
         } else {
       ?>
-      <li><a href="<?= URL; ?>assess">Assessment</a></li>
+      <a href="<?= URL; ?>assess">
+        <div class="dash-control student-button" id="assess-button">
+          <p>TAKE A TEST</p>
+        </div>
+      </a>
       <?php
         }
       ?>
-      <li><a href="<?= URL; ?>dashboard/logout">Logout</a></li>
-    </ul>
-    <div id="advancedOptions"></div>
+      <a href="<?= URL; ?>dashboard/logout">
+        <div class="dash-control" id="logout-button">
+          <p>LOGOUT</p>
+        </div>
+      </a>
+    </div>
+    <div class="dash-level" id="advancedOptions"></div>
   </header>
 
   <main>

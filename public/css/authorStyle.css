@@ -10,7 +10,7 @@ html {
 
 body {
   max-width: 1000px;
-	min-width: 800px;
+	min-width: 950px;
 	margin: 10px auto 10px auto;
   border-radius: 2px;
   box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
@@ -18,6 +18,42 @@ body {
   border: 1px solid #F7F7F7;
 }
 
+h1 {
+  float: left;
+  width: 95%;
+  height: 60px;
+  margin: 0;
+  padding-top: 20px;
+  padding-bottom: -20px;
+}
+
+#clear-buffer {
+  width: auto;
+  height: 4px;
+  float: clear;
+}
+
+main {
+  padding-bottom: 20px;
+}
+
+main p {
+  margin-top: 4px;
+}
+
 h1, h2 {
-  color: green;
+  color: #009933;
+}
+
+#exit-author-platform {
+  float: right;
+  font-size: 50px;
+  color: #009933;
+  height: 60px;
+  padding-bottom: 20px;
+  margin-right: 5px;
+}
+
+#exit-author-platform:hover {
+  cursor: pointer;
 }

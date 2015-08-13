@@ -13,7 +13,10 @@
 
   <header>
     <h1>Authoring Platform</h1>
+    <div id="exit-author-platform" onclick="exitPlatform();">X</div>
   </header>
+
+  <div id="clear-buffer"></div>
 
   <main>
 
@@ -24,7 +27,6 @@
       create a <button onclick="loadQuestionsForTestCreation();">NEW TEST</button>,
       <button  onclick="manageTests();">MANAGE</button> existing tests or
       <button onclick="loadTests();">ISSUE</button> a test to another user.
-      <button onclick="exitPlatform();">EXIT</button> when you are finished.
     </p>
 
     <div id="authorContainer"></div>

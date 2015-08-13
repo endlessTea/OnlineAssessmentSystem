@@ -1,0 +1,50 @@
+/**
+ *  VISUALISATIONSTYLE.CSS
+ *  Additional styling for data visualisations
+ *  @author Jonathan Lamb
+ */
+
+/**
+ *  http://bl.ocks.org/mbostock/3887118
+ *  Scatterplot, multiple tests
+ */
+
+#visLeft {
+  font-size: .7em;
+}
+
+#visLeft .axis path,
+#visLeft .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+#visLeft .dot {
+  stroke: #000;
+}
+
+/**
+ *  http://bl.ocks.org/mbostock/32bd93b1cc0fbccc9bf9
+ *  Donut chart
+ */
+
+#visRight path {
+  fill: #ccc;
+  stroke: #333;
+  stroke-width: 1.5px;
+  transition: fill 250ms linear;
+  transition-delay: 150ms;
+}
+
+#visRight path:hover {
+  fill: #999;
+  stroke: #000;
+  transition-delay: 0;
+}
+
+#visRight #sample1 {
+  width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}

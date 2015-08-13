@@ -28,14 +28,72 @@ ul {
   padding: 0;
 }
 
+.dash-level {
+  margin: 5px;
+  text-align: left;
+  display: -webkit-flex;
+  -webkit-flex-direction: row;
+  display: flex;
+  flex-direction: row;
+}
+
+.dash-control {
+  -webkit-flex: 1 1 auto;
+  flex: 1 1 auto;
+  margin: auto;
+  padding: 5px 40px 5px 60px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  max-width: 250px;
+  max-height: 52px;
+  transition: all .10s ease;
+}
+
+.student-button {
+  margin: auto 200px auto 200px;
+}
+
+.dash-control:hover {
+  cursor: pointer;
+  background-color: #85ADFF;
+  border-radius: 30px;
+}
+
+.dash-control p {
+  font-weight: bold;
+  color: #000;
+  margin-left: 8px;
+}
+
+.dash-control:hover p {
+  color: #fff;
+}
+
+.visualisation-control {
+  padding: 0 auto 0 auto;
+}
+
+#author-button, #assess-button {
+  background-image: url(../img/create_assess.png);
+}
+
+#vis-toggle-button {
+  background-image: url(../img/stats.png);
+}
+
+#logout-button {
+  background-image: url(../img/logout.png);
+}
+
 li {
   display: inline;
   padding: 10px 20px;
   margin: 15px 20px;
   text-transform: uppercase;
-  font-weight: bold;
+
   border: 2px solid #000;
   background: #fff;
+  color: #000;
 }
 
 a {
@@ -43,53 +101,8 @@ a {
   color: #000;
 }
 
-a:hover, li:hover {
+li:hover a, li:hover {
   background: blue;
   color: #fff;
   cursor: pointer;
-}
-
-/**
- *  http://bl.ocks.org/mbostock/3887118
- *  Scatterplot, multiple tests
- */
-
-#visLeft {
-  font-size: .7em;
-}
-
-#visLeft .axis path,
-#visLeft .axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-
-#visLeft .dot {
-  stroke: #000;
-}
-
-/**
- *  http://bl.ocks.org/mbostock/32bd93b1cc0fbccc9bf9
- *  Donut chart
- */
-
-#visRight path {
-  fill: #ccc;
-  stroke: #333;
-  stroke-width: 1.5px;
-  transition: fill 250ms linear;
-  transition-delay: 150ms;
-}
-
-#visRight path:hover {
-  fill: #999;
-  stroke: #000;
-  transition-delay: 0;
-}
-
-#visRight #sample1 {
-  width: 400px;
-  margin-left: auto;
-  margin-right: auto;
 }

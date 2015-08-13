@@ -3,6 +3,47 @@
  *  @author Jonathan Lamb
  */
 
+var visualisationsOn = false;
+
+function toggleVisualisations() {
+
+  visualisationsOn = !visualisationsOn;
+
+  if (visualisationsOn) {
+
+    // grow header
+    $('header').css({
+      'height' : '120px'
+    })
+
+    // create html
+    $('#advancedOptions').html(
+      "<div class=\"dash-control visualisation-control\" onclick=\"alert('students');\">" +
+        "<p>STUDENTS</p>" +
+      "</div>" +
+      "<div class=\"dash-control visualisation-control\"onclick=\"alert('classes');\">" +
+        "<p>CLASSES</p>" +
+      "</div>" +
+      "<div class=\"dash-control visualisation-control\" onclick=\"alert('tests');\">" +
+        "<p>TESTS</p>" +
+      "</div>" +
+      "<div class=\"dash-control visualisation-control\" onclick=\"alert('questions');\">" +
+        "<p>QUESTIONS</p>" +
+      "</div>"
+    );
+
+  } else {
+
+    // shrink header
+    $('header').css({
+      'height' : '60px'
+    })
+
+    // empty HTML from advanced options container
+    $('#advancedOptions').html('');
+  }
+}
+
 /**
  *  WIREFRAME VISUALISATIONS
  */

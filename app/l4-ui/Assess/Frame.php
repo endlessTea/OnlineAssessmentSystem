@@ -13,13 +13,15 @@
 
   <header>
     <h1>Assessment Platform</h1>
+    <div id="exit-assess-platform" onclick="exitPlatform();">X</div>
   </header>
+
+  <div id="clear-buffer"></div>
 
   <main>
 
     <p>
       <span id="selectTestPrompt">If tests have been made available to you, they will appear below.</span>
-      Click <button onclick="exitPlatform();">EXIT</button> to leave the platform.
     </p>
 
     <div id="assessContainer">
