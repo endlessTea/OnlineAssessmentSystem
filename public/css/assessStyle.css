@@ -4,6 +4,10 @@
  *  @author Jonathan Lamb
  */
 
+html {
+  background-color: #F6D1D1;
+}
+
 h1 {
   color: red;
 }

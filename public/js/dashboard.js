@@ -8,6 +8,7 @@
  */
 $(function() {
 
+  /*
   $('#visualisations').html(
     "<div id=\"visLeft\" class=\"floatBox\"></div><div id=\"visRight\" class=\"floatBox\"></div>"
   ).css({
@@ -36,6 +37,7 @@ $(function() {
 
   drawScatterplot();
   drawArcCorners();
+  */
 });
 
 /**

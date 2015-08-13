@@ -24,8 +24,6 @@
       <li><a href="<?= URL; ?>dashboard/logout">Logout</a></li>
     </ul>
 
-    <h2>Data Visualisations</h2>
-
     <div id="visualisations"></div>
 
   </main>
