@@ -54,12 +54,14 @@
 
   <main>
 
-    <p>Welcome <?= $fullName; ?></p>
+    <p id="page-prompt">Welcome <?= $fullName; ?></p>
 
     <?php
+      // provide different welcome text for assessors and students
       if ($accountType === "assessor") {
     ?>
 
+    <!-- provide data visualisation container for assessor accounts -->
     <div id="visualisations"></div>
 
     <?php

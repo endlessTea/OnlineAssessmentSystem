@@ -1,17 +1,17 @@
 <?php
 
 /**
- *  VISUALSMODELTEST.PHP
+ *  VISUALSMODELTEST.PHP (obsolete)
  *  @author Jonathan Lamb
  */
 class VisualsModelTest extends PHPUnit_Framework_TestCase {
 
   // store instantiated class and DB connection as instance variables
   private $_DB,
-    $_UserModel,
-    $_AuthorModel,
+    $_VisualsModel,
     $_AssessModel,
-    $_VisualsModel;
+    $_UserModel,
+    $_AuthorModel;
 
   /**
    *  Constructor
@@ -20,10 +20,10 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
   public function __construct() {
 
     $this->_DB = DB::getInstance();
+    $this->_VisualsModel = new VisualsModel();
+    $this->_AssessModel = new AssessModel();
     $this->_UserModel = new UserModel();
     $this->_AuthorModel = new AuthorModel();
-    $this->_AssessModel = new AssessModel();
-    $this->_VisualsModel = new VisualsModel();
   }
 
   /**
@@ -203,86 +203,212 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
     $s2t2feedback->{0} = 1;
     $s2t2feedback->{1} = 0;
     $this->assertTrue($this->_AssessModel->updateFeedback(new MongoId($testIds[1]), $studentTwo, $s2t2feedback));
+
+    //print_r($this->_AuthorModel->getTests($authorId));
+    //print_r($this->_AuthorModel->getQuestions($authorId));
   }
 
   /**
    *  @test
-   *  Get list of question id's and names associated with a user account
+   *  Check the performance of a single student on a single question
    */
-  public function getListOfQuestions_getAll_methodReturnsMatchingJSON() {
+  public function getStudentPerformanceSingleQuestion_validRequest_methodReturnsMatchingJSON() {
 
-    // get author id and question ids
-    $this->_UserModel->findUser("testAuthor");
-    $authorId = $this->_UserModel->getUserData()->userId;
-    $qOneDesc = "This question will not be included in any tests";
-    $qOneId = key($this->_DB->read("questions", array("question" => $qOneDesc)));
-    $qTwoDesc = "JavaScript is also known as ECMAScript.";
-    $qTwoId = key($this->_DB->read("questions", array("question" => $qTwoDesc)));
-    $qThreeDesc = "D3.js is not a data visualisation library.";
-    $qThreeId = key($this->_DB->read("questions", array("question" => $qThreeDesc)));
-    $qFourDesc = "AngularJS is a front-end web application framework.";
-    $qFourId = key($this->_DB->read("questions", array("question" => $qFourDesc)));
-    $qFiveDesc = "Open-source software is the same as 'free' software.";
-    $qFiveId = key($this->_DB->read("questions", array("question" => $qFiveDesc)));
+    // get student one's id and get the first question's id
+    $this->_UserModel->findUser("studentOne");
+    $studentId = $this->_UserModel->getUserData()->userId;
+    $questionId = key($this->_DB->read("questions", array("question" => "JavaScript is also known as ECMAScript.")));
 
     $this->assertSame(
-      "{\"{$qOneId}\":\"{$qOneDesc}\",\"{$qTwoId}\":\"{$qTwoDesc}\",\"{$qThreeId}\":\"{$qThreeDesc}\"," .
-      "\"{$qFourId}\":\"{$qFourDesc}\",\"{$qFiveId}\":\"{$qFiveDesc}\"}",
-      $this->_VisualsModel->getListOfQuestions($authorId)
+      "{\"{$studentId}\":1}",
+      $this->_VisualsModel->getStudentPerformanceSingleQuestion(new MongoId($questionId), $studentId)
     );
   }
 
   /**
    *  @test
-   *  Get single question data
+   *  Attempt to get student data for a question they have not taken
    */
-  public function getSingleQuestionJSON_getTakenData_methodReturnsMatchingJSON() {
+  public function getStudentPerformanceSingleQuestion_studentHasntTakenQuestion_methodReturnsFalse() {
 
-    // get author, student and question ids
+    // get student one's id and get the untaken question id
+    $this->_UserModel->findUser("studentOne");
+    $studentId = $this->_UserModel->getUserData()->userId;
+    $questionId = key($this->_DB->read("questions", array("question" => "This question will not be included in any tests")));
+
+    $this->assertFalse(
+      $this->_VisualsModel->getStudentPerformanceSingleQuestion(new MongoId($questionId), $studentId)
+    );
+  }
+
+  /**
+   *  @test
+   *  Check the performance of a single student on a single test
+   */
+  public function getStudentPerformanceSingleTest_validRequest_methodReturnsMatchingJSON() {
+
+    // get student two's id and get the second test id (using author id)
+    $this->_UserModel->findUser("studentTwo");
+    $studentId = $this->_UserModel->getUserData()->userId;
     $this->_UserModel->findUser("testAuthor");
     $authorId = $this->_UserModel->getUserData()->userId;
+    foreach ($this->_AuthorModel->getTests($authorId) as $tKey => $t) {
+      $testIds[] = $tKey;
+    }
+
+    $this->assertSame(
+      "{\"{$studentId}\":0}",
+      $this->_VisualsModel->getStudentPerformanceSingleTest(new MongoId($testIds[1]), $studentId)
+    );
+  }
+
+  /**
+   *  @test
+   *  Attempt to get student data for a test they have not taken
+   */
+  public function getStudentPerformanceSingleTest_studentHasntTakenTest_methodReturnsFalse() {
+
+    // get student one's id and get the untaken question id
+    $this->_UserModel->findUser("studentNoParticipation");
+    $studentId = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("testAuthor");
+    $authorId = $this->_UserModel->getUserData()->userId;
+    foreach ($this->_AuthorModel->getTests($authorId) as $tKey => $t) {
+      $testIds[] = $tKey;
+    }
+
+    $this->assertFalse(
+      $this->_VisualsModel->getStudentPerformanceSingleTest(new MongoId($testIds[0]), $studentId)
+    );
+  }
+
+  /**
+   *  @test
+   *  Check the performance of a single student for all tests they have taken
+   */
+  public function getStudentPerformanceAllTests_validRequest_methodReturnsMatchingJSON() {
+
+    // student one: both tests
+    $this->_UserModel->findUser("studentOne");
+    $studentId = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("testAuthor");
+    $authorId = $this->_UserModel->getUserData()->userId;
+    foreach ($this->_AuthorModel->getTests($authorId) as $tKey => $t) {
+      $testIds[] = $tKey;
+    }
+
+    $this->assertSame(
+      "{\"{$testIds[0]}\":2,\"{$testIds[1]}\":1}",
+      $this->_VisualsModel->getStudentPerformanceAllTests($studentId)
+    );
+  }
+
+  /**
+   *  @test
+   *  Attempt to get student data when they have taken no tests
+   */
+  public function getStudentPerformanceAllTests_studentHasntTakenAnyTests_methodReturnsFalse() {
+
+    $this->_UserModel->findUser("studentNoParticipation");
+    $studentId = $this->_UserModel->getUserData()->userId;
+    $this->assertFalse(
+      $this->_VisualsModel->getStudentPerformanceAllTests($studentId)
+    );
+  }
+
+  /**
+   *  @test
+   *  Check the performance of all students (class) for a single question
+   */
+  public function getClassPerformanceSingleQuestion_validRequest_methodReturnsMatchingJSON() {
+
+    // get user and question id's
     $this->_UserModel->findUser("studentOne");
     $studentOne = $this->_UserModel->getUserData()->userId;
     $this->_UserModel->findUser("studentTwo");
     $studentTwo = $this->_UserModel->getUserData()->userId;
-    $qId = key($this->_DB->read("questions", array("question" => "JavaScript is also known as ECMAScript.")));
-
+    $questionId = key($this->_DB->read("questions", array("question" => "AngularJS is a front-end web application framework.")));
     $this->assertSame(
-      "{\"{$studentOne}\":{\"uq\":1,\"ca\":1},\"{$studentTwo}\":{\"uq\":0,\"ca\":1}}",
-      $this->_VisualsModel->getSingleQuestionJSON(new MongoId($qId), $authorId)
+      "{\"{$studentOne}\":0,\"{$studentTwo}\":0}",
+      $this->_VisualsModel->getClassPerformanceSingleQuestion(new MongoId($questionId))
     );
   }
 
   /**
    *  @test
-   *  Attempt to get question data where no "taken" information exists
+   *  Attempt to get performance information for a question that has not been taken
    */
-  public function getSingleQuestionJSON_noTakenData_methodReturnsFalse() {
+  public function getClassPerformanceSingleQuestion_questionNotTaken_methodReturnsFalse() {
 
-    // get author id and question id for question that has not been taken
-    $this->_UserModel->findUser("testAuthor");
-    $authorId = $this->_UserModel->getUserData()->userId;
-    $qId = key($this->_DB->read("questions", array("question" => "This question will not be included in any tests")));
-
-    $this->assertFalse(
-      $this->_VisualsModel->getSingleQuestionJSON(new MongoId($qId), $authorId)
-    );
+    $questionId = key($this->_DB->read("questions", array("question" => "This question will not be included in any tests")));
+    $this->assertFalse($this->_VisualsModel->getClassPerformanceSingleQuestion(new MongoId($questionId)));
   }
 
   /**
    *  @test
-   *  Attempt to get a question where the user id does not match the question author
+   *  Check the performance of all students (class) for a single test
    */
-  public function getSingleQuestionJSON_authorDoesNotMatch_methodReturnsFalse() {
+  public function getClassPerformanceSingleTest_validRequest_methodReturnsMatchingJSON() {
 
+    // get user and test id's
+    $this->_UserModel->findUser("studentOne");
+    $studentOne = $this->_UserModel->getUserData()->userId;
     $this->_UserModel->findUser("studentTwo");
     $studentTwo = $this->_UserModel->getUserData()->userId;
-    $qId = key($this->_DB->read("questions", array("question" => "JavaScript is also known as ECMAScript.")));
+    $this->_UserModel->findUser("testAuthor");
+    $authorId = $this->_UserModel->getUserData()->userId;
+    foreach ($this->_AuthorModel->getTests($authorId) as $tKey => $t) {
+      $testIds[] = $tKey;
+    }
 
-    $this->assertFalse(
-      $this->_VisualsModel->getSingleQuestionJSON(new MongoId($qId), $studentTwo)
+    // check both tests
+    $this->assertSame(
+      "{\"{$studentOne}\":2,\"{$studentTwo}\":1}",
+      $this->_VisualsModel->getClassPerformanceSingleTest(new MongoId($testIds[0]))
+    );
+    $this->assertSame(
+      "{\"{$studentOne}\":1,\"{$studentTwo}\":0}",
+      $this->_VisualsModel->getClassPerformanceSingleTest(new MongoId($testIds[1]))
     );
   }
+
+  /**
+   *  @test
+   *  Check the performance of all students for all tests
+   */
+  public function getClassPerformanceAllTests_validRequest_methodReturnsMatchingJSON() {
+
+    // get user and test id's
+    $this->_UserModel->findUser("studentOne");
+    $studentOne = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("studentTwo");
+    $studentTwo = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("testAuthor");
+    $authorId = $this->_UserModel->getUserData()->userId;
+    foreach ($this->_AuthorModel->getTests($authorId) as $tKey => $t) {
+      $testIds[] = $tKey;
+    }
+
+    // check all tests returned
+    $this->assertSame(
+      "{\"{$testIds[0]}\":{\"{$studentOne}\":2,\"{$studentTwo}\":1}," .
+      "\"{$testIds[1]}\":{\"{$studentOne}\":1,\"{$studentTwo}\":0}}",
+      $this->_VisualsModel->getClassPerformanceAllTests()
+    );
+  }
+
+  /*
+   *  @test
+   *  TODO: feedback tests
+   */
+  /*
+   *  @test
+   *  TODO: feedback tests
+   */
+  /*
+   *  @test
+   *  TODO: feedback tests
+   */
 
   /**
    *  @test
