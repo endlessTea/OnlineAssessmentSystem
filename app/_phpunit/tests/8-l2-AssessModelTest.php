@@ -58,21 +58,21 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
     $this->_DB->create("questions", array(
       "schema" => "boolean",
       "author" => $authorId,
-      "statement" => "This sentence contains no vowels",
+      "question" => "This sentence contains no vowels",
       "singleAnswer" => "FALSE",
       "feedback" => "The sentence contains 2x 'i', 4x 'e', 3x 'o' and 1x 'a'"
     ));
     $this->_DB->create("questions", array(
       "schema" => "boolean",
       "author" => $authorId,
-      "statement" => "This sentence contains 10 vowels",
+      "question" => "This sentence contains 10 vowels",
       "singleAnswer" => "TRUE",
       "feedback" => "Count the instances of 'a', 'e', 'i', 'o' and 'u'"
     ));
     $this->_DB->create("questions", array(
       "schema" => "boolean",
       "author" => $authorId,
-      "statement" => "This sentence contains a jam sandwich",
+      "question" => "This sentence contains a jam sandwich",
       "singleAnswer" => "FALSE",
       "feedback" => "Clue: you cannot eat the question"
     ));
@@ -103,6 +103,68 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
       array("_id" => new MongoId($testId)),
       array("taken" => array($studentIdTaken => "3")
     )));
+
+    /*
+     *  Unit test addition 14/08/2015: Multiple choice test
+     *  Create users, get id's, create questions, get id's, create test, get id, register students
+     */
+    $this->_UserModel->createUser("testMCAuthor", "password", "Multiple Choice Test Author");
+    $this->_UserModel->createUser("testMCStudent", "password", "Multiple Choice Test Student");
+    $this->_UserModel->createUser("testMCStudent2", "password", "Multiple Choice Test Student 2");
+
+    $this->_UserModel->findUser("testMCAuthor");
+    $MCAuthorId = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("testMCStudent");
+    $MCStudentOne = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("testMCStudent2");
+    $MCStudentTwo = $this->_UserModel->getUserData()->userId;
+
+    $this->assertTrue($this->_DB->create("questions", array(
+      "schema" => "multiple",
+      "author" => $MCAuthorId,
+      "question" => "Which of the following are fruits?",
+      "options" => array(
+        "Banana", "Custard", "Gooseberry", "Potato"
+      ),
+      "correctAnswers" => array(
+        0, 2
+      ),
+      "feedback" => "RTFM (read the fruit manual)"
+    )));
+    $this->assertTrue($this->_DB->create("questions", array(
+      "schema" => "multiple",
+      "author" => $MCAuthorId,
+      "question" => "Which of the following statements are true?",
+      "options" => array(
+        "Ducks are birds",
+        "Cats are not mammals",
+        "Dogs are not mammals",
+        "Potatoes are not mammals"
+      ),
+      "correctAnswers" => array(
+        0, 3
+      ),
+      "feedback" => "I'm too lazy to write feedback about ducks, cats, dogs and potatoes."
+    )));
+
+    $MCquestions = array(
+      key($this->_DB->read("questions", array("question" => "Which of the following are fruits?"))),
+      key($this->_DB->read("questions", array("question" => "Which of the following statements are true?")))
+    );
+
+    $this->assertTrue($this->_DB->create("tests", array(
+      "schema" => "standard",
+      "author" => $MCAuthorId,
+      "questions" => $MCquestions
+    )));
+
+    $testId = key($this->_DB->read("tests", array("author" => $MCAuthorId)));
+
+    $this->assertTrue($this->_DB->update(
+      "tests",
+      array("_id" => new MongoId($testId)),
+      array("available" => array($MCStudentOne, $MCStudentTwo)
+    )));
   }
 
   /**
@@ -117,8 +179,6 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
     $testId = key($this->_DB->read("tests", array("author" => $authorId)));
     $this->_UserModel->findUser("testStudent");
     $studentId = $this->_UserModel->getUserData()->userId;
-
-    // "{\"{$testId}\":\"available\"}",
 
     $this->assertSame(
       array(
@@ -263,9 +323,9 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
     $testId = key($this->_DB->read("tests", array("author" => $authorId)));
 
     $this->assertSame(
-      "{\"0\":{\"schema\":\"boolean\",\"statement\":\"This sentence contains no vowels\"}," .
-      "\"1\":{\"schema\":\"boolean\",\"statement\":\"This sentence contains 10 vowels\"}," .
-      "\"2\":{\"schema\":\"boolean\",\"statement\":\"This sentence contains a jam sandwich\"}}",
+      "{\"0\":{\"schema\":\"boolean\",\"question\":\"This sentence contains no vowels\"}," .
+      "\"1\":{\"schema\":\"boolean\",\"question\":\"This sentence contains 10 vowels\"}," .
+      "\"2\":{\"schema\":\"boolean\",\"question\":\"This sentence contains a jam sandwich\"}}",
       $this->_AssessModel->getQuestionsJSON(new MongoId($testId))
     );
   }
@@ -281,9 +341,9 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
 
   /**
    *  @test
-   *  Submit answers to a test (valid)
+   *  Submit answers to a test (BOOLEAN)
    */
-  public function updateAnswers_submitValidAnswers_methodReturnsTrueDocumentsUpdated() {
+  public function updateAnswers_submitValidAnswersBoolean_methodReturnsTrueDocumentsUpdated() {
 
     // get Ids
     $this->_UserModel->findUser("testStudent");
@@ -312,7 +372,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
     );
 
     // check that the user's answer was marked and the question document was updated
-    $questionToCheck = array_pop($this->_DB->read("questions", array("statement" => "This sentence contains no vowels")));
+    $questionToCheck = array_pop($this->_DB->read("questions", array("question" => "This sentence contains no vowels")));
     $this->assertSame(
       0,
       $questionToCheck["taken"][$studentId]["ca"]
@@ -323,6 +383,52 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
     $this->assertSame(
       1,
       $testToCheck["taken"][$studentId]
+    );
+  }
+
+  /**
+   *  @test
+   *  Submit answers to a test (MULTIPLE CHOICE)
+   */
+  public function updateAnswers_submitValidAnswersMC_methodReturnsTrueDocumentsUpdated() {
+
+    // get Ids
+    $this->_UserModel->findUser("testMCAuthor");
+    $MCAuthorId = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("testMCStudent");
+    $MCStudentOne = $this->_UserModel->getUserData()->userId;
+    $testId = key($this->_DB->read("tests", array("author" => $MCAuthorId)));
+
+    // prepare answers (simulate PHP representation of JSON data)
+    $input = new stdClass();
+    $input->{0} = new stdClass();
+    $input->{0}->{'uq'} = 1;
+    $input->{0}->{'ans'} = array(
+      0, 2
+    );
+    $input->{1} = new stdClass();
+    $input->{1}->{'uq'} = 1;
+    $input->{1}->{'ans'} = array(
+      2, 3
+    );
+
+    $this->assertSame(
+      "{\"score\":1,\"feedback\":{\"1\":\"I'm too lazy to write feedback about ducks, cats, dogs and potatoes.\"}}",
+      $this->_AssessModel->updateAnswers(new MongoId($testId), $MCStudentOne, $input)
+    );
+
+    // check that the user's answer was marked and the question document was updated
+    $questionToCheck = array_pop($this->_DB->read("questions", array("question" => "Which of the following are fruits?")));
+    $this->assertSame(
+      1,
+      $questionToCheck["taken"][$MCStudentOne]["ca"]
+    );
+
+    // check that the test document has been updated as well containing the total number of correct answers
+    $testToCheck = array_pop($this->_DB->read("tests", array("author" => $MCAuthorId)));
+    $this->assertSame(
+      1,
+      $testToCheck["taken"][$MCStudentOne]
     );
   }
 
@@ -371,7 +477,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
     $authorId = $this->_UserModel->getUserData()->userId;
     $testId = key($this->_DB->read("tests", array("author" => $authorId)));
 
-    $this->assertFalse($this->_AssessModel->updateAnswers(new MongoId($testId), $studentId, $input = "Invalid JSON: Syntax error"));
+    $this->assertFalse($this->_AssessModel->updateAnswers(new MongoId($testId), $studentId, "Invalid JSON: Syntax error"));
   }
 
   /**
@@ -478,6 +584,35 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
 
   /**
    *  @test
+   *  Attempt to submit invalid answers to a test (MULTIPLE CHOICE)
+   */
+  public function updateAnswers_invalidAnswerMultipleChoice_methodReturnsFalse() {
+
+    // get Ids
+    $this->_UserModel->findUser("testMCAuthor");
+    $MCAuthorId = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("testMCStudent2");
+    $MCStudentOne = $this->_UserModel->getUserData()->userId;
+    $testId = key($this->_DB->read("tests", array("author" => $MCAuthorId)));
+
+    // prepare answers (simulate PHP representation of JSON data)
+    $input = new stdClass();
+    $input->{0} = new stdClass();
+    $input->{0}->{'uq'} = 1;
+    $input->{0}->{'ans'} = array(
+      0, 8
+    );
+    $input->{1} = new stdClass();
+    $input->{1}->{'uq'} = 1;
+    $input->{1}->{'ans'} = array(
+      -4, 3
+    );
+
+    $this->assertFalse($this->_AssessModel->updateAnswers(new MongoId($testId), $MCStudentOne, $input));
+  }
+
+  /**
+   *  @test
    *  Submit student feedback for questions (valid)
    */
   public function updateFeedback_submitValidInput_methodReturnsTrueDocumentUpdated() {
@@ -496,7 +631,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
 
     // check method returns true, check question document retains student answer and new feedback data
     $this->assertTrue($this->_AssessModel->updateFeedback(new MongoId($testId), $studentId, $studentFeedback));
-    $questionToCheck = array_pop($this->_DB->read("questions", array("statement" => "This sentence contains no vowels")));
+    $questionToCheck = array_pop($this->_DB->read("questions", array("question" => "This sentence contains no vowels")));
     $this->assertSame(
       0,
       $questionToCheck["taken"][$studentId]["ca"]

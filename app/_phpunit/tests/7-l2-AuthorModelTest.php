@@ -39,16 +39,38 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
    *  @test
    *  Create question that is compliant with question schema (boolean)
    */
-  public function createQuestion_schemaCompliant_methodReturnsTrue() {
+  public function createQuestion_schemaCompliantBoolean_methodReturnsTrue() {
 
     $result = $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
       "author" => $this->_testQuestionAuthorId,
-      "statement" => "The capital city of France is Paris.",
+      "question" => "The capital city of France is Paris.",
       "singleAnswer" => "TRUE",
       "feedback" => "Don't worry, it's an easy mistake to make."
     ));
     $this->assertTrue($result);
+  }
+
+  /**
+   *  @test
+   *  Create schema compliant question (multiple choice)
+   */
+  public function createQuestion_schemaCompliantMultiple_methodReturnsTrue() {
+
+    $this->assertTrue(
+      $this->_AuthorModel->createQuestion(array(
+        "schema" => "multiple",
+        "author" => $this->_testQuestionAuthorId,
+        "question" => "Which of the following are fruits?",
+        "options" => array(
+          "Banana", "Custard", "Gooseberry", "Potato"
+        ),
+        "correctAnswers" => array(
+          0, 2
+        ),
+        "feedback" => "RTFM (read the fruit manual)"
+      ))
+    );
   }
 
   /**
@@ -73,7 +95,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
     $result = $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
       "author" => $this->_testQuestionAuthorId,
-      "statement" => "This statement is false. Seriously, not a trick question.",
+      "question" => "This statement is false. Seriously, not a trick question.",
       "singleAnswer" => "FALSE"
     ));
     $this->assertTrue($result);
@@ -132,7 +154,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
     $result = $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
       "author" => $this->_testQuestionAuthorId,
-      "statement" => "This question appears to be valid, but it is not.",
+      "question" => "This question appears to be valid, but it is not.",
       "singleAnswer" => "TRUE",
       "feedback" => "See extra junk data below...",
       "junk" => "r93y02qhfgi3op2hg083qwghbn0o3w2"
@@ -144,10 +166,10 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
    *  @test
    *  Get both questions created earlier matching the author id
    */
-  public function getQuestions_matchingAuthorId_methodReturnsArrayOfTwoDocuments() {
+  public function getQuestions_matchingAuthorId_methodReturnsArrayOfThreeDocuments() {
 
     $documents = $this->_AuthorModel->getQuestions($this->_testQuestionAuthorId);
-    $this->assertEquals(2, count($documents));
+    $this->assertEquals(3, count($documents));
   }
 
   /**
@@ -178,7 +200,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
 
     // get ID of the first question created
     $question = $this->_DB->read("questions", array(
-      "statement" => "The capital city of France is Paris."
+      "question" => "The capital city of France is Paris."
     ));
     $questionId = key($question);
 
@@ -197,7 +219,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
 
     // get ID of the first question created
     $question = $this->_DB->read("questions", array(
-      "statement" => "This statement is false. Seriously, not a trick question."
+      "question" => "This statement is false. Seriously, not a trick question."
     ));
     $questionId = key($question);
 
@@ -228,7 +250,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   public function updateQuestion_attemptUpdateKeyNotInSchema_methodReturnsFalse() {
 
     $question = $this->_DB->read("questions", array(
-      "statement" => "The capital city of France is Paris."
+      "question" => "The capital city of France is Paris."
     ));
     $questionId = key($question);
 
@@ -246,7 +268,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   public function updateQuestion_attemptUpdateNotPermitted_methodReturnsFalse() {
 
     $question = $this->_DB->read("questions", array(
-      "statement" => "The capital city of France is Paris."
+      "question" => "The capital city of France is Paris."
     ));
     $questionId = key($question);
 
@@ -265,7 +287,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
 
     // obtain MongoId value for first question
     $question = $this->_DB->read("questions", array(
-      "statement" => "The capital city of France is Paris."
+      "question" => "The capital city of France is Paris."
     ));
     $questionId = key($question);
 
@@ -297,7 +319,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
 
     // get last question's id
     $question = $this->_DB->read("questions", array(
-      "statement" => "This statement is false. Seriously, not a trick question."
+      "question" => "This statement is false. Seriously, not a trick question."
     ));
     $questionId = key($question);
 
@@ -322,25 +344,25 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
     $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
       "author" => $this->_testTestAuthorId,
-      "statement" => "2 + 2 = 4",
+      "question" => "2 + 2 = 4",
       "singleAnswer" => "TRUE",
     ));
     $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
       "author" => $this->_testTestAuthorId,
-      "statement" => "2 + 4 = 10",
+      "question" => "2 + 4 = 10",
       "singleAnswer" => "FALSE",
     ));
     $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
       "author" => $this->_testTestAuthorId,
-      "statement" => "5 * 5 = 25",
+      "question" => "5 * 5 = 25",
       "singleAnswer" => "TRUE",
     ));
     $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
       "author" => $this->_testTestAuthorId,
-      "statement" => "8 - 2 = 1",
+      "question" => "8 - 2 = 1",
       "singleAnswer" => "FALSE",
     ));
 
@@ -408,7 +430,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
 
     // get test id
     $testId = key($this->_DB->read("tests", array("author" => $this->_testTestAuthorId)));
-    
+
     $this->assertEquals(
       1,
       count($this->_AuthorModel->getSingleTest(new MongoId($testId), $this->_testTestAuthorId))

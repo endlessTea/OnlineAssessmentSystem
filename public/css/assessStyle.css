@@ -48,8 +48,10 @@ main p {
   height: 60px;
   padding-bottom: 20px;
   margin-right: 5px;
+  transition: all .10s ease;
 }
 
 #exit-assess-platform:hover {
   cursor: pointer;
+  text-shadow: 3px 3px 3px rgba(0, 0, 0, 0.5);
 }

@@ -61,18 +61,42 @@ class AuthorController {
 
   /**
    *  AJAX: PROCESS NEW QUESTION
-   *  Create boolean question - TODO: refactor this method to work with new types
+   *  Create new question based on question type
    */
   public function createQuestion() {
 
-    // load question details and return the result of the operation
-    $question = array(
-      "schema" => "boolean",
-      "author" => $this->_UserModel->getUserData()->userId,
-      "statement" => $this->_AppModel->getPOSTData("st"),
-      "singleAnswer" => $this->_AppModel->getPOSTData("sa"),
-      "feedback" => $this->_AppModel->getPOSTData("fb")
-    );
+    $questionType = $this->_AppModel->getPOSTData("qt");
+    switch ($questionType) {
+
+      case "boolean":
+
+        $question = array(
+          "schema" => "boolean",
+          "author" => $this->_UserModel->getUserData()->userId,
+          "question" => $this->_AppModel->getPOSTData("st"),
+          "singleAnswer" => $this->_AppModel->getPOSTData("sa"),
+          "feedback" => $this->_AppModel->getPOSTData("fb")
+        );
+
+        break;
+
+      case "multiple":
+
+        $question = array(
+          "schema" => "multiple",
+          "author" => $this->_UserModel->getUserData()->userId,
+          "question" => $this->_AppModel->getPOSTData("qu"),
+          "options" => $this->_AppModel->getPOSTData("op", "getJSON"),
+          "correctAnswers" => $this->_AppModel->getPOSTData("ca", "getJSON"),
+          "feedback" => $this->_AppModel->getPOSTData("fb")
+        );
+
+        break;
+
+      default:
+        echo "<p>Error: unrecognised question type</p>";
+        exit;
+    }
 
     echo ($this->_AuthorModel->createQuestion($question)) ? "<p>Question created!</p>" : "<p>Error creating question</p>";
   }

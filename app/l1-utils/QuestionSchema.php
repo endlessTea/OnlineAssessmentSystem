@@ -21,7 +21,7 @@ class QuestionSchema {
       "boolean" => array(
         "schema" => "required",
         "author" => "required",
-        "statement" => "required",
+        "question" => "required",
         "singleAnswer" => "required",
         "feedback" => "optional"
       ),

@@ -27,10 +27,10 @@
         <div class="author-control" onclick="getQuestionTemplate('boolean');">
           <p>BOOLEAN</p>
         </div>
-        <div class="author-control" onclick="alert('multiple');">
+        <div class="author-control" onclick="getQuestionTemplate('multiple');">
           <p>MULTIPLE CHOICE</p>
         </div>
-        <div class="author-control" onclick="alert('pattern');">
+        <div class="author-control" onclick="getQuestionTemplate('pattern');">
           <p>PATTERN</p>
         </div>
       </div>
@@ -38,7 +38,7 @@
         <p>MANAGE<br>QUESTIONS</p>
       </div>
       <div class="author-control" onclick="loadQuestionsForTestCreation();">
-        <p>CREATE NEW<br>TEST</p>
+        <p>CREATE<br>NEW TEST</p>
       </div>
       <div class="author-control" onclick="manageTests();">
         <p>MANAGE<br>TESTS</p>

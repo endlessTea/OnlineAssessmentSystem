@@ -1,0 +1,36 @@
+<h2>Multiple Choice Question</h2>
+<form onsubmit="createQuestion('multiple'); return false;">
+  <div class="qField">
+    <label for="question">Provide a question with one or more possible answers:</label>
+    <br>
+    <input id="question"
+      type="text"
+      required
+      autocomplete="off"
+      placeholder="e.g. Identify three NoSQL database management systems">
+  </div>
+  <br>
+  <div class="qField">
+    <p>Insert options and check correct answers before submission:</p>
+    <div id="multiple-answers-container"></div>
+    <div id="multiple-option-container">
+      <div class="multiple-option-button" onclick="addMultipleOption();">
+        <p>ADD</p>
+      </div>
+      <div class="multiple-option-button" onclick="removeMultipleOption();">
+        <p>REMOVE</p>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="qField">
+    <label for="feedback">Provide optional feedback for this question:</label>
+    <br>
+    <input id="feedback"
+      type="text"
+      autocomplete="off"
+      placeholder="e.g. MySQL is a relational database management system.">
+  </div>
+  <br>
+  <input type="submit" value="Create Question">
+</form>

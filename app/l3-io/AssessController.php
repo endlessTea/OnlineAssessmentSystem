@@ -98,7 +98,7 @@ class AssessController {
     // get data, check if json returned (not false (boolean))
     $data = $this->_AssessModel->getQuestionsJSON($testIdObj);
     if ($data === false) {
-      echo "There was an issue loading the test. Please contact the system administrator.";
+      echo "There was an issue loading the test.";
       exit;
     }
 
@@ -129,7 +129,7 @@ class AssessController {
       $this->_AppModel->getPOSTData("ans", "getJSON")
     );
     if ($data === false) {
-      echo "There was an issue processing your answers. Please contact the system administrator.";
+      echo "There was an issue processing your answers.";
       exit;
     }
 
@@ -160,7 +160,7 @@ class AssessController {
       $this->_AppModel->getPOSTData("feed", "getJSON")
     );
     if ($data === false) {
-      echo "There was an issue processing your feedback. Please contact the system administrator.";
+      echo "There was an issue processing your feedback.";
       exit;
     }
 

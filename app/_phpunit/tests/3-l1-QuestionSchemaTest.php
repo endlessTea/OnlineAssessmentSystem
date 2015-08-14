@@ -26,7 +26,7 @@ class QuestionSchemaTest extends PHPUnit_Framework_TestCase {
     $this->_booleanSchema = array(
       "schema" => "required",
       "author" => "required",
-      "statement" => "required",
+      "question" => "required",
       "singleAnswer" => "required",
       "feedback" => "optional"
     );

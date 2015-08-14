@@ -3,6 +3,8 @@
  *  @author Jonathan Lamb
  */
 
+var multipleQuestionCount = 0;
+
 /**
  *  GET QUESTION TEMPLATE
  *  Request HTML question template via Ajax
@@ -34,26 +36,121 @@ function getQuestionTemplate(questionType) {
  */
 function createQuestion(questionType) {
 
-  $.ajax({
-    url: baseURL + "author/createQuestion",
-    data: {
-      qt: questionType,
-      st: $('#statement').val(),
-      sa: $('input[type="radio"][name="singleAnswer"]:checked').val(),
-      fb: $('#feedback').val()
-    },
-    type: "POST",
-    dataType: "html",
-    success: function (response) {
-      $("#authorContainer").html(response);
-    },
-    error: function (request, status, error) {
-      $("#authorContainer").html(
-        "<p>There was a problem with the request, please contact the system administrator: <br>" +
-        request.responseText + "</p>"
-      );
-    }
-  });
+  // send different ajax requests depending on the question type
+  switch (questionType) {
+
+    case "boolean":
+
+      $.ajax({
+        url: baseURL + "author/createQuestion",
+        data: {
+          qt: questionType,
+          st: $('#question').val(),
+          sa: $('input[type="radio"][name="singleAnswer"]:checked').val(),
+          fb: $('#feedback').val()
+        },
+        type: "POST",
+        dataType: "html",
+        success: function (response) {
+          $("#authorContainer").html(response);
+        },
+        error: function (request, status, error) {
+          $("#authorContainer").html(
+            "<p>There was a problem with the request, please contact the system administrator: <br>" +
+            request.responseText + "</p>"
+          );
+        }
+      });
+
+      break;
+
+    case "multiple":
+
+      if (multipleQuestionCount < 2) {
+
+        alert("You must provide at least 2 options for this question.");
+
+      } else {
+
+        // prepare choices and answers
+        var options = [];
+        var correctAnswers = [];
+        $('#multiple-answers-container input[type="text"]').each(function() {
+          options.push($(this).val());
+        });
+        $('#multiple-answers-container input[type="checkbox"]:checked').each(function() {
+          correctAnswers.push($(this).attr('name'));
+        });
+        options = JSON.stringify(options);
+        correctAnswers = JSON.stringify(correctAnswers);
+
+        $.ajax({
+          url: baseURL + "author/createQuestion",
+          data: {
+            qt: questionType,
+            qu: $('#question').val(),
+            op: options,
+            ca: correctAnswers,
+            fb: $('#feedback').val()
+          },
+          type: "POST",
+          dataType: "html",
+          success: function (response) {
+            $("#authorContainer").html(response);
+          },
+          error: function (request, status, error) {
+            $("#authorContainer").html(
+              "<p>There was a problem with the request, please contact the system administrator: <br>" +
+              request.responseText + "</p>"
+            );
+          }
+        });
+      }
+
+      break;
+
+    case "pattern":
+      alert("pattern question");
+      break;
+
+    default:
+      alert("Question type unrecognised, please contact the system administrator.");
+  }
+}
+
+/**
+ *  ADD MULTIPLE QUESTION
+ *  If creating multiple choice question, append input to multiple choice container
+ */
+function addMultipleOption() {
+
+  // append input
+  $('#multiple-answers-container').append(
+    "<div id=\"ans-" + multipleQuestionCount + "\">" +
+      "<input id=\"text-" + multipleQuestionCount + "\" required " +
+        "type=\"text\" autocomplete=\"off\" placeholder=\"Type an option here and check the box if it is a correct answer\">" +
+      "<input type=\"checkbox\" name=\"" + multipleQuestionCount + "\">" +
+    "</div>"
+  );
+
+  // increment multiple question count
+  multipleQuestionCount++;
+}
+
+/**
+ *  REMOVE MULTIPLE QUESTION
+ *  Decrement question counter and remove corresponding container
+ */
+function removeMultipleOption() {
+
+  if (multipleQuestionCount >= 0) {
+
+    multipleQuestionCount--;
+    $('#ans-' + multipleQuestionCount).remove();
+  }
+
+  // reset to 0 if all multiple questions were removed
+  if (multipleQuestionCount < 0) multipleQuestionCount = 0;
 }
 
 /**
@@ -74,7 +171,7 @@ function manageQuestions() {
       // create and append a representation of each question to the container
       for (var question in response) {
         $("#authorContainer").append(
-          "<p>" + question + ": " + response[question]["statement"] +
+          "<p>" + question + ": " + response[question]["question"] +
           "&nbsp;<button onclick=\"deleteQuestion('" +
           question + "')\">DELETE</button></p>"
         );
@@ -138,7 +235,7 @@ function loadQuestionsForTestCreation() {
       for (var question in response) {
         $("#testForm").append(
           "<div class=\"qField\">" +
-            "<p>" + question + ": " + response[question]["statement"] +
+            "<p>" + question + ": " + response[question]["question"] +
             "&nbsp;<input type=\"checkbox\" name=\"" + question + "\">" +
           "</div>"
         );
@@ -169,7 +266,7 @@ function createTest() {
   $('#testForm input:checked').each(function() {
     questions.push($(this).attr('name'));
   });
-  questions = JSON.stringify(questions);   //.replace("[", "{").replace("]", "}")
+  questions = JSON.stringify(questions);   
 
   // create a test if at least one question was selected
   if (questions !== '[]') {

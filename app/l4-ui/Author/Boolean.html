@@ -1,16 +1,17 @@
 <h2>Boolean Question</h2>
 <form onsubmit="createQuestion('boolean'); return false;">
   <div class="qField">
-    <label for="statement">Provide a statement that is true or false:</label>
+    <label for="question">Provide a statement that is true or false:</label>
     <br>
-    <input id="statement"
+    <input id="question"
       type="text"
       required
       autocomplete="off"
-      pattern="[a-zA-Z0-9\s]+"
       placeholder="e.g. CSMA/CD stands for 'Carrier Sense Multiple Access with Collision Detection'">
   </div>
+  <br>
   <div class="qField">
+    <p>Identify if the statement above is True or False:</p>
     <input name="singleAnswer"
       type="radio"
       value="TRUE"
@@ -26,9 +27,7 @@
     <br>
     <input id="feedback"
       type="text"
-      required
       autocomplete="off"
-      pattern="[a-zA-Z0-9\s]+"
       placeholder="e.g. CSMA/CD is a Media Access Control method, see lecture notes for details.">
   </div>
   <br>

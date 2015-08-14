@@ -95,7 +95,7 @@ var buildTest = function(data) {
 
       case "boolean":
         $("#testForm").append(
-          "<h3>\"" + questionsJSON[question]["statement"] + "\"</h3>" +
+          "<h3>\"" + questionsJSON[question]["question"] + "\"</h3>" +
           "<p>Is this TRUE or FALSE?</p>" +
           "<input name=\"" + question + "-ans\"" +
           "type=\"radio\" value=\"TRUE\" checked> TRUE" +
@@ -105,8 +105,28 @@ var buildTest = function(data) {
         );
         break;
 
+      case "multiple":
+
+        // create container
+        $("#testForm").append(
+          "<h3>" + questionsJSON[question]["question"] + "</h3>" +
+          "<p>Select the correct answers from the options below:</p>" +
+          "<div id=\"" + question + "-chk-con\"></div>"
+        );
+
+        // create options
+        var options = questionsJSON[question]["options"];
+        for (var i = 0; i < options.length; i++) {
+          $('#' + question + '-chk-con').append(
+            "<p>" + options[i] + "</p>" +
+            "<input type=\"checkbox\" name=\"" + i + "\">"
+          );
+        }
+        break;
+
       default:
         alert("Question Schema not recognised. Please contact the system administrator.");
+        return;
     }
 
     // obtain 'understanding of question' from the user
@@ -150,8 +170,16 @@ function submitAnswers() {
         answers[question]['ans'] = $('input[type="radio"][name="' + question + '-ans"]:checked').val();
         break;
 
+      case "multiple":
+        answers[question]['ans'] = [];
+        $('#' + question + '-chk-con input:checked').each(function() {
+          answers[question]['ans'].push($(this).attr('name'));
+        });
+        break;
+
       default:
         alert("Question Schema not recognised. Please contact the system administrator.");
+        return;
     }
   }
 

@@ -57,35 +57,35 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
     $resultOne = $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
       "author" => $authorId,
-      "statement" => "JavaScript is also known as ECMAScript.",
+      "question" => "JavaScript is also known as ECMAScript.",
       "singleAnswer" => "TRUE",
       "feedback" => "ECMAScript is the untrademarked name for the language."
     ));
     $resultTwo = $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
       "author" => $authorId,
-      "statement" => "D3.js is not a data visualisation library.",
+      "question" => "D3.js is not a data visualisation library.",
       "singleAnswer" => "FALSE",
       "feedback" => "D3.js is a data visualisation library created by Mike Bostock."
     ));
     $resultThree = $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
       "author" => $authorId,
-      "statement" => "AngularJS is a front-end web application framework.",
+      "question" => "AngularJS is a front-end web application framework.",
       "singleAnswer" => "TRUE",
       "feedback" => "AngularJS is maintained by Google."
     ));
     $resultFour = $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
       "author" => $authorId,
-      "statement" => "Open-source software is the same as 'free' software.",
+      "question" => "Open-source software is the same as 'free' software.",
       "singleAnswer" => "FALSE",
       "feedback" => "Ask Richard Stallman for further details."
     ));
     $resultFive = $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
       "author" => $authorId,
-      "statement" => "This question will not be included in any tests",
+      "question" => "This question will not be included in any tests",
       "singleAnswer" => "TRUE"
     ));
     $this->assertTrue($resultOne && $resultTwo && $resultThree && $resultFour && $resultFive);
@@ -217,7 +217,7 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
     // get student one's id and get the first question's id
     $this->_UserModel->findUser("studentOne");
     $studentId = $this->_UserModel->getUserData()->userId;
-    $questionId = key($this->_DB->read("questions", array("statement" => "JavaScript is also known as ECMAScript.")));
+    $questionId = key($this->_DB->read("questions", array("question" => "JavaScript is also known as ECMAScript.")));
 
     $this->assertSame(
       "{\"{$studentId}\":1}",
@@ -234,7 +234,7 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
     // get student one's id and get the untaken question id
     $this->_UserModel->findUser("studentOne");
     $studentId = $this->_UserModel->getUserData()->userId;
-    $questionId = key($this->_DB->read("questions", array("statement" => "This question will not be included in any tests")));
+    $questionId = key($this->_DB->read("questions", array("question" => "This question will not be included in any tests")));
 
     $this->assertFalse(
       $this->_VisualsModel->getStudentPerformanceSingleQuestion(new MongoId($questionId), $studentId)
@@ -327,7 +327,7 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
     $studentOne = $this->_UserModel->getUserData()->userId;
     $this->_UserModel->findUser("studentTwo");
     $studentTwo = $this->_UserModel->getUserData()->userId;
-    $questionId = key($this->_DB->read("questions", array("statement" => "AngularJS is a front-end web application framework.")));
+    $questionId = key($this->_DB->read("questions", array("question" => "AngularJS is a front-end web application framework.")));
     $this->assertSame(
       "{\"{$studentOne}\":0,\"{$studentTwo}\":0}",
       $this->_VisualsModel->getClassPerformanceSingleQuestion(new MongoId($questionId))
@@ -340,7 +340,7 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
    */
   public function getClassPerformanceSingleQuestion_questionNotTaken_methodReturnsFalse() {
 
-    $questionId = key($this->_DB->read("questions", array("statement" => "This question will not be included in any tests")));
+    $questionId = key($this->_DB->read("questions", array("question" => "This question will not be included in any tests")));
     $this->assertFalse($this->_VisualsModel->getClassPerformanceSingleQuestion(new MongoId($questionId)));
   }
 

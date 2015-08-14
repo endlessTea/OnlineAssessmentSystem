@@ -137,7 +137,12 @@ class AssessModel {
         switch ($q["schema"]) {
 
           case "boolean":
-            $questionRoot->{$questionNo}->statement = $q["statement"];
+            $questionRoot->{$questionNo}->question = $q["question"];
+            break;
+
+          case "multiple":
+            $questionRoot->{$questionNo}->question = $q["question"];
+            $questionRoot->{$questionNo}->options = $q["options"];
             break;
 
           default:
@@ -205,6 +210,57 @@ class AssessModel {
             // answer must be 'TRUE' or 'FALSE' only; mark according to $fullQuestion's 'singleAnswer'
             if ($answers->{$qNo}->{'ans'} !== 'TRUE' && $answers->{$qNo}->{'ans'} !== 'FALSE') return false;
             if ($answers->{$qNo}->{'ans'} === $fullQuestion["singleAnswer"]) {
+
+              $correct = 1;
+              $response->{'score'}++;
+
+            } else {
+
+              $correct = 0;
+              if (isset($fullQuestion["feedback"])) {
+                $response->{'feedback'}->{$qNo} = $fullQuestion["feedback"];
+              }
+            }
+
+            $convertedResponse = array(
+              "uq" => $answers->{$qNo}->{'uq'},
+              "ca" => $correct
+            );
+            break;
+
+          case "multiple":
+
+            // answer must be an array
+            if (!is_array($answers->{$qNo}->{'ans'})) return false;
+
+            // determine maximum option size, copy correct answers, initialise wrong answer flag
+            $maxOption = count($fullQuestion["options"]) - 1;
+            $correctAnswers = $fullQuestion["correctAnswers"];
+            $wrongAnswer = false;
+
+            foreach ($answers->{$qNo}->{'ans'} as $answer) {
+
+              // reject any answers that are invalid
+              if ($answer < 0 || $answer > $maxOption) return false;
+
+              // for each correct answer in response, remove it from the copied array of correct answers
+              if (in_array($answer, $correctAnswers)) {
+
+                // unset by value: identify key and unset key
+                // http://stackoverflow.com/questions/7225070/php-array-delete-by-value-not-key
+                if (($key = array_search($answer, $correctAnswers)) !== false) {
+                  unset($correctAnswers[$key]);
+                }
+
+              } else {
+
+                $wrongAnswer = true;
+                break;
+              }
+            }
+
+            // if none of the answers were incorrect and all have been guessed
+            if (!$wrongAnswer && empty($correctAnswers)) {
 
               $correct = 1;
               $response->{'score'}++;
