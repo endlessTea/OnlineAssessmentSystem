@@ -62,7 +62,7 @@
     ?>
 
     <!-- provide data visualisation container for assessor accounts -->
-    <div id="visualisations"></div>
+    <div id="visualisations-container"></div>
 
     <?php
       } else {

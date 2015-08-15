@@ -27,6 +27,8 @@ ul {
   padding: 0;
 }
 
+/* Dashboard control CSS */
+
 .dash-level {
   margin: 5px;
   text-align: left;
@@ -90,6 +92,31 @@ a {
   color: #000;
 }
 
+/* Question visualisation CSS */
+
 #question-choice {
   margin: 5px auto 20px auto;
+}
+
+#pie-container {
+  border: 1px dashed orange;
+  display: -webkit-flex;
+  -webkit-flex-direction: row;
+  display: flex;
+  flex-direction: row;
+}
+
+.three-pie {
+  border: 1px dashed blue;
+  -webkit-flex: 1 1 auto;
+  flex: 1 1 auto;
+  width: 300px;
+  height: 300px
+}
+
+#student-question-table {
+  border: 1px dashed red;
+  width: 700px;
+  height: 200px;
+  margin: auto;
 }
