@@ -48,6 +48,12 @@ h1, h2 {
   color: #009933;
 }
 
+input[type="text"] {
+  padding: 5px;
+  margin: 8px;
+  width: 600px;
+}
+
 .author-level {
   margin: 10px 10px 25px 10px;
   text-align: center;

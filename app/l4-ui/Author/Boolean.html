@@ -1,35 +1,29 @@
 <h2>Boolean Question</h2>
 <form onsubmit="createQuestion('boolean'); return false;">
-  <div class="qField">
-    <label for="question">Provide a statement that is true or false:</label>
-    <br>
-    <input id="question"
-      type="text"
-      required
-      autocomplete="off"
-      placeholder="e.g. CSMA/CD stands for 'Carrier Sense Multiple Access with Collision Detection'">
-  </div>
+  <label for="question">Provide a statement that is true or false:</label>
   <br>
-  <div class="qField">
-    <p>Identify if the statement above is True or False:</p>
-    <input name="singleAnswer"
-      type="radio"
-      value="TRUE"
-      checked> TRUE
-    <br>
-    <input name="singleAnswer"
-      type="radio"
-      value="FALSE"> FALSE
-  </div>
+  <input id="question"
+    type="text"
+    required
+    autocomplete="off"
+    placeholder="e.g. CSMA/CD stands for 'Carrier Sense Multiple Access with Collision Detection'">
   <br>
-  <div class="qField">
-    <label for="feedback">Provide optional feedback for this question:</label>
-    <br>
-    <input id="feedback"
-      type="text"
-      autocomplete="off"
-      placeholder="e.g. CSMA/CD is a Media Access Control method, see lecture notes for details.">
-  </div>
+  <p>Identify if the statement above is True or False:</p>
+  <input name="singleAnswer"
+    type="radio"
+    value="TRUE"
+    checked> TRUE
+  <br>
+  <input name="singleAnswer"
+    type="radio"
+    value="FALSE"> FALSE
+  <br><br>
+  <label for="feedback">Provide optional feedback for this question:</label>
+  <br>
+  <input id="feedback"
+    type="text"
+    autocomplete="off"
+    placeholder="e.g. CSMA/CD is a Media Access Control method, see lecture notes for details.">
   <br>
   <input type="submit" value="Create Question">
 </form>

@@ -98,6 +98,7 @@ class AuthorModel {
 
       // identify the schema of the question
       $document = $this->_DB->read("questions", array("_id" => $questionIdObj));
+      if (empty($document)) return false;
       $schema = $document[key($document)]["schema"];
 
       // only continue if the update complies with the schema AND it isn't an author or schema update
@@ -229,6 +230,7 @@ class AuthorModel {
 
       // identify the schema of the test
       $document = $this->_DB->read("tests", array("_id" => $testIdObj));
+      if (empty($document)) return false;
       $schema = $document[key($document)]["schema"];
 
       // if update contains questions and its value is not an array, fail the operation

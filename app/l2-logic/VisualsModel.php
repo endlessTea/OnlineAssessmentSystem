@@ -65,5 +65,48 @@ class VisualsModel {
     return false;
   }
 
+  /**
+   *  GET LIST OF TESTS FOR AN ASSESSOR
+   *  Get test id's and names
+   *  @return JSON of data on sucess, otherwise false if there is no data to return
+   */
+  public function getListOfTests($assessorIdStr) {
 
+    // reject an assessor id that does not consist of hexadecimal characters
+    if (preg_match('/^([a-z0-9])+$/', $assessorIdStr) !== 1) return false;
+
+    // check the author string against the authors for each test
+    $tests = $this->_DB->read("tests", array("author" => $assessorIdStr));
+    if (empty($tests)) return false;
+
+    // create root object and append id and test name
+    $response = new stdClass();
+    foreach ($tests as $tId => $details) {
+
+      $response->{$tId} = $details["name"];
+    }
+
+    return json_encode($response);
+  }
+
+  /**
+   *  GET SINGLE TEST DATA (JSON)
+   *  Get total students understanding of, performance on and understanding of feedback for a single test
+   *  @return JSON of data on success, else false if the test doesn't exist / hasn't been taken
+   */
+  public function getSingleTestJSON($testIdObj, $assessorIdStr) {
+
+    if (is_a($testIdObj, 'MongoId')) {
+
+      // get the test from MongoDB and check if it exists and anyone has taken it
+      $test = $this->_DB->read("tests", array("_id" => $testIdObj));
+      $test = array_pop($test);
+      if (empty($test) || !isset($test["taken"]) || $test["author"] !== $assessorIdStr) return false;
+
+      // return array of details about who has taken this test
+      return json_encode($test["taken"]);
+    }
+
+    return false;
+  }
 }

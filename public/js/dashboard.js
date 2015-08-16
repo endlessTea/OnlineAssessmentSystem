@@ -26,10 +26,10 @@ function toggleVisualisations() {
 
     // create html
     $('#advancedOptions').html(
-      "<div class=\"dash-control visualisation-control\" onclick=\"getQuestionList();\">" +
+      "<div id=\"leftmost-vis-control\" class=\"dash-control visualisation-control\" onclick=\"getQuestionList();\">" +
         "<p>QUESTIONS</p>" +
       "</div>" +
-      "<div class=\"dash-control visualisation-control\" onclick=\"alert('tests');\">" +
+      "<div class=\"dash-control visualisation-control\" onclick=\"getTestList();\">" +
         "<p>TESTS</p>" +
       "</div>" +
       "<div class=\"dash-control visualisation-control\" onclick=\"alert('students');\">" +
@@ -40,6 +40,8 @@ function toggleVisualisations() {
       "</div>"
     );
 
+    $('#visualisations-container').show();
+
   } else {
 
     // shrink header
@@ -49,6 +51,8 @@ function toggleVisualisations() {
 
     // empty HTML from advanced options container
     $('#advancedOptions').html('');
+
+    $('#visualisations-container').hide();
   }
 }
 
@@ -77,7 +81,7 @@ function getQuestionList() {
 
       // create a select element and seperate container for graphics/information
       $("#visualisations-container").html(
-        "<select id=\"question-choice\">" +
+        "<select id=\"question-choice\" class=\"vis-data-choice\">" +
           "<option value=\"\">Please choose one of your questions from this list: </option>" +
         "</select>" +
         "<div id=\"question-data-container\"></div>"
@@ -93,6 +97,52 @@ function getQuestionList() {
       // set a change listener to call the next function
       $('#question-choice').change(function() {
         loadQuestionVisualisations($(this).val());
+      });
+
+    },
+    error: function (request, status, error) {
+      $('#page-prompt').html('');
+      $("#visualisations").html(
+        "<p>There was a problem with the request, please contact the system administrator: <br>" +
+        request.responseText + "</p>"
+      );
+    }
+  });
+}
+
+/**
+ *  GET LIST OF TESTS FOR VISUALISATIONS
+ *  Show options for test-specific data visualisations
+ */
+function getTestList() {
+
+  clearVisualisationContainer();
+
+  // get list of tests via Ajax
+  $.ajax({
+    url: baseURL + "dashboard/getAssessorsTestList",
+    type: "GET",
+    dataType: "json",
+    success: function(response) {
+
+      // create a select element and seperate container for graphics/information
+      $("#visualisations-container").html(
+        "<select id=\"test-choice\" class=\"vis-data-choice\">" +
+          "<option value=\"\">Please choose one of your tests from this list: </option>" +
+        "</select>" +
+        "<div id=\"test-data-container\"></div>"
+      );
+
+      // append each test
+      for (var item in response) {
+        $('#test-choice').append(
+          "<option value=\"" + item + "\"> * " + response[item] + "</option>"
+        );
+      }
+
+      // set a change listener to call the next function
+      $('#test-choice').change(function() {
+        loadTestVisualisations($(this).val());
       });
 
     },
@@ -125,14 +175,67 @@ var loadQuestionVisualisations = function(value) {
       success: function(response) {
 
         // append new containers for visualisations
-        // "<p>" + JSON.stringify(response) + "</p>"+
         $("#question-data-container").html(
           "<div id=\"pie-container\">" +
-            "<div id=\"pie-left\" class=\"three-pie\"></div>" +
-            "<div id=\"pie-middle\" class=\"three-pie\"></div>" +
-            "<div id=\"pie-right\" class=\"three-pie\"></div>" +
+            "<div id=\"pie-left\" class=\"three-pie\">" +
+              "<div class=\"pie-desc-container\">" +
+                "<div class=\"pie-desc\">" +
+                "<p>Understanding of Questions</p>" +
+                "</div>" +
+                "<div class=\"pie-legend\">" +
+                  "<div id=\"plc-uq\" class=\"pie-legend-colour\"></div>" +
+                  "<div class=\"pie-legend-text\">" +
+                    "<p>Question Understood</p>" +
+                  "</div>" +
+                "</div>" +
+                "<div class=\"pie-legend\">" +
+                  "<div id=\"plc-dnuq\" class=\"pie-legend-colour\"></div>" +
+                  "<div class=\"pie-legend-text\">" +
+                    "<p>Question Not Understood</p>" +
+                  "</div>" +
+                "</div>" +
+              "</div>" +
+            "</div>" +
+            "<div id=\"pie-middle\" class=\"three-pie\">" +
+              "<div class=\"pie-desc-container\">" +
+                "<div class=\"pie-desc\">" +
+                "<p>Correct Answers</p>" +
+                "</div>" +
+                "<div class=\"pie-legend\">" +
+                  "<div id=\"plc-ca\" class=\"pie-legend-colour\"></div>" +
+                  "<div class=\"pie-legend-text\">" +
+                    "<p>Correctly Answered</p>" +
+                  "</div>" +
+                "</div>" +
+                "<div class=\"pie-legend\">" +
+                  "<div id=\"plc-wa\" class=\"pie-legend-colour\"></div>" +
+                  "<div class=\"pie-legend-text\">" +
+                    "<p>Incorrectly Answered</p>" +
+                  "</div>" +
+                "</div>" +
+              "</div>" +
+            "</div>" +
+            "<div id=\"pie-right\" class=\"three-pie\">" +
+              "<div class=\"pie-desc-container\">" +
+                "<div class=\"pie-desc\">" +
+                "<p>Understanding of Feedback</p>" +
+                "</div>" +
+                "<div class=\"pie-legend\">" +
+                  "<div id=\"plc-uf\" class=\"pie-legend-colour\"></div>" +
+                  "<div class=\"pie-legend-text\">" +
+                    "<p>Feedback Understood</p>" +
+                  "</div>" +
+                "</div>" +
+                "<div class=\"pie-legend\">" +
+                  "<div id=\"plc-dnuf\" class=\"pie-legend-colour\"></div>" +
+                  "<div class=\"pie-legend-text\">" +
+                    "<p>Feedback Not Understood</p>" +
+                  "</div>" +
+                "</div>" +
+              "</div>" +
+            "</div>" +
           "</div>" +
-          "<div id=\"student-question-table\"></div>"
+          "<div id=\"student-question-table-container\"></div>"
         );
 
         // compute values and draw corresponding pie charts for uq, ca and uf
@@ -140,8 +243,112 @@ var loadQuestionVisualisations = function(value) {
         drawPie("pie-middle", computeTotalCA(response));
         drawPie("pie-right", computeTotalUF(response));
 
-        // draw table of information (pass div id)
+        // insert html table
+        $('#student-question-table-container').html(
+          "<table>" +
+            "<thead>" +
+              "<tr>" +
+                "<th>Student</th>" +
+                "<th>UQ</th>" +
+                "<th>CA</th>" +
+                "<th>UF</th>" +
+              "</tr>" +
+            "</thead>" +
+            "<tbody id=\"question-table-body\">" +
+            "</tbody>" +
+          "</table>"
+        );
 
+        // loop through response; add table row per entry
+        for (var student in response) {
+          $('#question-table-body').append(
+            "<tr>" +
+              "<td>" + student + "</td>" +
+              "<td>" + response[student]["uq"] + "</td>" +
+              "<td>" + response[student]["ca"] + "</td>" +
+              "<td>" + response[student]["uf"] + "</td>" +
+            "</tr>"
+          );
+        }
+      },
+      error: function (request, status, error) {
+        $("#visualisations").html(
+          "<p>There was a problem with the request, please contact the system administrator: <br>" +
+          request.responseText + "</p>"
+        );
+      }
+    });
+  }
+}
+
+/**
+ *  LOAD SINGLE TEST VISUALISATIONS
+ *  Request data via Ajax, draw scatter plot and 2x pie charts
+ */
+var loadTestVisualisations = function(value) {
+
+  if (value) {
+
+    // fetch question data via Ajax
+    $.ajax({
+      url: baseURL + "dashboard/getTestData",
+      data: {
+        tId: value
+      },
+      type: "POST",
+      dataType: "json",
+      success: function(response) {
+
+        // append new containers for visualisations
+        $("#test-data-container").html(
+          "<div id=\"test-vis-container\">" +
+            "<div id=\"scatterplot\" class=\"large-scatterplot\"></div>" +
+            "<div id=\"two-pie-container\">" +
+              "<div id=\"pie-top-right\" class=\"two-pie\">" +
+                "<div class=\"pie-desc-container\">" +
+                  "<div class=\"pie-desc\">" +
+                  "<p>Understanding of Questions</p>" +
+                  "</div>" +
+                  "<div class=\"pie-legend\">" +
+                    "<div id=\"plc-uq\" class=\"pie-legend-colour\"></div>" +
+                    "<div class=\"pie-legend-text\">" +
+                      "<p>Questions Understood</p>" +
+                    "</div>" +
+                  "</div>" +
+                  "<div class=\"pie-legend\">" +
+                    "<div id=\"plc-dnuq\" class=\"pie-legend-colour\"></div>" +
+                    "<div class=\"pie-legend-text\">" +
+                      "<p>Questions Not Understood</p>" +
+                    "</div>" +
+                  "</div>" +
+                "</div>" +
+              "</div>" +
+              "<div id=\"pie-bottom-right\" class=\"two-pie\">" +
+                "<div class=\"pie-desc-container\">" +
+                  "<div class=\"pie-desc\">" +
+                  "<p>Understanding of Feedback</p>" +
+                  "</div>" +
+                  "<div class=\"pie-legend\">" +
+                    "<div id=\"plc-uf\" class=\"pie-legend-colour\"></div>" +
+                    "<div class=\"pie-legend-text\">" +
+                      "<p>Feedback Understood</p>" +
+                    "</div>" +
+                  "</div>" +
+                  "<div class=\"pie-legend\">" +
+                    "<div id=\"plc-dnuf\" class=\"pie-legend-colour\"></div>" +
+                    "<div class=\"pie-legend-text\">" +
+                      "<p>Feedback Not Understood</p>" +
+                    "</div>" +
+                  "</div>" +
+                "</div>" +
+              "</div>" +
+            "</div>" +
+          "</div>"
+        );
+
+        // compute values and draw corresponding pie charts for uq and uf
+        drawPie("pie-top-right", computeTotalUQ(response));
+        drawPie("pie-bottom-right", computeTotalUF(response));
       },
       error: function (request, status, error) {
         $("#visualisations").html(
@@ -155,20 +362,20 @@ var loadQuestionVisualisations = function(value) {
 
 /**
  *  COMPUTE TOTAL VALUES FOR 'UNDERSTANDING OF A QUESTION' (uq)
- *  Written for question data to be passed (TODO: refactor for later methods)
+ *  Written for question/test data to be passed
  */
 var computeTotalUQ = function(data) {
 
   // prepare object of values to return
-  totals = [];
-  totals[0] = 0;
-  totals[1] = 0;
+  totals = {};
+  totals.uq = 0;
+  totals.dnuq = 0;
 
   for (var user in data) {
-    if (data[user]["uq"] === "1") {
-      totals[0]++;
+    if (data[user]["uq"] === 1) {
+      totals.uq++;
     } else {
-      totals[1]++;
+      totals.dnuq++;
     }
   }
 
@@ -177,20 +384,20 @@ var computeTotalUQ = function(data) {
 
 /**
  *  COMPUTE TOTAL VALUES FOR 'CORRECT ANSWERS' (ca)
- *  Written for question data to be passed (TODO: refactor for later methods)
+ *  Written for question/test data to be passed
  */
 var computeTotalCA = function(data) {
 
   // prepare object of values to return
-  totals = [];
-  totals[0] = 0;
-  totals[1] = 0;
+  totals = {};
+  totals.ca = 0;
+  totals.wa = 0;
 
   for (var user in data) {
     if (data[user]["ca"] === 1) {
-      totals[0]++;
+      totals.ca++;
     } else {
-      totals[1]++;
+      totals.wa++;
     }
   }
 
@@ -199,22 +406,22 @@ var computeTotalCA = function(data) {
 
 /**
  *  COMPUTE TOTAL VALUES FOR 'UNDERSTANDING OF FEEDBACK' (uf)
- *  Written for question data to be passed (TODO: refactor for later methods)
+ *  Written for question/test data to be passed
  */
 var computeTotalUF = function(data) {
 
   // prepare object of values to return
-  totals = [];
-  totals[0] = 0;
-  totals[1] = 0;
+  totals = {};
+  totals.uf = 0;
+  totals.dnuf = 0;
 
   // additionally check if understanding of feedback was provided (sometimes n/a)
   for (var user in data) {
-    if (data[user]["uf"]) {
-      if (data[user]["uf"] === "1") {
-        totals[0]++;
+    if (typeof data[user]["uf"] !== 'undefined') {
+      if (data[user]["uf"] === 1) {
+        totals.uf++;
       } else {
-        totals[1]++;
+        totals.dnuf++;
       }
     }
   }
@@ -223,25 +430,40 @@ var computeTotalUF = function(data) {
 }
 
 /**
- *  DRAW PIE CHART (ARC CORNERS) TODO: refactor to allow 100%/0% values to be drawn (use pie?)
+ *  DRAW PIE CHART
  *  Pass container id and data to draw a pie chart within that container
  */
 var drawPie = function(divId, data) {
+
+  // change array based on data received & color scheme
+  var pieData = [];
+  var color;
+  if (data.uq) {
+    pieData[0] = data.uq;
+    pieData[1] = data.dnuq;
+    color = d3.scale.ordinal()
+      .range(["#FFFF00", "#990099"]);
+  } else if (data.uf) {
+    pieData[0] = data.uf;
+    pieData[1] = data.dnuf;
+    color = d3.scale.ordinal()
+      .range(["#0033CC", "#FF9900"]);
+  } else {
+    pieData[0] = data.ca;
+    pieData[1] = data.wa;
+    color = d3.scale.ordinal()
+      .range(["#00CC00", "#CC0000"]);
+  }
 
   var width = 300,
     height = 300,
     radius = height / 2 - 10;
 
   var arc = d3.svg.arc()
-    .innerRadius(radius - 80)
-    .outerRadius(radius)
-    .cornerRadius(20);
+    .innerRadius(0)
+    .outerRadius(radius);
 
-  var pie = d3.layout.pie()
-    .padAngle(.03);
-
-  // TODO (change color based on uq/ca/uf)
-  var color = d3.scale.category10();
+  var pie = d3.layout.pie();
 
   var svg = d3.select("#" + divId).append("svg")
     .attr("width", width)
@@ -249,9 +471,8 @@ var drawPie = function(divId, data) {
     .append("g")
       .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-  // http://bl.ocks.org/mbostock/3887193
   var g = svg.selectAll(".arc")
-    .data(pie(data))
+    .data(pie(pieData))
     .enter().append("g")
       .attr("class", "arc");
 
@@ -263,5 +484,5 @@ var drawPie = function(divId, data) {
     .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")" })
     .attr("dy", ".35em")
     .style("text-anchor", "middle")
-    .text(function(d) { return Math.round(d.data / (data[0] + data[1]) * 100) + "%"; });
+    .text(function(d) { return Math.round(d.data / (pieData[0] + pieData[1]) * 100) + "%"; });
 }

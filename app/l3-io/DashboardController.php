@@ -100,6 +100,61 @@ class DashboardController {
   }
 
   /**
+   *  AJAX: GET ASSESSOR'S TEST LIST
+   *  Return JSON representation of the tests the assessor has created
+   */
+  public function getAssessorsTestList() {
+
+    if ($this->_UserModel->getUserData()->accountType !== "assessor") {
+
+      echo "Insufficient account permissions (student account)";
+      exit;
+    }
+
+    // change the header to indicate that JSON data is being returned
+    header('Content-Type: application/json');
+
+    echo $this->_VisualsModel->getListOfTests(
+      $this->_UserModel->getUserData()->userId
+    );
+  }
+
+  /**
+   *  AJAX: GET TEST DATA
+   *  Return JSON of test data if the user is the author of the test
+   */
+  public function getTestData() {
+
+    if ($this->_UserModel->getUserData()->accountType !== "assessor") {
+
+      echo "Insufficient account permissions (student account)";
+      exit;
+    }
+
+    // attempt to convert test identifier to MongoId
+    try {
+      $testIdObj = new MongoId($this->_AppModel->getPOSTData("tId"));
+    } catch (Exception $e) {
+      echo "Invalid test identifier.";
+      exit;
+    }
+
+    $data = $this->_VisualsModel->getSingleTestJSON(
+      $testIdObj,
+      $this->_UserModel->getUserData()->userId
+    );
+    if ($data === false) {
+      echo "There was an issue loading the data.";
+      exit;
+    }
+
+    // change the header to indicate that JSON data is being returned
+    header('Content-Type: application/json');
+
+    echo $data;
+  }
+
+  /**
    *  LOG USER OUT
    */
   public function logout() {

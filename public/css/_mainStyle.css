@@ -15,12 +15,6 @@ header {
   height: 60px;
 }
 
-.qField input[type="text"] {
-  padding: 5px;
-  margin: 8px;
-  width: 600px;
-}
-
 input:invalid {
   box-shadow: none;
 }

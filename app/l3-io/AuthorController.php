@@ -135,6 +135,7 @@ class AuthorController {
 
     $test = array(
       "schema" => "standard",
+      "name" => $this->_AppModel->getPOSTData("tn"),
       "author" => $this->_UserModel->getUserData()->userId,
       "questions" => $this->_AppModel->getPOSTData("qs", "getJSON")
     );

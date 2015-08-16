@@ -373,6 +373,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
     // create test
     $result = $this->_AuthorModel->createTest(array(
       "schema" => "standard",
+      "name" => "Sample Test",
       "author" => $this->_testTestAuthorId,
       "questions" => $questionIds
     ));
@@ -387,6 +388,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
 
     $result = $this->_AuthorModel->createTest(array(
       "schema" => "standard",
+      "name" => "Bad Sample",
       "author" => $this->_testTestAuthorId
     ));
     $this->assertFalse($result);

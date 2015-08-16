@@ -20,6 +20,7 @@ class TestSchema {
     $this->_schema = array(
       "standard" => array(
         "schema" => "required",
+        "name" => "required",
         "author" => "required",
         "questions" => "required"
       )

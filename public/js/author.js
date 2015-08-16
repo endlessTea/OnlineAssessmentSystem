@@ -228,7 +228,12 @@ function loadQuestionsForTestCreation() {
 
       // create a form
       $("#authorContainer").append(
-        "<form id=\"testForm\" onsubmit=\"createTest(); return false;\"></form>"
+        "<form id=\"testForm\" onsubmit=\"createTest(); return false;\">" +
+          "<label for=\"testName\">Provide a name for your test (required):</label><br>" +
+          "<input id=\"testName\" required type=\"text\" autocomplete=\"off\" " +
+            "placeholder=\"e.g. Object-oriented Programming 1\" pattern=\"[\\w\\s,]+\">" +
+          "<p>Check the boxes for the questions you want to include in your test:</p>" +
+        "</form>"
       );
 
       // append each question to the form with checkbox input
@@ -266,7 +271,7 @@ function createTest() {
   $('#testForm input:checked').each(function() {
     questions.push($(this).attr('name'));
   });
-  questions = JSON.stringify(questions);   
+  questions = JSON.stringify(questions);
 
   // create a test if at least one question was selected
   if (questions !== '[]') {
@@ -274,6 +279,7 @@ function createTest() {
     $.ajax({
       url: baseURL + "author/createTest",
       data: {
+        tn: $('#testName').val(),
         qs: questions
       },
       type: "POST",
@@ -309,7 +315,7 @@ function manageTests() {
       // create and append a representation of each question to the container
       for (var test in response) {
         $("#authorContainer").append(
-          "<p>" + test + ": " + response[test]["questions"].length +
+          "<p>" + test + ": " + response[test]["name"] + ", " + response[test]["questions"].length +
           " questions &nbsp;<button onclick=\"deleteTest('" +
           test + "')\">DELETE</button></p>"
         );
@@ -367,7 +373,8 @@ function loadTests() {
       // create and append a representation of each question to the container
       for (var test in response) {
         $("#authorContainer").append(
-          "<p>" + test + " &nbsp;<button onclick=\"loadUsersForTest('" +
+          "<p>" + test + ": " + response[test]["name"] + ", " + response[test]["questions"].length +
+          " questions &nbsp;<button onclick=\"loadUsersForTest('" +
           test + "')\">SELECT</button></p>"
         );
       }
@@ -396,21 +403,30 @@ function loadUsersForTest(testId) {
     dataType: "json",
     success: function (response) {
 
-      // set container header
-      $("#authorContainer").html("<h2>Issue Test</h2>");
+      if ($.isEmptyObject(response)) {
 
-      // create a form
-      $("#authorContainer").append(
-        "<p>Test '" + testId + "' is available to issue to:</p>"
-      );
-
-      // create an entry for each available user
-      for (var user in response) {
-        $("#authorContainer").append(
-          "<p>" + user + ": " + response[user]
-          + " &nbsp;<button onclick=\"issueTest('" +
-          testId + "', '" + user + "')\">ISSUE</button></p>"
+        // advise the test cannot be issued
+        $("#authorContainer").html(
+          "<h2>Test Fully Issued</h2>" +
+          "<p>Test '" + testId + "' has been issued to every available user.</p>"
         );
+
+      } else {
+
+        // set container header and prompt
+        $("#authorContainer").html(
+          "<h2>Issue Test</h2>" +
+          "<p>Test '" + testId + "' is available to issue to:</p>"
+        );
+
+        // create an entry for each available user
+        for (var user in response) {
+          $("#authorContainer").append(
+            "<p>" + user + ": " + response[user]
+            + " &nbsp;<button onclick=\"issueTest('" +
+            testId + "', '" + user + "')\">ISSUE</button></p>"
+          );
+        }
       }
     },
     error: function (request, status, error) {

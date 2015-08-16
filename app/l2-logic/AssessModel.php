@@ -184,10 +184,11 @@ class AssessModel {
         $questions[] = $document;
       }
 
-      // add score and feedback to response root object
+      // add score and feedback to response root object; keep track of total understood questions
       $response = new stdClass();
       $response->{'score'} = 0;
       $response->{'feedback'} = new stdClass();
+      $totalUQ = 0;
 
       foreach ($questions as $qNo => $fullQuestion) {
 
@@ -222,8 +223,12 @@ class AssessModel {
               }
             }
 
+            // parse uq, increase total and add to taken array
+            $uq = intval($answers->{$qNo}->{'uq'});
+            $totalUQ += $uq;
+
             $convertedResponse = array(
-              "uq" => $answers->{$qNo}->{'uq'},
+              "uq" => $uq,
               "ca" => $correct
             );
             break;
@@ -273,8 +278,12 @@ class AssessModel {
               }
             }
 
+            // parse uq, increase total and add to taken array
+            $uq = intval($answers->{$qNo}->{'uq'});
+            $totalUQ += $uq;
+
             $convertedResponse = array(
-              "uq" => $answers->{$qNo}->{'uq'},
+              "uq" => $uq,
               "ca" => $correct
             );
             break;
@@ -304,11 +313,17 @@ class AssessModel {
       if (isset($test["taken"])) {
 
         $takenTestArray = $test["taken"];
-        $takenTestArray[$studentIdStr] = $response->{'score'};
+        $takenTestArray[$studentIdStr] = array(
+          "uq" => $totalUQ,
+          "ca" => $response->{'score'}
+        );
 
       } else {
 
-        $takenTestArray = array($studentIdStr => $response->{'score'});
+        $takenTestArray = array($studentIdStr => array(
+          "uq" => $totalUQ,
+          "ca" => $response->{'score'}
+        ));
       }
 
       // Update Test: if the operation fails for any question, throw an Exception
@@ -354,6 +369,9 @@ class AssessModel {
         $questions[] = $document;
       }
 
+      // keep track of total 'understanding of feedback' for reporting
+      $totalUF = 0;
+
       // if student feedback was provided for a specific question
       foreach ($questions as $qNo => $fullQuestion) {
         if (isset($feedback->{$qNo})) {
@@ -361,19 +379,35 @@ class AssessModel {
           // fail the operation if an invalid feedback value was provided
           if ($feedback->{$qNo} != 0 && $feedback->{$qNo} != 1) return false;
 
+          // parse int value for understanding of feedback and increase total
+          $uf = intval($feedback->{$qNo});
+          $totalUF += $uf;
+
           // obtain the UPDATED version of the question from MongoDB
           $updatedQuestion = $this->_DB->read("questions", array("_id" => $fullQuestion["_id"]));
           $updatedQuestion = array_pop($updatedQuestion);
 
           // copy the existing question "taken" array and PUSH the feedback value onto it for the student
           $takenQuestionArray = $updatedQuestion["taken"];
-          $takenQuestionArray[$studentIdStr]["uf"] = $feedback->{$qNo};
+          $takenQuestionArray[$studentIdStr]["uf"] = $uf;
 
           // Update Question: if the operation fails for any question, throw an Exception
           if (!$this->_DB->update("questions", array("_id" => $fullQuestion["_id"]), array("taken" => $takenQuestionArray)))
             throw new Exception("The following question update failed: " . implode($takenQuestionArray));
         }
       }
+
+      // update test taken array
+      $takenTestArray = $test["taken"];
+      $takenTestArray[$studentIdStr] = array(
+        "uq" => $takenTestArray[$studentIdStr]["uq"],
+        "ca" => $takenTestArray[$studentIdStr]["ca"],
+        "uf" => $totalUF
+      );
+
+      // Update Test: if the operation fails for any question, throw an Exception
+      if (!$this->_DB->update("tests", array("_id" => $test["_id"]), array("taken" => $takenTestArray)))
+        throw new Exception("The following test update failed: " . implode($takenTestArray));
 
       return true;
     }

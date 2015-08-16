@@ -98,6 +98,7 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
     // create 2x tests
     $resultOne = $this->_AuthorModel->createTest(array(
       "schema" => "standard",
+      "name" => "Test One",
       "author" => $authorId,
       "questions" => array(
         $questionsIds[0], $questionsIds[1]
@@ -105,12 +106,21 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
     ));
     $resultTwo = $this->_AuthorModel->createTest(array(
       "schema" => "standard",
+      "name" => "Test Two",
       "author" => $authorId,
       "questions" => array(
         $questionsIds[2], $questionsIds[3]
       )
     ));
-    $this->assertTrue($resultOne && $resultTwo);
+    $resultThree = $this->_AuthorModel->createTest(array(
+      "schema" => "standard",
+      "name" => "Test Not Taken",
+      "author" => $authorId,
+      "questions" => array(
+        $questionsIds[1], $questionsIds[2]
+      )
+    ));
+    $this->assertTrue($resultOne && $resultTwo && $resultThree);
 
     // get test id's
     foreach ($this->_AuthorModel->getTests($authorId) as $tKey => $t) {
@@ -281,6 +291,80 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
 
     $this->assertFalse(
       $this->_VisualsModel->getSingleQuestionJSON(new MongoId($qId), $studentTwo)
+    );
+  }
+
+  /**
+   *  @test
+   *  Get list of test id's and names associated with a user account
+   */
+  public function getListOfTests_getAll_methodReturnsMatchingJSON() {
+
+    // get author id and question ids
+    $this->_UserModel->findUser("testAuthor");
+    $authorId = $this->_UserModel->getUserData()->userId;
+    $tNotTakenName = "Test Not Taken";
+    $tNotTakenId = key($this->_DB->read("tests", array("name" => $tNotTakenName)));
+    $tOneName = "Test One";
+    $tOneId = key($this->_DB->read("tests", array("name" => $tOneName)));
+    $tTwoName = "Test Two";
+    $tTwoId = key($this->_DB->read("tests", array("name" => $tTwoName)));
+
+    $this->assertSame(
+      "{\"{$tNotTakenId}\":\"{$tNotTakenName}\",\"{$tOneId}\":\"{$tOneName}\",\"{$tTwoId}\":\"{$tTwoName}\"}",
+      $this->_VisualsModel->getListOfTests($authorId)
+    );
+  }
+
+  /**
+   *  @test
+   *  Get single test data
+   */
+  public function getSingleTestJSON_getTakenData_methodReturnsMatchingJSON() {
+
+    // get author, student and test id
+    $this->_UserModel->findUser("testAuthor");
+    $authorId = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("studentOne");
+    $studentOne = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("studentTwo");
+    $studentTwo = $this->_UserModel->getUserData()->userId;
+    $tId = key($this->_DB->read("tests", array("name" => "Test Two")));
+
+    $this->assertSame(
+      "{\"{$studentOne}\":{\"uq\":1,\"ca\":1,\"uf\":0},\"{$studentTwo}\":{\"uq\":1,\"ca\":0,\"uf\":1}}",
+      $this->_VisualsModel->getSingleTestJSON(new MongoId($tId), $authorId)
+    );
+  }
+
+  /**
+   *  @test
+   *  Attempt to get test data where no "taken" information exists
+   */
+  public function getSingleTestJSON_noTakenData_methodReturnsFalse() {
+
+    // get author id and test id for test that has not been taken
+    $this->_UserModel->findUser("testAuthor");
+    $authorId = $this->_UserModel->getUserData()->userId;
+    $tId = key($this->_DB->read("tests", array("name" => "Test Not Taken")));
+
+    $this->assertFalse(
+      $this->_VisualsModel->getSingleTestJSON(new MongoId($tId), $authorId)
+    );
+  }
+
+  /**
+   *  @test
+   *  Attempt to get a test where the user id does not match the test author
+   */
+  public function getSingleTestJSON_authorDoesNotMatch_methodReturnsFalse() {
+
+    $this->_UserModel->findUser("studentTwo");
+    $studentTwo = $this->_UserModel->getUserData()->userId;
+    $tId = key($this->_DB->read("tests", array("name" => "Test Two")));
+
+    $this->assertFalse(
+      $this->_VisualsModel->getSingleTestJSON(new MongoId($tId), $studentTwo)
     );
   }
 

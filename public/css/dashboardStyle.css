@@ -72,7 +72,20 @@ ul {
 }
 
 .visualisation-control {
-  padding: 0 auto 0 auto;
+  border: 2px solid #85ADFF;
+  background-color: #E8E8FF;
+  border-radius: 10px;
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.2);
+  margin: 10px 30px auto auto;
+  height: 30px;
+}
+
+.visualisation-control p {
+  margin: 5px auto auto 8px;
+}
+
+#leftmost-vis-control {
+  margin-left: 20px;
 }
 
 #author-button, #assess-button {
@@ -92,14 +105,11 @@ a {
   color: #000;
 }
 
-/* Question visualisation CSS */
-
-#question-choice {
+.vis-data-choice {
   margin: 5px auto 20px auto;
 }
 
 #pie-container {
-  border: 1px dashed orange;
   display: -webkit-flex;
   -webkit-flex-direction: row;
   display: flex;
@@ -107,16 +117,106 @@ a {
 }
 
 .three-pie {
-  border: 1px dashed blue;
   -webkit-flex: 1 1 auto;
   flex: 1 1 auto;
   width: 300px;
-  height: 300px
+  height: 450px;
 }
 
-#student-question-table {
+.pie-desc-container {
+  height: 100px;
+}
+
+.pie-desc {
+  height: 40px;
+}
+
+.pie-desc p {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.pie-legend {
+  height: 20px;
+  margin: 5px;
+}
+
+.pie-legend-colour {
+  width: 6%;
+  float: left;
+  height: inherit;
+  margin-left: 25px;
+  border: 1px solid black;
+}
+
+/* match to d3 orginal scale for 'drawPie' */
+#plc-uq {
+  background-color: #FFFF00;
+}
+#plc-dnuq {
+  background-color: #990099;
+}
+#plc-ca {
+  background-color: #00CC00;
+}
+#plc-wa {
+  background-color: #CC0000;
+}
+#plc-uf {
+  background-color: #0033CC;
+}
+#plc-dnuf {
+  background-color: #FF9900;
+}
+
+.pie-legend-text {
+  width: 75%;
+  float: right;
+}
+
+.pie-legend-text p {
+  margin: 0;
+  text-align: left;
+}
+
+#test-vis-container {
+  display: -webkit-flex;
+  -webkit-flex-direction: row;
+  display: flex;
+  flex-direction: row;
+}
+
+.large-scatterplot {
+  border: 1px dashed green;
+  width: 600px;
+  height: 800px;
+  -webkit-flex: 1 1 auto;
+  flex: 1 1 auto;
+}
+
+#two-pie-container {
+  border: 1px dashed orange;
+  width: 400px;
+  height: 800px;
+  -webkit-flex: 1 1 auto;
+  flex: 1 1 auto;
+  display: inline-block;
+}
+
+.two-pie {
+  border: 1px dashed blue;
+  width: 300px;
+  height: 400px;
+  margin: auto;
+}
+
+#student-question-table-container {
   border: 1px dashed red;
   width: 700px;
   height: 200px;
+  margin: auto;
+}
+
+#student-question-table-container table {
   margin: auto;
 }

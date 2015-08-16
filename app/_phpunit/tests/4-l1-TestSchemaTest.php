@@ -25,6 +25,7 @@ class TestSchemaTest extends PHPUnit_Framework_TestCase {
     );
     $this->_standardSchema = array(
       "schema" => "required",
+      "name" => "required",
       "author" => "required",
       "questions" => "required"
     );

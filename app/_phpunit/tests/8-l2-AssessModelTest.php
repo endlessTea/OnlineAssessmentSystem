@@ -381,7 +381,10 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
     // check that the test document has been updated as well containing the total number of correct answers
     $testToCheck = array_pop($this->_DB->read("tests", array("author" => $authorId)));
     $this->assertSame(
-      1,
+      array(
+        "uq" => 2,
+        "ca" => 1
+      ),
       $testToCheck["taken"][$studentId]
     );
   }
@@ -427,7 +430,10 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
     // check that the test document has been updated as well containing the total number of correct answers
     $testToCheck = array_pop($this->_DB->read("tests", array("author" => $MCAuthorId)));
     $this->assertSame(
-      1,
+      array(
+        "uq" => 2,
+        "ca" => 1
+      ),
       $testToCheck["taken"][$MCStudentOne]
     );
   }
