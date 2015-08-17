@@ -29,14 +29,8 @@ function toggleVisualisations() {
       "<div id=\"leftmost-vis-control\" class=\"dash-control visualisation-control\" onclick=\"getQuestionList();\">" +
         "<p>QUESTIONS</p>" +
       "</div>" +
-      "<div class=\"dash-control visualisation-control\" onclick=\"getTestList();\">" +
+      "<div id=\"rightmost-vis-control\" class=\"dash-control visualisation-control\" onclick=\"getTestList();\">" +
         "<p>TESTS</p>" +
-      "</div>" +
-      "<div class=\"dash-control visualisation-control\" onclick=\"alert('students');\">" +
-        "<p>STUDENTS</p>" +
-      "</div>" +
-      "<div class=\"dash-control visualisation-control\" onclick=\"alert('classes');\">" +
-        "<p>CLASSES</p>" +
       "</div>"
     );
 
@@ -127,21 +121,21 @@ function getTestList() {
 
       // create a select element and seperate container for graphics/information
       $("#visualisations-container").html(
-        "<select id=\"test-choice\" class=\"vis-data-choice\">" +
+        "<select id=\"question-choice\" class=\"vis-data-choice\">" +
           "<option value=\"\">Please choose one of your tests from this list: </option>" +
         "</select>" +
-        "<div id=\"test-data-container\"></div>"
+        "<div id=\"question-data-container\"></div>"
       );
 
       // append each test
       for (var item in response) {
-        $('#test-choice').append(
+        $('#question-choice').append(
           "<option value=\"" + item + "\"> * " + response[item] + "</option>"
         );
       }
 
       // set a change listener to call the next function
-      $('#test-choice').change(function() {
+      $('#question-choice').change(function() {
         loadTestVisualisations($(this).val());
       });
 
@@ -243,33 +237,8 @@ var loadQuestionVisualisations = function(value) {
         drawPie("pie-middle", computeTotalCA(response, "question"));
         drawPie("pie-right", computeTotalUF(response, "question"));
 
-        // insert html table
-        $('#student-question-table-container').html(
-          "<table>" +
-            "<thead>" +
-              "<tr>" +
-                "<th>Student</th>" +
-                "<th>UQ</th>" +
-                "<th>CA</th>" +
-                "<th>UF</th>" +
-              "</tr>" +
-            "</thead>" +
-            "<tbody id=\"question-table-body\">" +
-            "</tbody>" +
-          "</table>"
-        );
-
-        // loop through response; add table row per entry
-        for (var student in response) {
-          $('#question-table-body').append(
-            "<tr>" +
-              "<td>" + student + "</td>" +
-              "<td>" + response[student]["uq"] + "</td>" +
-              "<td>" + response[student]["ca"] + "</td>" +
-              "<td>" + response[student]["uf"] + "</td>" +
-            "</tr>"
-          );
-        }
+        // draw table of information
+        drawTable(response, "question");
       },
       error: function (request, status, error) {
         $("#visualisations").html(
@@ -300,57 +269,76 @@ var loadTestVisualisations = function(value) {
       success: function(response) {
 
         // append new containers for visualisations
-        $("#test-data-container").html(
-          "<div id=\"test-vis-container\">" +
-            "<div id=\"scatterplot\" class=\"large-scatterplot\"></div>" +
-            "<div id=\"two-pie-container\">" +
-              "<div id=\"pie-top-right\" class=\"two-pie\">" +
-                "<div class=\"pie-desc-container\">" +
-                  "<div class=\"pie-desc\">" +
-                  "<p>Understanding of Questions</p>" +
-                  "</div>" +
-                  "<div class=\"pie-legend\">" +
-                    "<div id=\"plc-uq\" class=\"pie-legend-colour\"></div>" +
-                    "<div class=\"pie-legend-text\">" +
-                      "<p>Questions Understood</p>" +
-                    "</div>" +
-                  "</div>" +
-                  "<div class=\"pie-legend\">" +
-                    "<div id=\"plc-dnuq\" class=\"pie-legend-colour\"></div>" +
-                    "<div class=\"pie-legend-text\">" +
-                      "<p>Questions Not Understood</p>" +
-                    "</div>" +
+        $("#question-data-container").html(
+          "<div id=\"pie-container\">" +
+            "<div id=\"pie-left\" class=\"three-pie\">" +
+              "<div class=\"pie-desc-container\">" +
+                "<div class=\"pie-desc\">" +
+                "<p>Understanding of Questions</p>" +
+                "</div>" +
+                "<div class=\"pie-legend\">" +
+                  "<div id=\"plc-uq\" class=\"pie-legend-colour\"></div>" +
+                  "<div class=\"pie-legend-text\">" +
+                    "<p>Questions Understood</p>" +
                   "</div>" +
                 "</div>" +
-              "</div>" +
-              "<div id=\"pie-bottom-right\" class=\"two-pie\">" +
-                "<div class=\"pie-desc-container\">" +
-                  "<div class=\"pie-desc\">" +
-                  "<p>Understanding of Feedback</p>" +
-                  "</div>" +
-                  "<div class=\"pie-legend\">" +
-                    "<div id=\"plc-uf\" class=\"pie-legend-colour\"></div>" +
-                    "<div class=\"pie-legend-text\">" +
-                      "<p>Feedback Understood</p>" +
-                    "</div>" +
-                  "</div>" +
-                  "<div class=\"pie-legend\">" +
-                    "<div id=\"plc-dnuf\" class=\"pie-legend-colour\"></div>" +
-                    "<div class=\"pie-legend-text\">" +
-                      "<p>Feedback Not Understood</p>" +
-                    "</div>" +
+                "<div class=\"pie-legend\">" +
+                  "<div id=\"plc-dnuq\" class=\"pie-legend-colour\"></div>" +
+                  "<div class=\"pie-legend-text\">" +
+                    "<p>Questions Not Understood</p>" +
                   "</div>" +
                 "</div>" +
               "</div>" +
             "</div>" +
-          "</div>"
+            "<div id=\"pie-middle\" class=\"three-pie\">" +
+              "<div class=\"pie-desc-container\">" +
+                "<div class=\"pie-desc\">" +
+                "<p>Correct Answers</p>" +
+                "</div>" +
+                "<div class=\"pie-legend\">" +
+                  "<div id=\"plc-ca\" class=\"pie-legend-colour\"></div>" +
+                  "<div class=\"pie-legend-text\">" +
+                    "<p>Correctly Answered</p>" +
+                  "</div>" +
+                "</div>" +
+                "<div class=\"pie-legend\">" +
+                  "<div id=\"plc-wa\" class=\"pie-legend-colour\"></div>" +
+                  "<div class=\"pie-legend-text\">" +
+                    "<p>Incorrectly Answered</p>" +
+                  "</div>" +
+                "</div>" +
+              "</div>" +
+            "</div>" +
+            "<div id=\"pie-right\" class=\"three-pie\">" +
+              "<div class=\"pie-desc-container\">" +
+                "<div class=\"pie-desc\">" +
+                "<p>Understanding of Feedback</p>" +
+                "</div>" +
+                "<div class=\"pie-legend\">" +
+                  "<div id=\"plc-uf\" class=\"pie-legend-colour\"></div>" +
+                  "<div class=\"pie-legend-text\">" +
+                    "<p>Feedback Understood</p>" +
+                  "</div>" +
+                "</div>" +
+                "<div class=\"pie-legend\">" +
+                  "<div id=\"plc-dnuf\" class=\"pie-legend-colour\"></div>" +
+                  "<div class=\"pie-legend-text\">" +
+                    "<p>Feedback Not Understood</p>" +
+                  "</div>" +
+                "</div>" +
+              "</div>" +
+            "</div>" +
+          "</div>" +
+          "<div id=\"student-question-table-container\"></div>"
         );
 
-        // compute values and draw corresponding pie charts for uq and uf
-        drawPie("pie-top-right", computeTotalUQ(response, "test"));
-        drawPie("pie-bottom-right", computeTotalUF(response, "test"));
+        // compute values and draw corresponding pie charts for uq, ca and uf
+        drawPie("pie-left", computeTotalUQ(response, "test"));
+        drawPie("pie-middle", computeTotalCA(response, "test"));
+        drawPie("pie-right", computeTotalUF(response, "test"));
 
-        drawScatterplot();
+        // draw table of information
+        drawTable(response, "test");
       },
       error: function (request, status, error) {
         $("#visualisations").html(
@@ -421,6 +409,14 @@ var computeTotalCA = function(data, usage) {
       } else {
         totals.wa++;
       }
+    }
+
+  } else if (usage === "test") {
+
+    for (var user in data.userData) {
+
+      totals.ca += data.userData[user]["ca"];
+      totals.wa += (data.testData["totalQuestions"] - data.userData[user]["ca"]);
     }
 
   } else {
@@ -536,112 +532,121 @@ var drawPie = function(divId, data) {
 }
 
 /**
- *  TEST: TODO, refactor me
+ *  DRAW TABLE OF INFORMATION ABOUT STUDENTS
  */
-var drawScatterplot = function() {
+var drawTable = function(data, usage) {
 
-  // http://bl.ocks.org/mbostock/3887118
-  var margin = {top: 20, right: 20, bottom: 30, left: 40},
-    width = 600 - margin.left - margin.right,
-    height = 600 - margin.top - margin.bottom;
+  // use function to replace 1, 0 and 'undefined' with image or text
+  var replaceQuestionData = function(value) {
 
-  var x = d3.scale.linear()
-    .range([0, width]);
+    switch (value) {
 
-  var y = d3.scale.linear()
-    .range([height, 0]);
+      case 0:
+        console.log("enter 0");
+        return "<img src=\"" + baseURL + "public/img/cross.png\"></img>";
+        break;
 
-  var color = d3.scale.category10();
+      case 1:
+        console.log("enter 1");
+        return "<img src=\"" + baseURL + "public/img/tick.png\"></img>";
+        break;
 
-  var xAxis = d3.svg.axis()
-    .scale(x)
-    .orient("bottom")
-    .tickFormat(d3.format("d"))
-    .tickSubdivide(0);
+      default:
+        console.log("enter n/a");
+        return "N/A";
+    }
+  }
 
-  var yAxis = d3.svg.axis()
-    .scale(y)
-    .orient("left")
-    .tickFormat(d3.format("d"))
-    .tickSubdivide(0);
+  // use function to replace test scores with percentages
+  var replaceTestData = function(value, totalQs, totalCAs) {
 
-  var svg = d3.select("#scatterplot").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    if (typeof value === 'undefined') {
 
-  d3.json("public/js/scatterplot_ex1.json", function(error, data) {
-    if (error) throw error;
+      return "N/A";
+    }
 
-    // ???
-    data.forEach(function(d) {
-      d.score = +d.score;
-      d.user = +d.user;
-    });
+    if (totalCAs !== "") {
 
-    // ???
-    x.domain(d3.extent(data, function(d) { return d.user; })).nice();
-    y.domain(d3.extent(data, function(d) { return d.score; })).nice();
+      return Math.round(value / (totalQs - totalCAs) * 100) + "%";
+    }
 
-    var xAxisSVG = svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis)
-      .append("text")
-        .attr("class", "label")
-        .attr("x", width)
-        .attr("y", -6)
-        .style("text-anchor", "end")
-        .text("User Id");
+    return Math.round(value / totalQs * 100) + "%";
+  }
 
-    console.log(xAxisSVG);
+  if (usage === "question") {
 
-    svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis)
-      .append("text")
-        .attr("class", "label")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text("Score");
+    // insert html table
+    $('#student-question-table-container').html(
+      "<table>" +
+        "<thead>" +
+          "<tr>" +
+            "<th>Student Name</th>" +
+            "<th>Understood<br>Question</th>" +
+            "<th>Correct<br>Answer</th>" +
+            "<th>Understood<br>Feedback</th>" +
+          "</tr>" +
+        "</thead>" +
+        "<tbody id=\"question-table-body\">" +
+        "</tbody>" +
+      "</table>"
+    );
 
-    svg.selectAll(".dot")
-      .data(data)
-      .enter().append("circle")
-        .attr("class", "dot")
-        .attr("r", 3.5)
-        .attr("cx", function(d) {
-          return x(d.user);
-        })
-        .attr("cy", function(d) {
-          return y(d.score);
-        })
-        .style("fill", function(d) {
-          return color(d.test);
-        });
+    // loop through response; add table row per entry
+    for (var student in data) {
+      $('#question-table-body').append(
+        "<tr>" +
+          "<td>" + data[student]["name"] + "</td>" +
+          "<td>" + replaceQuestionData(data[student]["uq"]) + "</td>" +
+          "<td>" + replaceQuestionData(data[student]["ca"]) + "</td>" +
+          "<td>" + replaceQuestionData(data[student]["uf"]) + "</td>" +
+        "</tr>"
+      );
+    }
 
-    var legend = svg.selectAll(".legend")
-      .data(color.domain())
-      .enter().append("g")
-        .attr("class", "legend")
-        .attr("transform", function(d, i) {
-          return "translate(0," + i * 20 + ")";
-        });
+  } else if (usage === "test") {
 
-    legend.append("rect")
-      .attr("x", width - 18)
-      .attr("width", 18)
-      .attr("height", 18)
-      .style("fill", color);
+    // insert html table
+    $('#student-question-table-container').html(
+      "<table>" +
+        "<thead>" +
+          "<tr>" +
+            "<th>Student Name</th>" +
+            "<th>Questions<br>understood (%)</th>" +
+            "<th>Correct<br>answers (%)</th>" +
+            "<th>Feedback<br>understood (%)</th>" +
+          "</tr>" +
+        "</thead>" +
+        "<tbody id=\"question-table-body\">" +
+        "</tbody>" +
+      "</table>"
+    );
 
-    legend.append("text")
-      .attr("x", width - 24)
-      .attr("y", 9)
-      .attr("dy", ".35em")
-      .style("text-anchor", "end")
-      .text(function(d) { return d; });
-  });
+    // loop through response; add table row per entry
+    for (var student in data.userData) {
+      $('#question-table-body').append(
+        "<tr>" +
+          "<td>" + data.userData[student]["name"] + "</td>" +
+          "<td>" + replaceTestData(
+            data.userData[student]["uq"],
+            data.testData["totalQuestions"],
+            ""
+          ) + "</td>" +
+          "<td>" + replaceTestData(
+            data.userData[student]["ca"],
+            data.testData["totalQuestions"],
+            ""
+          ) + "</td>" +
+          "<td>" + replaceTestData(
+            data.userData[student]["uf"],
+            data.testData["totalQuestions"],
+            data.userData[student]["ca"]
+          ) + "</td>" +
+        "</tr>"
+      );
+    }
+
+  } else {
+
+    throw new Exception("Unrecognised usage.");
+  }
 }
