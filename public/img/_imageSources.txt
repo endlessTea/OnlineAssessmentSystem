@@ -1,6 +1,9 @@
 create_assess.png
 http://aspnethosting2go.com/wp-content/uploads/2014/07/feature2.png
 
+cross.png
+http://www.icon100.com/up/2625/16/cross.png
+
 ideas_background.jpg
 http://il3.picdn.net/shutterstock/videos/4008184/thumb/3.jpg
 
@@ -15,3 +18,6 @@ http://freeiconbox.com/icon/256/31148.png
 
 stats.png
 http://am2.athena-testbed.com/wp-content/uploads/2013/08/Icon-Marketing-Analysis-mD-DC-VA.png
+
+tick.png
+http://png-2.findicons.com/files/icons/1588/farm_fresh_web/32/tick.png

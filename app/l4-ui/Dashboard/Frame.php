@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="<?= URL; ?>public/css/dashboardStyle.css">
 
   <?php
+    // additional visualisations css
     if ($accountType === "assessor") {
   ?>
   <link rel="stylesheet" href="<?= URL; ?>public/css/visualisationStyle.css">

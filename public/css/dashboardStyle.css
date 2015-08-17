@@ -119,6 +119,12 @@ a {
   margin: 5px auto 20px auto;
 }
 
+#question-choice {
+  min-width: 500px;
+  max-width: 900px;
+  font-size: 1em;
+}
+
 #pie-container {
   display: -webkit-flex;
   -webkit-flex-direction: row;
@@ -222,6 +228,7 @@ a {
   width: 700px;
   height: 200px;
   margin: auto;
+  overflow: auto;
 }
 
 #student-question-table-container table {

@@ -6,6 +6,8 @@
 // toggle visualisations on and off
 var visualisationsOn = false;
 
+
+
 /**
  *  TOGGLE VISUALISATIONS
  *  Turn visualisation options on and off
