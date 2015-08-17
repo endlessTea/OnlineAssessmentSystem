@@ -239,9 +239,9 @@ var loadQuestionVisualisations = function(value) {
         );
 
         // compute values and draw corresponding pie charts for uq, ca and uf
-        drawPie("pie-left", computeTotalUQ(response));
-        drawPie("pie-middle", computeTotalCA(response));
-        drawPie("pie-right", computeTotalUF(response));
+        drawPie("pie-left", computeTotalUQ(response, "question"));
+        drawPie("pie-middle", computeTotalCA(response, "question"));
+        drawPie("pie-right", computeTotalUF(response, "question"));
 
         // insert html table
         $('#student-question-table-container').html(
@@ -347,8 +347,10 @@ var loadTestVisualisations = function(value) {
         );
 
         // compute values and draw corresponding pie charts for uq and uf
-        drawPie("pie-top-right", computeTotalUQ(response));
-        drawPie("pie-bottom-right", computeTotalUF(response));
+        drawPie("pie-top-right", computeTotalUQ(response, "test"));
+        drawPie("pie-bottom-right", computeTotalUF(response, "test"));
+
+        drawScatterplot();
       },
       error: function (request, status, error) {
         $("#visualisations").html(
@@ -364,19 +366,37 @@ var loadTestVisualisations = function(value) {
  *  COMPUTE TOTAL VALUES FOR 'UNDERSTANDING OF A QUESTION' (uq)
  *  Written for question/test data to be passed
  */
-var computeTotalUQ = function(data) {
+var computeTotalUQ = function(data, usage) {
 
   // prepare object of values to return
   totals = {};
   totals.uq = 0;
   totals.dnuq = 0;
 
-  for (var user in data) {
-    if (data[user]["uq"] === 1) {
-      totals.uq++;
-    } else {
-      totals.dnuq++;
+  if (usage === "question") {
+
+    for (var user in data) {
+      if (data[user]["uq"] === 1) {
+        totals.uq++;
+      } else {
+        totals.dnuq++;
+      }
     }
+
+  } else if (usage === "test") {
+
+    for (var user in data.userData) {
+
+      // add understanding of questions to overall total
+      totals.uq += data.userData[user]["uq"];
+
+      // calculate lack of understanding of questions by deducting from no. questions
+      totals.dnuq += (data.testData["totalQuestions"] - data.userData[user]["uq"]);
+    }
+
+  } else {
+
+    throw new Exception("Unrecognised usage.");
   }
 
   return totals;
@@ -386,19 +406,26 @@ var computeTotalUQ = function(data) {
  *  COMPUTE TOTAL VALUES FOR 'CORRECT ANSWERS' (ca)
  *  Written for question/test data to be passed
  */
-var computeTotalCA = function(data) {
+var computeTotalCA = function(data, usage) {
 
   // prepare object of values to return
   totals = {};
   totals.ca = 0;
   totals.wa = 0;
 
-  for (var user in data) {
-    if (data[user]["ca"] === 1) {
-      totals.ca++;
-    } else {
-      totals.wa++;
+  if (usage === "question") {
+
+    for (var user in data) {
+      if (data[user]["ca"] === 1) {
+        totals.ca++;
+      } else {
+        totals.wa++;
+      }
     }
+
+  } else {
+
+    throw new Exception("Unrecognised usage.");
   }
 
   return totals;
@@ -408,22 +435,43 @@ var computeTotalCA = function(data) {
  *  COMPUTE TOTAL VALUES FOR 'UNDERSTANDING OF FEEDBACK' (uf)
  *  Written for question/test data to be passed
  */
-var computeTotalUF = function(data) {
+var computeTotalUF = function(data, usage) {
 
   // prepare object of values to return
   totals = {};
   totals.uf = 0;
   totals.dnuf = 0;
 
-  // additionally check if understanding of feedback was provided (sometimes n/a)
-  for (var user in data) {
-    if (typeof data[user]["uf"] !== 'undefined') {
-      if (data[user]["uf"] === 1) {
-        totals.uf++;
-      } else {
-        totals.dnuf++;
+  if (usage === "question") {
+
+    // additionally check if understanding of feedback was provided (sometimes n/a)
+    for (var user in data) {
+      if (typeof data[user]["uf"] !== 'undefined') {
+        if (data[user]["uf"] === 1) {
+          totals.uf++;
+        } else {
+          totals.dnuf++;
+        }
       }
     }
+
+  } else if (usage === "test") {
+
+    // TODO: consider getting this method to return NO DATA for drawPie to handle
+    for (var user in data.userData) {
+      if (typeof data.userData[user]["uf"] !== 'undefined') {
+
+        // add understanding of feedback to overall total
+        totals.uf += data.userData[user]["uf"];
+
+        // calculate lack of understanding of feedback by deducting from total q's minus correct answers
+        totals.dnuf += ((data.testData["totalQuestions"] - data.userData[user]["ca"]) - data.userData[user]["uf"]);
+      }
+    }
+
+  } else {
+
+    throw new Exception("Unrecognised usage.");
   }
 
   return totals;
@@ -485,4 +533,115 @@ var drawPie = function(divId, data) {
     .attr("dy", ".35em")
     .style("text-anchor", "middle")
     .text(function(d) { return Math.round(d.data / (pieData[0] + pieData[1]) * 100) + "%"; });
+}
+
+/**
+ *  TEST: TODO, refactor me
+ */
+var drawScatterplot = function() {
+
+  // http://bl.ocks.org/mbostock/3887118
+  var margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = 600 - margin.left - margin.right,
+    height = 600 - margin.top - margin.bottom;
+
+  var x = d3.scale.linear()
+    .range([0, width]);
+
+  var y = d3.scale.linear()
+    .range([height, 0]);
+
+  var color = d3.scale.category10();
+
+  var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom")
+    .tickFormat(d3.format("d"))
+    .tickSubdivide(0);
+
+  var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .tickFormat(d3.format("d"))
+    .tickSubdivide(0);
+
+  var svg = d3.select("#scatterplot").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  d3.json("public/js/scatterplot_ex1.json", function(error, data) {
+    if (error) throw error;
+
+    // ???
+    data.forEach(function(d) {
+      d.score = +d.score;
+      d.user = +d.user;
+    });
+
+    // ???
+    x.domain(d3.extent(data, function(d) { return d.user; })).nice();
+    y.domain(d3.extent(data, function(d) { return d.score; })).nice();
+
+    var xAxisSVG = svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+      .append("text")
+        .attr("class", "label")
+        .attr("x", width)
+        .attr("y", -6)
+        .style("text-anchor", "end")
+        .text("User Id");
+
+    console.log(xAxisSVG);
+
+    svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+      .append("text")
+        .attr("class", "label")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Score");
+
+    svg.selectAll(".dot")
+      .data(data)
+      .enter().append("circle")
+        .attr("class", "dot")
+        .attr("r", 3.5)
+        .attr("cx", function(d) {
+          return x(d.user);
+        })
+        .attr("cy", function(d) {
+          return y(d.score);
+        })
+        .style("fill", function(d) {
+          return color(d.test);
+        });
+
+    var legend = svg.selectAll(".legend")
+      .data(color.domain())
+      .enter().append("g")
+        .attr("class", "legend")
+        .attr("transform", function(d, i) {
+          return "translate(0," + i * 20 + ")";
+        });
+
+    legend.append("rect")
+      .attr("x", width - 18)
+      .attr("width", 18)
+      .attr("height", 18)
+      .style("fill", color);
+
+    legend.append("text")
+      .attr("x", width - 24)
+      .attr("y", 9)
+      .attr("dy", ".35em")
+      .style("text-anchor", "end")
+      .text(function(d) { return d; });
+  });
 }

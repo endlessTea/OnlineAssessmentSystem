@@ -258,7 +258,8 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
     $qId = key($this->_DB->read("questions", array("question" => "JavaScript is also known as ECMAScript.")));
 
     $this->assertSame(
-      "{\"{$studentOne}\":{\"uq\":1,\"ca\":1},\"{$studentTwo}\":{\"uq\":0,\"ca\":1}}",
+      "{\"{$studentOne}\":{\"uq\":1,\"ca\":1,\"name\":\"Test Student\"}," .
+        "\"{$studentTwo}\":{\"uq\":0,\"ca\":1,\"name\":\"Test Student Two\"}}",
       $this->_VisualsModel->getSingleQuestionJSON(new MongoId($qId), $authorId)
     );
   }
@@ -332,7 +333,9 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
     $tId = key($this->_DB->read("tests", array("name" => "Test Two")));
 
     $this->assertSame(
-      "{\"{$studentOne}\":{\"uq\":1,\"ca\":1,\"uf\":0},\"{$studentTwo}\":{\"uq\":1,\"ca\":0,\"uf\":1}}",
+      "{\"testData\":{\"totalQuestions\":2}," . 
+        "\"userData\":{\"{$studentOne}\":{\"uq\":1,\"ca\":1,\"uf\":0,\"name\":\"Test Student\"}," .
+        "\"{$studentTwo}\":{\"uq\":1,\"ca\":0,\"uf\":1,\"name\":\"Test Student Two\"}}}",
       $this->_VisualsModel->getSingleTestJSON(new MongoId($tId), $authorId)
     );
   }

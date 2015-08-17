@@ -58,8 +58,18 @@ class VisualsModel {
       $question = array_pop($question);
       if (empty($question) || !isset($question["taken"]) || $question["author"] !== $assessorIdStr) return false;
 
+      // copy 'taken' array and add full user name with each user id
+      $response = $question["taken"];
+      foreach ($response as $uId => $details) {
+
+        // identify the user's full name by getting the document from MongoDB
+        $user = $this->_DB->read("users", array("_id" => new MongoId($uId)));
+        $user = array_pop($user);
+        $response[$uId]["name"] = $user["full_name"];
+      }
+
       // return array of details about who has taken this question
-      return json_encode($question["taken"]);
+      return json_encode($response);
     }
 
     return false;
@@ -103,8 +113,23 @@ class VisualsModel {
       $test = array_pop($test);
       if (empty($test) || !isset($test["taken"]) || $test["author"] !== $assessorIdStr) return false;
 
+      // copy 'taken' array add general test info and add full user name with each user id
+      $response = array(
+        "testData" => array(
+          "totalQuestions" => count($test["questions"])
+        ),
+        "userData" => $test["taken"]
+      );
+      foreach ($response["userData"] as $uId => $details) {
+
+        // identify the user's full name by getting the document from MongoDB
+        $user = $this->_DB->read("users", array("_id" => new MongoId($uId)));
+        $user = array_pop($user);
+        $response["userData"][$uId]["name"] = $user["full_name"];
+      }
+
       // return array of details about who has taken this test
-      return json_encode($test["taken"]);
+      return json_encode($response);
     }
 
     return false;

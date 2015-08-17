@@ -189,22 +189,20 @@ a {
 .large-scatterplot {
   border: 1px dashed green;
   width: 600px;
-  height: 800px;
+  height: 820px;
   -webkit-flex: 1 1 auto;
   flex: 1 1 auto;
 }
 
 #two-pie-container {
-  border: 1px dashed orange;
   width: 400px;
-  height: 800px;
+  height: 820px;
   -webkit-flex: 1 1 auto;
   flex: 1 1 auto;
   display: inline-block;
 }
 
 .two-pie {
-  border: 1px dashed blue;
   width: 300px;
   height: 400px;
   margin: auto;
