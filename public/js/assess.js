@@ -124,6 +124,15 @@ var buildTest = function(data) {
         }
         break;
 
+      case "pattern":
+        $("#testForm").append(
+          "<h3>\"" + questionsJSON[question]["question"] + "\"</h3>" +
+          "<p>Type your answer in the box below:</p>" +
+          "<input id=\"" + question + "-rx\"" +
+          "type=\"text\" required>"
+        );
+        break;
+
       default:
         alert("Question Schema not recognised. Please contact the system administrator.");
         return;
@@ -175,6 +184,10 @@ function submitAnswers() {
         $('#' + question + '-chk-con input:checked').each(function() {
           answers[question]['ans'].push($(this).attr('name'));
         });
+        break;
+
+      case "pattern":
+        answers[question]['ans'] = $('#' + question + '-rx').val();
         break;
 
       default:

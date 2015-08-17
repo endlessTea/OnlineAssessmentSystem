@@ -165,6 +165,55 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
       array("_id" => new MongoId($testId)),
       array("available" => array($MCStudentOne, $MCStudentTwo)
     )));
+
+    /*
+     *  Unit test addition 17/08/2015: Pattern matching test
+     *  Create users, get id's, create questions, get id's, create test, get id, register students
+     */
+    $this->_UserModel->createUser("testPMAuthor", "password", "Pattern Match Test Author");
+    $this->_UserModel->createUser("testPMStudent", "password", "Pattern Match Test Student");
+    $this->_UserModel->createUser("testPMStudent2", "password", "Pattern Match Test Student 2");
+
+    $this->_UserModel->findUser("testPMAuthor");
+    $PMAuthorId = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("testPMStudent");
+    $PMStudentOne = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("testPMStudent2");
+    $PMStudentTwo = $this->_UserModel->getUserData()->userId;
+
+    $this->assertTrue($this->_DB->create("questions", array(
+      "schema" => "pattern",
+      "author" => $PMAuthorId,
+      "question" => "Name a fruit beginning with 'A'",
+      "pattern" => "/^[Aa]pples?$/",
+      "feedback" => "RTFM (read the fruit manual)"
+    )));
+    $this->assertTrue($this->_DB->create("questions", array(
+      "schema" => "pattern",
+      "author" => $PMAuthorId,
+      "question" => "Name a server-side scripting language beginning with 'P'",
+      "pattern" => "/^[Pp](erl|ython|HP)$/",
+      "feedback" => "Check Wikipedia plz"
+    )));
+
+    $PMquestions = array(
+      key($this->_DB->read("questions", array("question" => "Name a fruit beginning with 'A'"))),
+      key($this->_DB->read("questions", array("question" => "Name a server-side scripting language beginning with 'P'")))
+    );
+
+    $this->assertTrue($this->_DB->create("tests", array(
+      "schema" => "standard",
+      "author" => $PMAuthorId,
+      "questions" => $PMquestions
+    )));
+
+    $testId = key($this->_DB->read("tests", array("author" => $PMAuthorId)));
+
+    $this->assertTrue($this->_DB->update(
+      "tests",
+      array("_id" => new MongoId($testId)),
+      array("available" => array($PMStudentOne, $PMStudentTwo)
+    )));
   }
 
   /**
@@ -435,6 +484,51 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
         "ca" => 1
       ),
       $testToCheck["taken"][$MCStudentOne]
+    );
+  }
+
+  /**
+   *  @test
+   *  Submit answers to a test (PATTERN MATCHING)
+   */
+  public function updateAnswers_submitValidAnswersPattern_methodReturnsTrueDocumentsUpdated() {
+
+    // get Ids
+    $this->_UserModel->findUser("testPMAuthor");
+    $PMAuthorId = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("testPMStudent");
+    $PMStudentOne = $this->_UserModel->getUserData()->userId;
+    $testId = key($this->_DB->read("tests", array("author" => $PMAuthorId)));
+
+    // prepare answers (simulate PHP representation of JSON data)
+    $input = new stdClass();
+    $input->{0} = new stdClass();
+    $input->{0}->{'uq'} = 1;
+    $input->{0}->{'ans'} = "apple";
+    $input->{1} = new stdClass();
+    $input->{1}->{'uq'} = 0;
+    $input->{1}->{'ans'} = "The pythons";
+
+    $this->assertSame(
+      "{\"score\":1,\"feedback\":{\"1\":\"Check Wikipedia plz\"}}",
+      $this->_AssessModel->updateAnswers(new MongoId($testId), $PMStudentOne, $input)
+    );
+
+    // check that the user's answer was marked and the question document was updated
+    $questionToCheck = array_pop($this->_DB->read("questions", array("question" => "Name a fruit beginning with 'A'")));
+    $this->assertSame(
+      1,
+      $questionToCheck["taken"][$PMStudentOne]["ca"]
+    );
+
+    // check that the test document has been updated as well containing the total number of correct answers
+    $testToCheck = array_pop($this->_DB->read("tests", array("author" => $PMAuthorId)));
+    $this->assertSame(
+      array(
+        "uq" => 1,
+        "ca" => 1
+      ),
+      $testToCheck["taken"][$PMStudentOne]
     );
   }
 

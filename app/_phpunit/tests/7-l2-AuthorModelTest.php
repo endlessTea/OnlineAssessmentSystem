@@ -75,6 +75,23 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
 
   /**
    *  @test
+   *  Create schema compliant question (RegExp pattern)
+   */
+  public function createQuestion_schemaCompliantPattern_methodReturnsTrue() {
+
+    $this->assertTrue(
+      $this->_AuthorModel->createQuestion(array(
+        "schema" => "pattern",
+        "author" => $this->_testQuestionAuthorId,
+        "question" => "Name a fruit beginning with 'A'",
+        "pattern" => "/^[Aa]pple(s|z)?$/",
+        "feedback" => "RTFM (read the fruit manual)"
+      ))
+    );
+  }
+
+  /**
+   *  @test
    *  Attempt to create a question that does not belong to a recognised schema
    */
   public function createQuestion_unrecognisedSchema_methodReturnsFalse() {
@@ -169,7 +186,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   public function getQuestions_matchingAuthorId_methodReturnsArrayOfThreeDocuments() {
 
     $documents = $this->_AuthorModel->getQuestions($this->_testQuestionAuthorId);
-    $this->assertEquals(3, count($documents));
+    $this->assertEquals(4, count($documents));
   }
 
   /**

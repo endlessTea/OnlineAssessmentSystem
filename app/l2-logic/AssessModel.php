@@ -145,6 +145,10 @@ class AssessModel {
             $questionRoot->{$questionNo}->options = $q["options"];
             break;
 
+          case "pattern":
+            $questionRoot->{$questionNo}->question = $q["question"];
+            break;
+
           default:
             return false;
         }
@@ -266,6 +270,34 @@ class AssessModel {
 
             // if none of the answers were incorrect and all have been guessed
             if (!$wrongAnswer && empty($correctAnswers)) {
+
+              $correct = 1;
+              $response->{'score'}++;
+
+            } else {
+
+              $correct = 0;
+              if (isset($fullQuestion["feedback"])) {
+                $response->{'feedback'}->{$qNo} = $fullQuestion["feedback"];
+              }
+            }
+
+            // parse uq, increase total and add to taken array
+            $uq = intval($answers->{$qNo}->{'uq'});
+            $totalUQ += $uq;
+
+            $convertedResponse = array(
+              "uq" => $uq,
+              "ca" => $correct
+            );
+            break;
+
+          case "pattern":
+
+            // answer must be a String
+            if (!is_string($answers->{$qNo}->{'ans'})) return false;
+
+            if (preg_match($fullQuestion["pattern"], $answers->{$qNo}->{'ans'}) === 1) {
 
               $correct = 1;
               $response->{'score'}++;

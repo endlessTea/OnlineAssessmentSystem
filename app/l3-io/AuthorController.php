@@ -73,7 +73,7 @@ class AuthorController {
         $question = array(
           "schema" => "boolean",
           "author" => $this->_UserModel->getUserData()->userId,
-          "question" => $this->_AppModel->getPOSTData("st"),
+          "question" => $this->_AppModel->getPOSTData("qu"),
           "singleAnswer" => $this->_AppModel->getPOSTData("sa"),
           "feedback" => $this->_AppModel->getPOSTData("fb")
         );
@@ -88,6 +88,18 @@ class AuthorController {
           "question" => $this->_AppModel->getPOSTData("qu"),
           "options" => $this->_AppModel->getPOSTData("op", "getJSON"),
           "correctAnswers" => $this->_AppModel->getPOSTData("ca", "getJSON"),
+          "feedback" => $this->_AppModel->getPOSTData("fb")
+        );
+
+        break;
+
+      case "pattern":
+
+        $question = array(
+          "schema" => "pattern",
+          "author" => $this->_UserModel->getUserData()->userId,
+          "question" => $this->_AppModel->getPOSTData("qu"),
+          "pattern" => $this->_AppModel->getPOSTData("rx"),
           "feedback" => $this->_AppModel->getPOSTData("fb")
         );
 

@@ -37,7 +37,7 @@ class QuestionSchema {
         "schema" => "required",
         "author" => "required",
         "question" => "required",
-        "correctPattern" => "required",
+        "pattern" => "required",
         "feedback" => "optional"
       )
     );

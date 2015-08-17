@@ -45,7 +45,7 @@ function createQuestion(questionType) {
         url: baseURL + "author/createQuestion",
         data: {
           qt: questionType,
-          st: $('#question').val(),
+          qu: $('#question').val(),
           sa: $('input[type="radio"][name="singleAnswer"]:checked').val(),
           fb: $('#feedback').val()
         },
@@ -110,7 +110,28 @@ function createQuestion(questionType) {
       break;
 
     case "pattern":
-      alert("pattern question");
+
+      $.ajax({
+        url: baseURL + "author/createQuestion",
+        data: {
+          qt: questionType,
+          qu: $('#question').val(),
+          rx: "/" + $('#regex').val() + "/",
+          fb: $('#feedback').val()
+        },
+        type: "POST",
+        dataType: "html",
+        success: function (response) {
+          $("#authorContainer").html(response);
+        },
+        error: function (request, status, error) {
+          $("#authorContainer").html(
+            "<p>There was a problem with the request, please contact the system administrator: <br>" +
+            request.responseText + "</p>"
+          );
+        }
+      });
+
       break;
 
     default:

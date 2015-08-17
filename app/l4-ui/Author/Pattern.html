@@ -1,5 +1,27 @@
 <h2>Pattern Matching Question</h2>
 <form onsubmit="createQuestion('pattern'); return false;">
-  
+  <label for="question">Provide a question that requires a short answer:</label>
+  <br>
+  <input id="question"
+    type="text"
+    required
+    autocomplete="off"
+    placeholder="e.g. Name a server-side scripting language beginning with 'P'">
+  <br><br>
+  <label for="regex">Provide a regular expression that can be used to check the user's answer:</label>
+  <br>
+  <input id="regex"
+    type="text"
+    required
+    autocomplete="off"
+    placeholder="e.g. ^[Pp](erl|ython|HP)$">
+  <br><br>
+  <label for="feedback">Provide optional feedback for this question:</label>
+  <br>
+  <input id="feedback"
+    type="text"
+    autocomplete="off"
+    placeholder="e.g. MySQL is a relational database management system.">
+  <br>
   <input type="submit" value="Create Question">
 </form>
