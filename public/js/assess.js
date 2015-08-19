@@ -90,15 +90,20 @@ var buildTest = function(data) {
   // check the schema for each question and insert appropriate HTML with question values
   for (var question in questionsJSON) {
 
+    // append a container for each question
+    $('#testForm').append(
+      "<div id=\"q-" + question + "-container\" class=\"question-container\"></div>"
+    )
+
     // title: present question "0" as question "1" etc.
-    $("#testForm").append(
+    $("#q-" + question + "-container").append(
       "<h2>Question " + (parseInt(question) + 1) + ":</h2>"
     );
 
     switch (questionsJSON[question]["schema"]) {
 
       case "boolean":
-        $("#testForm").append(
+        $("#q-" + question + "-container").append(
           "<h3>\"" + questionsJSON[question]["question"] + "\"</h3>" +
           "<p>Is this TRUE or FALSE?</p>" +
           "<input name=\"" + question + "-ans\"" +
@@ -112,7 +117,7 @@ var buildTest = function(data) {
       case "multiple":
 
         // create container
-        $("#testForm").append(
+        $("#q-" + question + "-container").append(
           "<h3>" + questionsJSON[question]["question"] + "</h3>" +
           "<p>Select the correct answers from the options below:</p>" +
           "<div id=\"" + question + "-chk-con\"></div>"
@@ -129,20 +134,20 @@ var buildTest = function(data) {
         break;
 
       case "pattern":
-        $("#testForm").append(
+        $("#q-" + question + "-container").append(
           "<h3>\"" + questionsJSON[question]["question"] + "\"</h3>" +
           "<p>Type a single word answer in the box below:</p>" +
           "<input id=\"" + question + "-rx\"" +
-          "type=\"text\" required>"
+          "type=\"text\" required autocomplete=\"off\">"
         );
         break;
 
       case "short":
-        $("#testForm").append(
+        $("#q-" + question + "-container").append(
           "<h3>\"" + questionsJSON[question]["question"] + "\"</h3>" +
           "<p>Type a short answer in the box below:</p>" +
           "<input id=\"" + question + "-ans\"" +
-          "type=\"text\" required>"
+          "type=\"text\" required autocomplete=\"off\">"
         );
         break;
 
@@ -152,7 +157,7 @@ var buildTest = function(data) {
     }
 
     // obtain 'understanding of question' from the user
-    $("#testForm").append(
+    $("#q-" + question + "-container").append(
       "<h4>Did you understand Question " + (parseInt(question) + 1) + "?</h4>" +
       "<input name=\"" + question + "-uq\"" +
         "type=\"radio\" value=\"1\" checked> YES" +
@@ -261,7 +266,12 @@ var buildSelfAssessmentForm = function(data) {
 
   for (var answer in data) {
 
-    $("#selfAnsForm").append(
+    // append a container for each question
+    $('#selfAnsForm').append(
+      "<div id=\"q-" + answer + "-container\" class=\"question-container\"></div>"
+    )
+
+    $("#q-" + answer + "-container").append(
       "<h3>Question " + (parseInt(answer) + 1) + ":</h3>" +
       "<p>The example answer from the assessor is:</p>" +
       "<h4>" + data[answer]["ans"] + "</h4>" +
@@ -366,7 +376,12 @@ var buildFeedbackResponse = function(data) {
 
     for (var item in feedbackJSON.feedback) {
 
-      $("#feedForm").append(
+      // append a container for each question
+      $('#feedForm').append(
+        "<div id=\"q-" + item + "-container\" class=\"question-container\"></div>"
+      )
+
+      $("#q-" + item + "-container").append(
         "<h3>Question " + (parseInt(item) + 1) + ":</h3>" +
         "<h4>" + feedbackJSON.feedback[item] + "</h4>" +
         "<p>Do you understand the feedback?</p>" +

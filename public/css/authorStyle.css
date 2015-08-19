@@ -23,11 +23,12 @@ header {
 
 h1 {
   float: left;
-  width: 95%;
+  width: 64%;
   height: 60px;
   margin: 0;
   padding-top: 20px;
   padding-bottom: -20px;
+  text-align: right;
 }
 
 #clear-buffer {
@@ -52,6 +53,26 @@ input[type="text"] {
   padding: 5px;
   margin: 8px;
   width: 600px;
+}
+
+input[type="submit"], button {
+  height: 35px;
+  border-radius: 15px;
+  padding: 5px 20px 5px 20px;
+  background-color: #B2E0B2;
+  font-weight: bold;
+  font-family: 'Roboto', Verdana, sans-serif;
+  font-size: 0.9em;
+  border: 2px solid #009933;
+  background-color: #D8F0D8;
+  transition: all .10s ease;
+}
+
+input[type="submit"]:hover, button:hover {
+  cursor: pointer;
+  background-color: #009933;
+  border-radius: 30px;
+  color: #fff;
 }
 
 .author-level {

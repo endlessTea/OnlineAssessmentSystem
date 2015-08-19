@@ -44,7 +44,7 @@ class AssessModel {
 
           if (!isset($details["available"])) continue;
           if (in_array($studentIdStr, $details["available"]))
-            $availableTests[] = $tId;
+            $availableTests[$tId] = $details["name"];
         }
 
         if (!empty($availableTests)) {
@@ -386,7 +386,7 @@ class AssessModel {
 
             $convertedResponse = array(
               "uq" => $uq,
-              "ca" => $answers->{$qNo}->{'ca'}
+              "ca" => intval($answers->{$qNo}->{'ca'})
             );
             break;
 

@@ -26,11 +26,11 @@
         if (!is_array($tests)) {
           echo "<p>" . $tests . "</p>";
         } else {
-          foreach ($tests as $test) {
+          foreach ($tests as $tId => $name) {
       ?>
 
-      <p><?= $test; ?>
-      <button onclick="checkAndLoadDisclaimer('<?= $test; ?>');">LOAD</button></p>
+      <h2><?= $name; ?>
+      <button onclick="checkAndLoadDisclaimer('<?= $tId; ?>');">LOAD</button></h2>
 
       <?php
           }
