@@ -524,13 +524,30 @@ var drawPie = function(divId, data) {
 
   g.append("path")
     .style("fill", function(d, i) { return color(i); })
-    .attr("d", arc);
+    .attr("d", arc)
+    .transition()
+      .ease("elastic")
+      .duration(500)
+      .attrTween("d", tweenPie);
 
   g.append("text")
     .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")" })
     .attr("dy", ".35em")
     .style("text-anchor", "middle")
-    .text(function(d) { return Math.round(d.data / (pieData[0] + pieData[1]) * 100) + "%"; });
+    .style("font-weight", "bold")
+    .style("font-size", "1.1em")
+    .text(function(d) {
+      var value = Math.round(d.data / (pieData[0] + pieData[1]) * 100);
+      if (value > 0) return value + "%";
+      else return "";
+    });
+
+  // http://bl.ocks.org/mbostock/4341574
+  function tweenPie(b) {
+    b.innerRadius = 0;
+    var i = d3.interpolate({startAngle: 0, endAngle: 0}, b);
+    return function(t) { return arc(i(t)); };
+  }
 }
 
 /**
@@ -544,17 +561,14 @@ var drawTable = function(data, usage) {
     switch (value) {
 
       case 0:
-        console.log("enter 0");
         return "<img src=\"" + baseURL + "public/img/cross.png\"></img>";
         break;
 
       case 1:
-        console.log("enter 1");
         return "<img src=\"" + baseURL + "public/img/tick.png\"></img>";
         break;
 
       default:
-        console.log("enter n/a");
         return "N/A";
     }
   }

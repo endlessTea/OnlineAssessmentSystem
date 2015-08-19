@@ -11,6 +11,9 @@ var multipleQuestionCount = 0;
  */
 function getQuestionTemplate(questionType) {
 
+  // reset multiple var count
+  multipleQuestionCount = 0;
+
   $.ajax({
     url: baseURL + "author/getQuestionTemplate",
     data: {

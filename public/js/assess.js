@@ -118,8 +118,8 @@ var buildTest = function(data) {
         var options = questionsJSON[question]["options"];
         for (var i = 0; i < options.length; i++) {
           $('#' + question + '-chk-con').append(
-            "<p>" + options[i] + "</p>" +
-            "<input type=\"checkbox\" name=\"" + i + "\">"
+            "<p>" + options[i] +
+            "&nbsp;<input type=\"checkbox\" name=\"" + i + "\"></p>"
           );
         }
         break;
