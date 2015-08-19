@@ -137,6 +137,31 @@ function createQuestion(questionType) {
 
       break;
 
+      case "short":
+
+        $.ajax({
+          url: baseURL + "author/createQuestion",
+          data: {
+            qt: questionType,
+            qu: $('#question').val(),
+            ans: $('#answer').val(),
+            fb: $('#feedback').val()
+          },
+          type: "POST",
+          dataType: "html",
+          success: function (response) {
+            $("#authorContainer").html(response);
+          },
+          error: function (request, status, error) {
+            $("#authorContainer").html(
+              "<p>There was a problem with the request, please contact the system administrator: <br>" +
+              request.responseText + "</p>"
+            );
+          }
+        });
+
+        break;
+
     default:
       alert("Question type unrecognised, please contact the system administrator.");
   }

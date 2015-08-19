@@ -69,14 +69,14 @@ input[type="text"] {
 }
 
 .author-question-description p {
-  margin: 55px 20px auto 20px;
+  margin: 32px 20px auto 20px;
 }
 
 .author-question-container .author-control {
   height: 35px;
   margin: 5px 5px;
   padding-top: 5px;
-  width: 200px;
+  width: 150px;
 }
 
 .author-control {

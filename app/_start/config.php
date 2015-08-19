@@ -27,7 +27,7 @@ define('URL', URL_PROTOCOL . URL_DOMAIN . URL_SUB_FOLDER . '/');
 $GLOBALS['config'] = array(
   'mongodb' => array(
     'host' => 'localhost',
-    'db' => 'msc_v5'
+    'db' => 'msc_v6'
   )
 );
 

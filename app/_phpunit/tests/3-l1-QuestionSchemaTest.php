@@ -21,7 +21,7 @@ class QuestionSchemaTest extends PHPUnit_Framework_TestCase {
 
     // define schemas (match to values contained in QuestionSchema class)
     $this->_schemaNames = array(
-      "boolean", "multiple", "pattern"
+      "boolean", "multiple", "pattern", "short"
     );
     $this->_booleanSchema = array(
       "schema" => "required",

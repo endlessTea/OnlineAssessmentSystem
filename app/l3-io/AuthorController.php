@@ -105,6 +105,18 @@ class AuthorController {
 
         break;
 
+      case "short":
+
+        $question = array(
+          "schema" => "short",
+          "author" => $this->_UserModel->getUserData()->userId,
+          "question" => $this->_AppModel->getPOSTData("qu"),
+          "answer" => $this->_AppModel->getPOSTData("ans"),
+          "feedback" => $this->_AppModel->getPOSTData("fb")
+        );
+
+        break;
+
       default:
         echo "<p>Error: unrecognised question type</p>";
         exit;

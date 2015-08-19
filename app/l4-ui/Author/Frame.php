@@ -30,8 +30,13 @@
         <div class="author-control" onclick="getQuestionTemplate('multiple');">
           <p>MULTIPLE CHOICE</p>
         </div>
+      </div>
+      <div class="author-question-container">
         <div class="author-control" onclick="getQuestionTemplate('pattern');">
-          <p>PATTERN</p>
+          <p>REGEX PATTERN</p>
+        </div>
+        <div class="author-control" onclick="getQuestionTemplate('short');">
+          <p>SHORT ANSWER</p>
         </div>
       </div>
       <div class="author-control" onclick="manageQuestions();">

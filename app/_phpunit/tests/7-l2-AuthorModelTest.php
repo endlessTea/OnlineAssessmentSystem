@@ -92,6 +92,22 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
 
   /**
    *  @test
+   *  Create schema compliant question (short answer)
+   */
+  public function createQuestion_schemaCompliantShortAnswer_methodReturnsTrue() {
+
+    $this->assertTrue(
+      $this->_AuthorModel->createQuestion(array(
+        "schema" => "short",
+        "author" => $this->_testQuestionAuthorId,
+        "question" => "What can JSON (JavaScript Object Notation) be used for?",
+        "answer" => "JSON is a data format that allows key-value pairs to be exchanged via Ajax requests."
+      ))
+    );
+  }
+
+  /**
+   *  @test
    *  Attempt to create a question that does not belong to a recognised schema
    */
   public function createQuestion_unrecognisedSchema_methodReturnsFalse() {
@@ -116,6 +132,22 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
       "singleAnswer" => "FALSE"
     ));
     $this->assertTrue($result);
+  }
+
+  /*
+   *  @test
+   *  Attempt to create a short answer question where answer is not provided by the author
+   */
+  public function createQuestion_shortAnswerNoFeedback_methodReturnsTrue() {
+
+    // this method should return false as feedback has been made required in the schema class
+    $this->assertFalse(
+      $this->_AuthorModel->createQuestion(array(
+        "schema" => "short",
+        "author" => $this->_testQuestionAuthorId,
+        "question" => "What can JSON (JavaScript Object Notation) be used for?"
+      ))
+    );
   }
 
   /**
@@ -183,10 +215,10 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
    *  @test
    *  Get both questions created earlier matching the author id
    */
-  public function getQuestions_matchingAuthorId_methodReturnsArrayOfThreeDocuments() {
+  public function getQuestions_matchingAuthorId_methodReturnsArrayOfFiveDocuments() {
 
     $documents = $this->_AuthorModel->getQuestions($this->_testQuestionAuthorId);
-    $this->assertEquals(4, count($documents));
+    $this->assertEquals(5, count($documents));
   }
 
   /**

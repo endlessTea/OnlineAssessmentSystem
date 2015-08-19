@@ -214,6 +214,55 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
       array("_id" => new MongoId($testId)),
       array("available" => array($PMStudentOne, $PMStudentTwo)
     )));
+
+    /*
+     *  Unit test addition 19/08/2015: Short answer test
+     *  Create users, get id's, create questions, get id's, create test, get id, register students
+     */
+    $this->_UserModel->createUser("testSAAuthor", "password", "Short Answer Test Author");
+    $this->_UserModel->createUser("testSAStudent", "password", "Short Answer Test Student");
+    $this->_UserModel->createUser("testSAStudent2", "password", "Short Answer Test Student 2");
+
+    $this->_UserModel->findUser("testSAAuthor");
+    $SAAuthorId = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("testSAStudent");
+    $SAStudentOne = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("testSAStudent2");
+    $SAStudentTwo = $this->_UserModel->getUserData()->userId;
+
+    $this->assertTrue($this->_DB->create("questions", array(
+      "schema" => "short",
+      "author" => $SAAuthorId,
+      "question" => "What is Apache Maven?",
+      "answer" => "Maven is a build automation tool.",
+      "feedback" => "Maven is available at: https://maven.apache.org/"
+    )));
+    $this->assertTrue($this->_DB->create("questions", array(
+      "schema" => "short",
+      "author" => $SAAuthorId,
+      "question" => "Provide example IDEs that Maven can integrate with",
+      "answer" => "Eclipse, JetBrains IntelliJ, Netbeans.",
+      "feedback" => "Eclipse, JetBrains IntelliJ, and Netbeans all support Maven integration"
+    )));
+
+    $SAquestions = array(
+      key($this->_DB->read("questions", array("question" => "What is Apache Maven?"))),
+      key($this->_DB->read("questions", array("question" => "Provide example IDEs that Maven can integrate with")))
+    );
+
+    $this->assertTrue($this->_DB->create("tests", array(
+      "schema" => "standard",
+      "author" => $SAAuthorId,
+      "questions" => $SAquestions
+    )));
+
+    $testId = key($this->_DB->read("tests", array("author" => $SAAuthorId)));
+
+    $this->assertTrue($this->_DB->update(
+      "tests",
+      array("_id" => new MongoId($testId)),
+      array("available" => array($SAStudentOne, $SAStudentTwo)
+    )));
   }
 
   /**
@@ -390,9 +439,26 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
 
   /**
    *  @test
+   *  Get answers to short answer questions
+   */
+  public function getAnswersForSelfMarking_validRequest_methodReturnsMatchingJSON() {
+
+    $this->_UserModel->findUser("testSAAuthor");
+    $authorId = $this->_UserModel->getUserData()->userId;
+    $testId = key($this->_DB->read("tests", array("author" => $authorId)));
+
+    $this->assertSame(
+      "{\"0\":{\"ans\":\"Maven is a build automation tool.\"}," .
+        "\"1\":{\"ans\":\"Eclipse, JetBrains IntelliJ, Netbeans.\"}}",
+      $this->_AssessModel->getAnswersForSelfMarking(new MongoId($testId))
+    );
+  }
+
+  /**
+   *  @test
    *  Submit answers to a test (BOOLEAN)
    */
-  public function updateAnswers_submitValidAnswersBoolean_methodReturnsTrueDocumentsUpdated() {
+  public function updateAnswers_submitValidAnswersBoolean_methodReturnsJSONDocumentsUpdated() {
 
     // get Ids
     $this->_UserModel->findUser("testStudent");
@@ -442,7 +508,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
    *  @test
    *  Submit answers to a test (MULTIPLE CHOICE)
    */
-  public function updateAnswers_submitValidAnswersMC_methodReturnsTrueDocumentsUpdated() {
+  public function updateAnswers_submitValidAnswersMC_methodReturnsJSONDocumentsUpdated() {
 
     // get Ids
     $this->_UserModel->findUser("testMCAuthor");
@@ -491,7 +557,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
    *  @test
    *  Submit answers to a test (PATTERN MATCHING)
    */
-  public function updateAnswers_submitValidAnswersPattern_methodReturnsTrueDocumentsUpdated() {
+  public function updateAnswers_submitValidAnswersPattern_methodReturnsJSONDocumentsUpdated() {
 
     // get Ids
     $this->_UserModel->findUser("testPMAuthor");
@@ -529,6 +595,91 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
         "ca" => 1
       ),
       $testToCheck["taken"][$PMStudentOne]
+    );
+  }
+
+  /**
+   *  @test
+   *  Submit valid 'correctness of answers' for Short Answer test (result of self-marking)
+   */
+  public function updateAnswers_submitValidCOA_methodReturnsJSONDocumentsUpdated() {
+
+    // get Ids
+    $this->_UserModel->findUser("testSAAuthor");
+    $SAAuthorId = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("testSAStudent");
+    $SAStudentOne = $this->_UserModel->getUserData()->userId;
+    $testId = key($this->_DB->read("tests", array("author" => $SAAuthorId)));
+
+    // prepare answers (simulate PHP representation of JSON data)
+    $input = new stdClass();
+    $input->{0} = new stdClass();
+    $input->{0}->{'uq'} = 1;
+    $input->{0}->{'ca'} = 1;
+    $input->{1} = new stdClass();
+    $input->{1}->{'uq'} = 1;
+    $input->{1}->{'ca'} = 0;
+
+    $this->assertSame(
+      "{\"score\":1,\"feedback\":{\"1\":\"Eclipse, JetBrains IntelliJ, and Netbeans all support Maven integration\"}}",
+      $this->_AssessModel->updateAnswers(new MongoId($testId), $SAStudentOne, $input)
+    );
+
+    // check that the user's answer was marked and the question document was updated
+    $questionToCheck = array_pop($this->_DB->read("questions", array("question" => "What is Apache Maven?")));
+    $this->assertSame(
+      1,
+      $questionToCheck["taken"][$SAStudentOne]["ca"]
+    );
+
+    // check that the test document has been updated as well containing the total number of correct answers
+    $testToCheck = array_pop($this->_DB->read("tests", array("author" => $SAAuthorId)));
+    $this->assertSame(
+      array(
+        "uq" => 2,
+        "ca" => 1
+      ),
+      $testToCheck["taken"][$SAStudentOne]
+    );
+  }
+
+  /**
+   *  @test
+   *  Attempt to submit answers instead of 'correctness of answers' (attempt to get server to mark them)
+   */
+  public function updateAnswers_submitAnswersNotCOA_methodReturnsFalse() {
+
+    // get Ids
+    $this->_UserModel->findUser("testSAAuthor");
+    $SAAuthorId = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("testSAStudent2");
+    $SAStudentTwo = $this->_UserModel->getUserData()->userId;
+    $testId = key($this->_DB->read("tests", array("author" => $SAAuthorId)));
+
+    // prepare answers (simulate PHP representation of JSON data)
+    $input = new stdClass();
+    $input->{0} = new stdClass();
+    $input->{0}->{'uq'} = 1;
+    $input->{0}->{'ans'} = "I don't know.";
+    $input->{1} = new stdClass();
+    $input->{1}->{'uq'} = 1;
+    $input->{1}->{'ans'} = "Why am I taking this test?!";
+
+    $this->assertFalse(
+      $this->_AssessModel->updateAnswers(new MongoId($testId), $SAStudentTwo, $input)
+    );
+
+    // try again with String values for 'ca'
+    $input = new stdClass();
+    $input->{0} = new stdClass();
+    $input->{0}->{'uq'} = 1;
+    $input->{0}->{'ca'} = "Errrrr.";
+    $input->{1} = new stdClass();
+    $input->{1}->{'uq'} = 1;
+    $input->{1}->{'ca'} = "Hmmmm...";
+
+    $this->assertFalse(
+      $this->_AssessModel->updateAnswers(new MongoId($testId), $SAStudentTwo, $input)
     );
   }
 

@@ -39,6 +39,13 @@ class QuestionSchema {
         "question" => "required",
         "pattern" => "required",
         "feedback" => "optional"
+      ),
+      "short" => array(
+        "schema" => "required",
+        "author" => "required",
+        "question" => "required",
+        "answer" => "required",
+        "feedback" => "optional"
       )
     );
   }

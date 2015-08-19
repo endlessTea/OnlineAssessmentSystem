@@ -7,6 +7,9 @@
 var testId;
 var questionsJSON;
 var feedbackJSON;
+var selfAssessJSON;
+var answersJSON;
+var selfAssess = false;
 
 /**
  *  LOAD TEST
@@ -75,12 +78,13 @@ function startTest() {
  */
 var buildTest = function(data) {
 
-  // set variable to share JSON data among methods
+  // set variable to share JSON data among methods and reset self-assessment flag
   questionsJSON = data;
+  selfAssess = false;
 
   // create form element
   $("#assessContainer").html(
-    "<form id=\"testForm\" onsubmit=\"submitAnswers(); return false;\"></form>"
+    "<form id=\"testForm\" onsubmit=\"storeFormAnswers(); return false;\"></form>"
   );
 
   // check the schema for each question and insert appropriate HTML with question values
@@ -127,8 +131,17 @@ var buildTest = function(data) {
       case "pattern":
         $("#testForm").append(
           "<h3>\"" + questionsJSON[question]["question"] + "\"</h3>" +
-          "<p>Type your answer in the box below:</p>" +
+          "<p>Type a single word answer in the box below:</p>" +
           "<input id=\"" + question + "-rx\"" +
+          "type=\"text\" required>"
+        );
+        break;
+
+      case "short":
+        $("#testForm").append(
+          "<h3>\"" + questionsJSON[question]["question"] + "\"</h3>" +
+          "<p>Type a short answer in the box below:</p>" +
+          "<input id=\"" + question + "-ans\"" +
           "type=\"text\" required>"
         );
         break;
@@ -156,38 +169,44 @@ var buildTest = function(data) {
 }
 
 /**
- *  SUBMIT TEST ANSWERS
- *  Submit answers to the server
+ *  STORE ANSWERS SO FAR (PREPARE FOR SELF-MARKING QUESTIONS)
+ *  Store answers so far as a variable.
+ *  If self-assessment is required, call self-assessment method, otherwise submit answers.
  */
-function submitAnswers() {
+function storeFormAnswers() {
 
-  // create root object
-  var answers = {};
+  answersJSON = {};
 
   for (var question in questionsJSON) {
 
     // create child object for each question
-    answers[question] = {};
+    answersJSON[question] = {};
 
     // get 'understanding of question'
-    answers[question]['uq'] = $('input[type="radio"][name="' + question + '-uq"]:checked').val();
+    answersJSON[question]['uq'] = $('input[type="radio"][name="' + question + '-uq"]:checked').val();
 
     // check question schema to determine what values to retrieve
     switch (questionsJSON[question]["schema"]) {
 
       case "boolean":
-        answers[question]['ans'] = $('input[type="radio"][name="' + question + '-ans"]:checked').val();
+        answersJSON[question]['ans'] = $('input[type="radio"][name="' + question + '-ans"]:checked').val();
         break;
 
       case "multiple":
-        answers[question]['ans'] = [];
+        answersJSON[question]['ans'] = [];
         $('#' + question + '-chk-con input:checked').each(function() {
-          answers[question]['ans'].push($(this).attr('name'));
+          answersJSON[question]['ans'].push($(this).attr('name'));
         });
         break;
 
       case "pattern":
-        answers[question]['ans'] = $('#' + question + '-rx').val();
+        answersJSON[question]['ans'] = $('#' + question + '-rx').val();
+        break;
+
+      // mark test as requiring self assessment
+      case "short":
+        if (!selfAssess) selfAssess = true;
+        answersJSON[question]['ans'] = $('#' + question + '-ans').val();
         break;
 
       default:
@@ -196,12 +215,103 @@ function submitAnswers() {
     }
   }
 
+  if (selfAssess) getSelfMarkingAnswers();
+  else submitAnswers();
+}
+
+/**
+ *  GET ANSWERS FOR SELF-MARKING QUESTIONS
+ *  If self-assessment is required, fetch answers and build form
+ */
+var getSelfMarkingAnswers= function() {
+
+  $.ajax({
+    url: baseURL + "assess/getSelfMarkingAnswers",
+    data: {
+      tId: testId
+    },
+    type: "POST",
+    dataType: "json",
+    success: function(response) {
+      selfAssessJSON = response;
+      buildSelfAssessmentForm(response);
+    },
+    error: function (request, status, error) {
+      $("#assessContainer").html(
+        "<p>There was a problem with the request, please contact the system administrator: <br>" +
+        request.responseText + "</p>"
+      );
+    }
+  });
+}
+
+/**
+ *  BUILD SELF-ASSESSMENT FORM
+ *  Construct HTML form to allow user to mark their own short answer questions
+ */
+var buildSelfAssessmentForm = function(data) {
+
+  // advise user they need to mark their own short answers (create form element)
+  $("#assessContainer").html(
+    "<h2>Self-marking required to continue</h2>" +
+    "<p>Please mark your answers as correct or incorrect according " +
+    "to the example answers provided by the assessor:</p>" +
+    "<form id=\"selfAnsForm\" onsubmit=\"processSelfAssessmentForm(); return false;\"></form>"
+  );
+
+  for (var answer in data) {
+
+    $("#selfAnsForm").append(
+      "<h3>Question " + (parseInt(answer) + 1) + ":</h3>" +
+      "<p>The example answer from the assessor is:</p>" +
+      "<h4>" + data[answer]["ans"] + "</h4>" +
+      "<p>The answer that you provided was:</p>" +
+      "<h4>" + answersJSON[answer]["ans"] + "</h4>" +
+      "<p>Please mark your answer as 'Correct' or 'Incorrect'</p>" +
+      "<input name=\"" + answer + "-mark\"" +
+      "type=\"radio\" value=\"1\" checked> CORRECT" +
+      "<br>" +
+      "<input name=\"" + answer + "-mark\"" +
+      "type=\"radio\" value=\"0\"> INCORRECT"
+    );
+  }
+
+  // append submit button
+  $("#selfAnsForm").append(
+    "<br><br><input type=\"submit\" value=\"SUBMIT\">"
+  );
+}
+
+/**
+ *  PROCESS SELF-ASSESSMENT FORM AND UPDATE / SUBMIT ANSWERS
+ *  Store user's marks and unset short answer answers. Submit answers to server.
+ */
+var processSelfAssessmentForm = function() {
+
+  for (var answer in selfAssessJSON) {
+
+    // remove respective answer from answersJSON
+    delete answersJSON[answer]["ans"];
+
+    // add indication of correct answer
+    answersJSON[answer]["ca"] = $('input[type="radio"][name="' + answer + '-mark"]:checked').val();
+  }
+
+  submitAnswers();
+}
+
+/**
+ *  SUBMIT TEST ANSWERS
+ *  Submit answers to the server
+ */
+var submitAnswers = function() {
+
   // send answers via Ajax
   $.ajax({
     url: baseURL + "assess/submitAnswers",
     data: {
       tId: testId,
-      ans: JSON.stringify(answers)
+      ans: JSON.stringify(answersJSON)
     },
     type: "POST",
     dataType: "json",

@@ -109,6 +109,35 @@ class AssessController {
   }
 
   /**
+   *  AJAX: GET ANSERS FOR SELF-ASSESSMENT QUESTIONS
+   *  Return JSON of answers for 'show answer' schema questions
+   */
+  public function getSelfMarkingAnswers() {
+
+    // attempt to convert test identifier to MongoId
+    try {
+      $testIdObj = new MongoId($this->_AppModel->getPOSTData("tId"));
+    } catch (Exception $e) {
+      echo "Invalid test identifier.";
+      exit;
+    }
+
+    // pass data to model, store answers or result in variable
+    $data = $this->_AssessModel->getAnswersForSelfMarking(
+      $testIdObj
+    );
+    if ($data === false) {
+      echo "There was an issue in retrieving answers for self-marking.";
+      exit;
+    }
+
+    // change the header to indicate that JSON data is being returned
+		header('Content-Type: application/json');
+
+    echo $data;
+  }
+
+  /**
    *  AJAX: HANDLE ANSWERS SUBMITTED FOR A TEST
    *  Process user's answers to a test, return feedback on success
    */

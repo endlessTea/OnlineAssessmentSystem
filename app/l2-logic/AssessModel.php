@@ -137,16 +137,14 @@ class AssessModel {
         switch ($q["schema"]) {
 
           case "boolean":
+          case "pattern":
+          case "short":
             $questionRoot->{$questionNo}->question = $q["question"];
             break;
 
           case "multiple":
             $questionRoot->{$questionNo}->question = $q["question"];
             $questionRoot->{$questionNo}->options = $q["options"];
-            break;
-
-          case "pattern":
-            $questionRoot->{$questionNo}->question = $q["question"];
             break;
 
           default:
@@ -162,6 +160,50 @@ class AssessModel {
     }
 
     return false;
+  }
+
+  /**
+   *  GET ANSWERS FOR SHORT ANSWER QUESTIONS
+   *  Short answers are self-marked by the student, so answers are returned to the student first before all answers are processed.
+   *  @return JSON of feeback on success, else false (boolean)
+   */
+  public function getAnswersForSelfMarking($testIdObj) {
+
+    if (is_a($testIdObj, 'MongoId')) {
+
+      // get the specified test, return false if test doesn't exist
+      $test = $this->_DB->read("tests", array("_id" => $testIdObj));
+      if (empty($test)) return false;
+      $test = array_pop($test);
+
+      // loop through question Ids and add the corresponding question to an array
+      $questions = array();
+      foreach ($test["questions"] as $questionId) {
+
+        $document = $this->_DB->read("questions", array("_id" => new MongoId($questionId)));
+        $document = array_pop($document);
+        $questions[] = $document;
+      }
+
+      // convert appropriate values of questions to JSON
+      $answerRoot = new stdClass();
+      $questionNo = 0;
+
+      foreach($questions as $q) {
+
+        // check if the question has the 'short answer' schema
+        if ($q["schema"] === "short") {
+
+          $answerRoot->{$questionNo} = new stdClass();
+          $answerRoot->{$questionNo}->{'ans'} = $q["answer"];
+        }
+
+        // increment question number
+        $questionNo++;
+      }
+
+      return json_encode($answerRoot);
+    }
   }
 
   /**
@@ -204,13 +246,13 @@ class AssessModel {
 
         if ($answers->{$qNo}->{'uq'} != 0 && $answers->{$qNo}->{'uq'} != 1) return false;
 
-        // check if an answer was provided at all
-        if (!isset($answers->{$qNo}->{'ans'})) return false;
-
         // Check value of and mark answer
         switch ($fullQuestion["schema"]) {
 
           case "boolean":
+
+            // check if an answer was provided at all
+            if (!isset($answers->{$qNo}->{'ans'})) return false;
 
             // answer must be 'TRUE' or 'FALSE' only; mark according to $fullQuestion's 'singleAnswer'
             if ($answers->{$qNo}->{'ans'} !== 'TRUE' && $answers->{$qNo}->{'ans'} !== 'FALSE') return false;
@@ -239,7 +281,8 @@ class AssessModel {
 
           case "multiple":
 
-            // answer must be an array
+            // check if an answer was provided at all anc check if an array
+            if (!isset($answers->{$qNo}->{'ans'})) return false;
             if (!is_array($answers->{$qNo}->{'ans'})) return false;
 
             // determine maximum option size, copy correct answers, initialise wrong answer flag
@@ -294,7 +337,8 @@ class AssessModel {
 
           case "pattern":
 
-            // answer must be a String
+            // answer must be provided and must be a String
+            if (!isset($answers->{$qNo}->{'ans'})) return false;
             if (!is_string($answers->{$qNo}->{'ans'})) return false;
 
             if (preg_match($fullQuestion["pattern"], $answers->{$qNo}->{'ans'}) === 1) {
@@ -317,6 +361,32 @@ class AssessModel {
             $convertedResponse = array(
               "uq" => $uq,
               "ca" => $correct
+            );
+            break;
+
+          case "short":
+
+            // indicator of correctness should be provided, rather than the answer to grade (self-marking)
+            if (!isset($answers->{$qNo}->{'ca'})) return false;
+            if ($answers->{$qNo}->{'ca'} === "1") {
+
+              $response->{'score'}++;
+
+            } elseif ($answers->{$qNo}->{'ca'} === "0") {
+
+              if (isset($fullQuestion["feedback"])) {
+                $response->{'feedback'}->{$qNo} = $fullQuestion["feedback"];
+              }
+
+            } else return false;
+
+            // parse uq, increase total and add to taken array
+            $uq = intval($answers->{$qNo}->{'uq'});
+            $totalUQ += $uq;
+
+            $convertedResponse = array(
+              "uq" => $uq,
+              "ca" => $answers->{$qNo}->{'ca'}
             );
             break;
 
