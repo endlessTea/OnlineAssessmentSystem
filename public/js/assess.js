@@ -290,6 +290,8 @@ var buildSelfAssessmentForm = function(data) {
   $("#selfAnsForm").append(
     "<br><br><input type=\"submit\" value=\"SUBMIT\">"
   );
+
+  $('html,body').scrollTop(0);
 }
 
 /**
@@ -397,6 +399,8 @@ var buildFeedbackResponse = function(data) {
     $("#feedForm").append(
       "<br><br><input type=\"submit\" value=\"SUBMIT\">"
     );
+
+    $('html,body').scrollTop(0);
   }
 }
 

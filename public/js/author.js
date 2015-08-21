@@ -241,23 +241,28 @@ function manageQuestions() {
  */
 function deleteQuestion(questionId) {
 
-  $.ajax({
-    url: baseURL + "author/deleteQuestion",
-    data: {
-      qId: questionId
-    },
-    type: "POST",
-    dataType: "html",
-    success: function (response) {
-      $("#authorContainer").html(response);
-    },
-    error: function (request, status, error) {
-      $("#authorContainer").html(
-        "<p>There was a problem with the request, please contact the system administrator: <br>" +
-        request.responseText + "</p>"
-      );
-    }
-  });
+  var deleteQuestion = prompt("Are you sure you want to delete question Id: " + questionId + "?\n" +
+    "Enter the word 'DELETE' in upper case to delete this data.");
+  if (deleteQuestion === "DELETE") {
+
+    $.ajax({
+      url: baseURL + "author/deleteQuestion",
+      data: {
+        qId: questionId
+      },
+      type: "POST",
+      dataType: "html",
+      success: function (response) {
+        $("#authorContainer").html(response);
+      },
+      error: function (request, status, error) {
+        $("#authorContainer").html(
+          "<p>There was a problem with the request, please contact the system administrator: <br>" +
+          request.responseText + "</p>"
+        );
+      }
+    });
+  }
 }
 
 /**
@@ -385,23 +390,28 @@ function manageTests() {
  */
 function deleteTest(testId) {
 
-  $.ajax({
-    url: baseURL + "author/deleteTest",
-    data: {
-      tId: testId
-    },
-    type: "POST",
-    dataType: "html",
-    success: function (response) {
-      $("#authorContainer").html(response);
-    },
-    error: function (request, status, error) {
-      $("#authorContainer").html(
-        "<p>There was a problem with the request, please contact the system administrator: <br>" +
-        request.responseText + "</p>"
-      );
-    }
-  });
+  var deleteTest = prompt("Are you sure you want to delete test Id: " + testId + "?\n" +
+    "Enter the word 'DELETE' in upper case to delete this data.");
+  if (deleteTest === "DELETE") {
+
+    $.ajax({
+      url: baseURL + "author/deleteTest",
+      data: {
+        tId: testId
+      },
+      type: "POST",
+      dataType: "html",
+      success: function (response) {
+        $("#authorContainer").html(response);
+      },
+      error: function (request, status, error) {
+        $("#authorContainer").html(
+          "<p>There was a problem with the request, please contact the system administrator: <br>" +
+          request.responseText + "</p>"
+        );
+      }
+    });
+  }
 }
 
 /**
