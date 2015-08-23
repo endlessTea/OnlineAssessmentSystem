@@ -484,21 +484,33 @@ var drawPie = function(divId, data) {
   // change array based on data received & color scheme
   var pieData = [];
   var color;
-  if (data.uq) {
+  if (data.uq || data.dnuq) {
     pieData[0] = data.uq;
     pieData[1] = data.dnuq;
     color = d3.scale.ordinal()
-      .range(["#FFFF00", "#990099"]);
-  } else if (data.uf) {
+      .range(["#FFFF66", "#C266C2"]);
+  } else if (data.uf || data.dnuf) {
     pieData[0] = data.uf;
     pieData[1] = data.dnuf;
     color = d3.scale.ordinal()
-      .range(["#0033CC", "#FF9900"]);
+      .range(["#66A3FF", "#FFB84D"]);
   } else {
     pieData[0] = data.ca;
     pieData[1] = data.wa;
     color = d3.scale.ordinal()
-      .range(["#00CC00", "#CC0000"]);
+      .range(["#80E680", "#E68080"]);
+  }
+
+  // update container to state that no data is available if no data is available
+  if (typeof pieData[0] === 'undefined' || typeof pieData[1] === 'undefined') {
+
+    $('#' + divId).append(
+      "<h3 id=\"no-pie-data\">NO DATA</h3>"
+    );
+    $('#no-pie-data').css({
+      'margin-top' : '130px'
+    });
+    return;
   }
 
   var width = 300,
@@ -527,7 +539,7 @@ var drawPie = function(divId, data) {
     .attr("d", arc)
     .transition()
       .ease("elastic")
-      .duration(500)
+      .duration(400)
       .attrTween("d", tweenPie);
 
   g.append("text")
@@ -611,7 +623,7 @@ var drawTable = function(data, usage) {
     for (var student in data) {
       $('#question-table-body').append(
         "<tr>" +
-          "<td>" + data[student]["name"] + "</td>" +
+          "<td class=\"cell-student-name\">" + data[student]["name"] + "</td>" +
           "<td>" + replaceQuestionData(data[student]["uq"]) + "</td>" +
           "<td>" + replaceQuestionData(data[student]["ca"]) + "</td>" +
           "<td>" + replaceQuestionData(data[student]["uf"]) + "</td>" +
@@ -627,9 +639,9 @@ var drawTable = function(data, usage) {
         "<thead>" +
           "<tr>" +
             "<th>Student Name</th>" +
-            "<th>Questions<br>understood (%)</th>" +
-            "<th>Correct<br>answers (%)</th>" +
-            "<th>Feedback<br>understood (%)</th>" +
+            "<th>Questions<br>understood</th>" +
+            "<th>Correct<br>answers</th>" +
+            "<th>Feedback<br>understood</th>" +
           "</tr>" +
         "</thead>" +
         "<tbody id=\"question-table-body\">" +
@@ -641,18 +653,18 @@ var drawTable = function(data, usage) {
     for (var student in data.userData) {
       $('#question-table-body').append(
         "<tr>" +
-          "<td>" + data.userData[student]["name"] + "</td>" +
-          "<td>" + replaceTestData(
+          "<td class=\"cell-student-name\">" + data.userData[student]["name"] + "</td>" +
+          "<td class=\"cell-color-change\">" + replaceTestData(
             data.userData[student]["uq"],
             data.testData["totalQuestions"],
             ""
           ) + "</td>" +
-          "<td>" + replaceTestData(
+          "<td class=\"cell-color-change\">" + replaceTestData(
             data.userData[student]["ca"],
             data.testData["totalQuestions"],
             ""
           ) + "</td>" +
-          "<td>" + replaceTestData(
+          "<td class=\"cell-color-change\">" + replaceTestData(
             data.userData[student]["uf"],
             data.testData["totalQuestions"],
             data.userData[student]["ca"]
@@ -660,6 +672,24 @@ var drawTable = function(data, usage) {
         "</tr>"
       );
     }
+
+    // loop through each table body row and change the cell background colour
+    $('#question-table-body .cell-color-change').each(function(elem) {
+
+      var value = $(this).html().replace(/\%/, '');
+
+      if (value >= 90) $(this).css({ 'background-color' : '#47E150' });
+      else if (value >= 80) $(this).css({ 'background-color' : '#56D653' });
+      else if (value >= 70) $(this).css({ 'background-color' : '#65CB57' });
+      else if (value >= 60) $(this).css({ 'background-color' : '#74C05B' });
+      else if (value >= 50) $(this).css({ 'background-color' : '#83B55E' });
+      else if (value >= 40) $(this).css({ 'background-color' : '#92AA62' });
+      else if (value >= 30) $(this).css({ 'background-color' : '#A19F66' });
+      else if (value >= 20) $(this).css({ 'background-color' : '#BB8B6C' });
+      else if (value >= 10) $(this).css({ 'background-color' : '#CC7F70' });
+      else if (value >= 0) $(this).css({ 'background-color' : '#DD7375' });
+      else $(this).css({ 'background-color' : '#E6E6E6'});
+    });
 
   } else {
 

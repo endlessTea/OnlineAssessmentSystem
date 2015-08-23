@@ -4,6 +4,7 @@
  */
 
 var multipleQuestionCount = 0;
+var questionsJSON;
 
 /**
  *  GET QUESTION TEMPLATE
@@ -48,6 +49,7 @@ function createQuestion(questionType) {
         url: baseURL + "author/createQuestion",
         data: {
           qt: questionType,
+          qn: $('#questionName').val(),
           qu: $('#question').val(),
           sa: $('input[type="radio"][name="singleAnswer"]:checked').val(),
           fb: $('#feedback').val()
@@ -91,6 +93,7 @@ function createQuestion(questionType) {
           url: baseURL + "author/createQuestion",
           data: {
             qt: questionType,
+            qn: $('#questionName').val(),
             qu: $('#question').val(),
             op: options,
             ca: correctAnswers,
@@ -118,6 +121,7 @@ function createQuestion(questionType) {
         url: baseURL + "author/createQuestion",
         data: {
           qt: questionType,
+          qn: $('#questionName').val(),
           qu: $('#question').val(),
           rx: "/" + $('#regex').val() + "/",
           fb: $('#feedback').val()
@@ -143,6 +147,7 @@ function createQuestion(questionType) {
           url: baseURL + "author/createQuestion",
           data: {
             qt: questionType,
+            qn: $('#questionName').val(),
             qu: $('#question').val(),
             ans: $('#answer').val(),
             fb: $('#feedback').val()
@@ -208,21 +213,57 @@ function removeMultipleOption() {
  */
 function manageQuestions() {
 
+  // inner function to replace cell value with image
+  var replaceTakenData = function(item) {
+
+    if (typeof item === 'undefined') {
+      return "<img src=\"" + baseURL + "public/img/cross.png\"></img>";
+    } else {
+      return "<img src=\"" + baseURL + "public/img/tick.png\"></img>";
+    }
+  }
+
   $.ajax({
     url: baseURL + "author/getQuestions",
     type: "GET",
     dataType: "json",
     success: function (response) {
 
+      // set JSON of questions as response for re-use
+      questionsJSON = response;
+
       // set container header
       $("#authorContainer").html("<h2>Manage Questions</h2>");
 
+      // append a table to the container
+      $('#authorContainer').append(
+        "<table>" +
+          "<thead>" +
+            "<tr>" +
+              "<th>Unique ID</th>" +
+              "<th>Name</th>" +
+              "<th>Type</th>" +
+              "<th>Taken</th>" +
+              "<th></th>" +   // deliberately left blank
+              "<th></th>" +
+            "</tr>" +
+          "</thead>" +
+          "<tbody id=\"manage-question-table-body\">" +
+          "</tbody>" +
+        "</table>"
+      );
+
       // create and append a representation of each question to the container
       for (var question in response) {
-        $("#authorContainer").append(
-          "<p>" + question + ": " + response[question]["question"] +
-          "&nbsp;<button onclick=\"deleteQuestion('" +
-          question + "')\">DELETE</button></p>"
+        $("#manage-question-table-body").append(
+          "<tr>" +
+            "<td class=\"table-mongo-id\">" + question + "</td>" +
+            "<td>" + response[question]["name"] + "</td>" +
+            "<td>" + response[question]["schema"].toUpperCase() + "</td>" +
+            "<td>" + replaceTakenData(response[question]["taken"]) + "</td>" +
+            "<td class=\"table-button-container\"><button onclick=\"getQuestionInfo('" + question + "')\">INFO</button></td>" +
+            "<td class=\"table-button-container\"><button onclick=\"deleteQuestion('" + question + "')\">DELETE</button></td>" +
+          "</tr>"
         );
       }
     },
@@ -236,13 +277,89 @@ function manageQuestions() {
 }
 
 /**
+ *  GET QUESTION INFORMATION
+ *  Provide further information about a question
+ */
+function getQuestionInfo(questionId) {
+
+  // identify and store schema type
+  var schema = questionsJSON[questionId]["schema"];
+
+  // update container with question information
+  $("#authorContainer").html(
+    "<h2>Question Information</h2>" +
+    "<p><span class=\"info-heading\">ID</span>: " + questionId + "</p>" +
+    "<p><span class=\"info-heading\">Name</span>: " + questionsJSON[questionId]["name"] + "</p>" +
+    "<p><span class=\"info-heading\">Type</span>: " + schema.toUpperCase() + "</p>" +
+    "<p><span class=\"info-heading\">Question</span>: " + questionsJSON[questionId]["question"] + "</p>"
+  );
+
+  // add answers as per schema
+  switch (schema) {
+
+    case "boolean":
+      $("#authorContainer").append(
+        "<p><span class=\"info-heading\">Answer</span>: " + questionsJSON[questionId]["singleAnswer"] + "</p>"
+      );
+      break;
+
+    case "multiple":
+      $("#authorContainer").append(
+        "<h3>Options / Answers</h3>" +
+        "<p class=\"info-options-desc\">Correct options below are highlighted in green:</p>"
+      );
+      for (var option in questionsJSON[questionId]["options"]) {
+        $("#authorContainer").append(
+          "<div id=\"option-" + option + "\" class=\"option-container\">" +
+            "<p>" + questionsJSON[questionId]["options"][option] + "</p>" +
+          "</div>"
+        );
+        if (questionsJSON[questionId]["correctAnswers"].indexOf(option) > -1) {
+          $('#option-' + option).css({
+            'background-color' : '#B2E0B2'
+          });
+        }
+      }
+      break;
+
+    case "pattern":
+      $("#authorContainer").append(
+        "<p><span class=\"info-heading\">Pattern</span>: " + questionsJSON[questionId]["pattern"] + "</p>"
+      );
+      break;
+
+    case "short":
+      $("#authorContainer").append(
+        "<p><span class=\"info-heading\">Answer</span>: " + questionsJSON[questionId]["answer"] + "</p>"
+      );
+      break;
+
+    default:
+      alert("Question type unrecognised, please contact the system administrator.");
+  }
+
+  // add feedback if it has been provided
+  var feedback = questionsJSON[questionId]["feedback"];
+  if (typeof feedback === 'undefined') {
+    $("#authorContainer").append(
+      "<p>Feedback was not provided with this question.</p>"
+    );
+  } else {
+    $("#authorContainer").append(
+      "<p><span class=\"info-heading\">Feedback</span>: " + feedback + "</p>"
+    );
+  }
+}
+
+/**
  *  DELETE QUESTION
  *  Request to delete a question based on MongoId
  */
 function deleteQuestion(questionId) {
 
-  var deleteQuestion = prompt("Are you sure you want to delete question Id: " + questionId + "?\n" +
-    "Enter the word 'DELETE' in upper case to delete this data.");
+  var deleteQuestion = prompt("Are you sure you want to delete '" + questionsJSON[questionId]["name"] + "'?\n\n" +
+    "\n\n" +
+    "If you're SURE you want to delete it, type 'DELETE' in upper case below and confirm.");
   if (deleteQuestion === "DELETE") {
 
     $.ajax({

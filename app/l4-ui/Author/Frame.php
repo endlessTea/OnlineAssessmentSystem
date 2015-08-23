@@ -39,14 +39,24 @@
           <p>SHORT ANSWER</p>
         </div>
       </div>
-      <div class="author-control" onclick="manageQuestions();">
+      <div id="manage-question-option" class="author-control" onclick="manageQuestions();">
         <p>MANAGE<br>QUESTIONS</p>
       </div>
-      <div class="author-control" onclick="loadQuestionsForTestCreation();">
-        <p>CREATE<br>NEW TEST</p>
+      <div class="author-question-container">
+        <div class="author-control" onclick="alert('todo');">
+          <p>CREATE GROUP</p>
+        </div>
+        <div class="author-control test-options" onclick="alert('todo');">
+          <p>MANAGE GROUPS</p>
+        </div>
       </div>
-      <div class="author-control" onclick="manageTests();">
-        <p>MANAGE<br>TESTS</p>
+      <div class="author-question-container">
+        <div class="author-control" onclick="loadQuestionsForTestCreation();">
+          <p>CREATE TEST</p>
+        </div>
+        <div class="author-control test-options" onclick="manageTests();">
+          <p>MANAGE TESTS</p>
+        </div>
       </div>
       <div class="author-control" onclick="loadTests();">
         <p>ISSUE<br>TEST</p>

@@ -1,5 +1,16 @@
 <h2>Pattern Matching Question</h2>
 <form onsubmit="createQuestion('pattern'); return false;">
+  <label for="questionName">Provide a name for your question as an identifier:</label>
+  <br>
+  <input id="questionName"
+    type="text"
+    required
+    autocomplete="off"
+    title="Alphanumeric characters and commas ',' only"
+    placeholder="e.g. Server-side languages"
+    pattern="[\w\s,]+"
+    maxlength="35">
+  <br><br>
   <label for="question">Provide a question that requires a short answer:</label>
   <br>
   <input id="question"

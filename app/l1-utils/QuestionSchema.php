@@ -20,6 +20,7 @@ class QuestionSchema {
     $this->_schema = array(
       "boolean" => array(
         "schema" => "required",
+        "name" => "required",
         "author" => "required",
         "question" => "required",
         "singleAnswer" => "required",
@@ -27,6 +28,7 @@ class QuestionSchema {
       ),
       "multiple" => array(
         "schema" => "required",
+        "name" => "required",
         "author" => "required",
         "question" => "required",
         "options" => "required",
@@ -35,6 +37,7 @@ class QuestionSchema {
       ),
       "pattern" => array(
         "schema" => "required",
+        "name" => "required",
         "author" => "required",
         "question" => "required",
         "pattern" => "required",
@@ -42,6 +45,7 @@ class QuestionSchema {
       ),
       "short" => array(
         "schema" => "required",
+        "name" => "required",
         "author" => "required",
         "question" => "required",
         "answer" => "required",

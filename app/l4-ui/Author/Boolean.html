@@ -1,5 +1,16 @@
 <h2>Boolean Question</h2>
 <form onsubmit="createQuestion('boolean'); return false;">
+  <label for="questionName">Provide a name for your question as an identifier:</label>
+  <br>
+  <input id="questionName"
+    type="text"
+    required
+    autocomplete="off"
+    title="Alphanumeric characters and commas ',' only"
+    placeholder="e.g. Networking Protocols: CSMA/CD"
+    pattern="[\w\s,]+"
+    maxlength="35">
+  <br><br>
   <label for="question">Provide a statement that is true or false:</label>
   <br>
   <input id="question"

@@ -43,6 +43,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
 
     $result = $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
+      "name" => "Capital of France",
       "author" => $this->_testQuestionAuthorId,
       "question" => "The capital city of France is Paris.",
       "singleAnswer" => "TRUE",
@@ -60,6 +61,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
     $this->assertTrue(
       $this->_AuthorModel->createQuestion(array(
         "schema" => "multiple",
+        "name" => "Fruit select",
         "author" => $this->_testQuestionAuthorId,
         "question" => "Which of the following are fruits?",
         "options" => array(
@@ -82,6 +84,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
     $this->assertTrue(
       $this->_AuthorModel->createQuestion(array(
         "schema" => "pattern",
+        "name" => "Name a fruit",
         "author" => $this->_testQuestionAuthorId,
         "question" => "Name a fruit beginning with 'A'",
         "pattern" => "/^[Aa]pple(s|z)?$/",
@@ -99,6 +102,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
     $this->assertTrue(
       $this->_AuthorModel->createQuestion(array(
         "schema" => "short",
+        "name" => "Describe JSON",
         "author" => $this->_testQuestionAuthorId,
         "question" => "What can JSON (JavaScript Object Notation) be used for?",
         "answer" => "JSON is a data format that allows key-value pairs to be exchanged via Ajax requests."
@@ -114,6 +118,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
 
     $result = $this->_AuthorModel->createQuestion(array(
       "schema" => "inexistentSchema",
+      "name" => "Where is this schema?",
       "key" => "value"
     ));
     $this->assertFalse($result);
@@ -127,6 +132,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
 
     $result = $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
+      "name" => "Optional Feedback",
       "author" => $this->_testQuestionAuthorId,
       "question" => "This statement is false. Seriously, not a trick question.",
       "singleAnswer" => "FALSE"
@@ -144,6 +150,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
     $this->assertFalse(
       $this->_AuthorModel->createQuestion(array(
         "schema" => "short",
+        "name" => "Where is the feedback",
         "author" => $this->_testQuestionAuthorId,
         "question" => "What can JSON (JavaScript Object Notation) be used for?"
       ))
@@ -158,6 +165,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
 
     $result = $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
+      "name" => "Sandwich madness",
       "author" => $this->_testQuestionAuthorId,
       "sandwich" => "This is a sandwich, not a statement.",
       "filling" => "Jam, of course."
@@ -173,6 +181,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
 
     $result = $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
+      "name" => "Something Missing",
       "author" => $this->_testQuestionAuthorId,
       "answer" => "TRUE"
     ));
@@ -187,6 +196,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
 
     $result = $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
+      "name" => "This data is rubbish",
       "author" => $this->_testQuestionAuthorId,
       "question" => "Can I borrow your stapler?",
       "answer" => "Certainly."
@@ -202,6 +212,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
 
     $result = $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
+      "name" => "Bonus Junk",
       "author" => $this->_testQuestionAuthorId,
       "question" => "This question appears to be valid, but it is not.",
       "singleAnswer" => "TRUE",
@@ -392,24 +403,28 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
     // create questions
     $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
+      "name" => "Maths 1",
       "author" => $this->_testTestAuthorId,
       "question" => "2 + 2 = 4",
       "singleAnswer" => "TRUE",
     ));
     $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
+      "name" => "Maths 2",
       "author" => $this->_testTestAuthorId,
       "question" => "2 + 4 = 10",
       "singleAnswer" => "FALSE",
     ));
     $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
+      "name" => "Maths 3",
       "author" => $this->_testTestAuthorId,
       "question" => "5 * 5 = 25",
       "singleAnswer" => "TRUE",
     ));
     $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
+      "name" => "Maths 4",
       "author" => $this->_testTestAuthorId,
       "question" => "8 - 2 = 1",
       "singleAnswer" => "FALSE",

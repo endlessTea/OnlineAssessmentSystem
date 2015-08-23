@@ -167,22 +167,22 @@ a {
 
 /* match to d3 orginal scale for 'drawPie' */
 #plc-uq {
-  background-color: #FFFF00;
+  background-color: #FFFF66;
 }
 #plc-dnuq {
-  background-color: #990099;
+  background-color: #C266C2;
 }
 #plc-ca {
-  background-color: #00CC00;
+  background-color: #80E680;
 }
 #plc-wa {
-  background-color: #CC0000;
+  background-color: #E68080;
 }
 #plc-uf {
-  background-color: #0033CC;
+  background-color: #66A3FF;
 }
 #plc-dnuf {
-  background-color: #FF9900;
+  background-color: #FFB84D;
 }
 
 .pie-legend-text {
@@ -225,16 +225,21 @@ a {
 }
 
 #student-question-table-container {
-  width: 700px;
-  height: 200px;
+  width: 800px;
+  max-height: 300px;
   margin: auto;
   overflow: auto;
 }
 
 #student-question-table-container table {
-  margin: auto;
+  margin: auto auto 20px auto;
+  border-collapse: collapse;
 }
 
+table img {
+  width: 15px;
+  height: 15px;
+}
 
 #student-question-table-container thead {
   width: 100%;
@@ -243,10 +248,17 @@ a {
 #student-question-table-container td {
   padding: 5px 5px 5px 0;
 	vertical-align: top;
+  min-width: 180px;
+  border-bottom: 1px solid #B2B2B2;
+}
+
+#student-question-table-container .cell-student-name {
+  width: 250px;
 }
 
 #student-question-table-container thead th {
   padding-right: 10px;
+  border-bottom: 2px solid #B2B2B2;
 }
 
 #student-question-table-container img {

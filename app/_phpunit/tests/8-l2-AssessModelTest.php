@@ -83,6 +83,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
     // create a test
     $this->assertTrue($this->_DB->create("tests", array(
       "schema" => "standard",
+      "name" => "testOne",
       "author" => $authorId,
       "questions" => array_keys($documents)
     )));
@@ -154,6 +155,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
 
     $this->assertTrue($this->_DB->create("tests", array(
       "schema" => "standard",
+      "name" => "testTwo",
       "author" => $MCAuthorId,
       "questions" => $MCquestions
     )));
@@ -203,6 +205,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
 
     $this->assertTrue($this->_DB->create("tests", array(
       "schema" => "standard",
+      "name" => "testThree",
       "author" => $PMAuthorId,
       "questions" => $PMquestions
     )));
@@ -252,6 +255,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
 
     $this->assertTrue($this->_DB->create("tests", array(
       "schema" => "standard",
+      "name" => "testFour",
       "author" => $SAAuthorId,
       "questions" => $SAquestions
     )));
@@ -280,7 +284,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
 
     $this->assertSame(
       array(
-        "{$testId}"
+        "{$testId}" => "testOne"
       ),
       $this->_AssessModel->getListOfAvailableTests($studentId)
     );

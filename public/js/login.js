@@ -95,9 +95,14 @@ function registerNewUser() {
           "<a href=\"" + baseURL + "\">LOG IN</a> " +
           "    &nbsp;with the details provided</p>"
         );
-      } else if (response === "invalid") {
+      } else if (response === "taken") {
         $("#NotificationsFromServer").html(
-          "<p>The username or password provided was not valid<br>" +
+          "<p>The username provided has already been taken.<br>" +
+          "Please try again.</p>"
+        );
+      } else {
+        $("#NotificationsFromServer").html(
+          "<p>The credentials provided were not valid<br>" +
           "Please try again.</p>"
         );
       }

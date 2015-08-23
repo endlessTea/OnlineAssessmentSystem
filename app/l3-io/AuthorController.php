@@ -72,6 +72,7 @@ class AuthorController {
 
         $question = array(
           "schema" => "boolean",
+          "name" => $this->_AppModel->getPOSTData("qn"),
           "author" => $this->_UserModel->getUserData()->userId,
           "question" => $this->_AppModel->getPOSTData("qu"),
           "singleAnswer" => $this->_AppModel->getPOSTData("sa"),
@@ -84,6 +85,7 @@ class AuthorController {
 
         $question = array(
           "schema" => "multiple",
+          "name" => $this->_AppModel->getPOSTData("qn"),
           "author" => $this->_UserModel->getUserData()->userId,
           "question" => $this->_AppModel->getPOSTData("qu"),
           "options" => $this->_AppModel->getPOSTData("op", "getJSON"),
@@ -97,6 +99,7 @@ class AuthorController {
 
         $question = array(
           "schema" => "pattern",
+          "name" => $this->_AppModel->getPOSTData("qn"),
           "author" => $this->_UserModel->getUserData()->userId,
           "question" => $this->_AppModel->getPOSTData("qu"),
           "pattern" => $this->_AppModel->getPOSTData("rx"),
@@ -109,6 +112,7 @@ class AuthorController {
 
         $question = array(
           "schema" => "short",
+          "name" => $this->_AppModel->getPOSTData("qn"),
           "author" => $this->_UserModel->getUserData()->userId,
           "question" => $this->_AppModel->getPOSTData("qu"),
           "answer" => $this->_AppModel->getPOSTData("ans"),

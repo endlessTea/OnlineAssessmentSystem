@@ -1,5 +1,16 @@
 <h2>Multiple Choice Question</h2>
 <form onsubmit="createQuestion('multiple'); return false;">
+  <label for="questionName">Provide a name for your question as an identifier:</label>
+  <br>
+  <input id="questionName"
+    type="text"
+    required
+    autocomplete="off"
+    title="Alphanumeric characters and commas ',' only"
+    placeholder="e.g. NoSQL databases 1"
+    pattern="[\w\s,]+"
+    maxlength="35">
+  <br><br>
   <label for="question">Provide a question with one or more possible answers:</label>
   <br>
   <input id="question"

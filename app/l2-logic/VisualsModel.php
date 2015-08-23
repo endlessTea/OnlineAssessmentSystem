@@ -38,7 +38,7 @@ class VisualsModel {
     $response = new stdClass();
     foreach ($questions as $qId => $details) {
 
-      $response->{$qId} = $details["question"];
+      $response->{$qId} = $details["name"];
     }
 
     return json_encode($response);

@@ -65,11 +65,21 @@ class LoginController {
       exit;
     }
 
-    echo ($this->_UserModel->createUser(
-      $this->_AppModel->getPOSTData("u"),
+    $userName = $this->_AppModel->getPOSTData("u");
+
+    $result = $this->_UserModel->createUser(
+      $userName,
       $this->_AppModel->getPOSTData("p"),
       $this->_AppModel->getPOSTData("n"),
       $accountType
-    ) === true) ? "userRegistered" : "invalid";
+    );
+
+    if ($result === "Duplicate key: The user name '{$userName}' already exists.") {
+      echo "taken";
+    } else if ($result === true) {
+      echo "userRegistered";
+    } else {
+      echo "invalid";
+    }
   }
 }

@@ -368,11 +368,11 @@ class AssessModel {
 
             // indicator of correctness should be provided, rather than the answer to grade (self-marking)
             if (!isset($answers->{$qNo}->{'ca'})) return false;
-            if ($answers->{$qNo}->{'ca'} === "1") {
+            if ($answers->{$qNo}->{'ca'} == "1") {
 
               $response->{'score'}++;
 
-            } elseif ($answers->{$qNo}->{'ca'} === "0") {
+            } elseif ($answers->{$qNo}->{'ca'} == "0") {
 
               if (isset($fullQuestion["feedback"])) {
                 $response->{'feedback'}->{$qNo} = $fullQuestion["feedback"];

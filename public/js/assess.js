@@ -171,6 +171,8 @@ var buildTest = function(data) {
   $("#testForm").append(
     "<br><br><input type=\"submit\" value=\"SUBMIT\">"
   );
+
+  $('html,body').scrollTop(0);
 }
 
 /**

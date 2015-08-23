@@ -56,6 +56,7 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
     // create new questions
     $resultOne = $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
+      "name" => "JavaScript",
       "author" => $authorId,
       "question" => "JavaScript is also known as ECMAScript.",
       "singleAnswer" => "TRUE",
@@ -63,6 +64,7 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
     ));
     $resultTwo = $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
+      "name" => "D3",
       "author" => $authorId,
       "question" => "D3.js is not a data visualisation library.",
       "singleAnswer" => "FALSE",
@@ -70,6 +72,7 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
     ));
     $resultThree = $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
+      "name" => "Angular JS",
       "author" => $authorId,
       "question" => "AngularJS is a front-end web application framework.",
       "singleAnswer" => "TRUE",
@@ -77,6 +80,7 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
     ));
     $resultFour = $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
+      "name" => "Open Source",
       "author" => $authorId,
       "question" => "Open-source software is the same as 'free' software.",
       "singleAnswer" => "FALSE",
@@ -84,6 +88,7 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
     ));
     $resultFive = $this->_AuthorModel->createQuestion(array(
       "schema" => "boolean",
+      "name" => "Unused",
       "author" => $authorId,
       "question" => "This question will not be included in any tests",
       "singleAnswer" => "TRUE"
@@ -224,20 +229,20 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
     // get author id and question ids
     $this->_UserModel->findUser("testAuthor");
     $authorId = $this->_UserModel->getUserData()->userId;
-    $qOneDesc = "This question will not be included in any tests";
-    $qOneId = key($this->_DB->read("questions", array("question" => $qOneDesc)));
-    $qTwoDesc = "JavaScript is also known as ECMAScript.";
-    $qTwoId = key($this->_DB->read("questions", array("question" => $qTwoDesc)));
-    $qThreeDesc = "D3.js is not a data visualisation library.";
-    $qThreeId = key($this->_DB->read("questions", array("question" => $qThreeDesc)));
-    $qFourDesc = "AngularJS is a front-end web application framework.";
-    $qFourId = key($this->_DB->read("questions", array("question" => $qFourDesc)));
-    $qFiveDesc = "Open-source software is the same as 'free' software.";
-    $qFiveId = key($this->_DB->read("questions", array("question" => $qFiveDesc)));
+    $qOneDesc = "Unused";
+    $qOneId = key($this->_DB->read("questions", array("name" => $qOneDesc)));
+    $qTwoDesc = "JavaScript";
+    $qTwoId = key($this->_DB->read("questions", array("name" => $qTwoDesc)));
+    $qThreeDesc = "D3";
+    $qThreeId = key($this->_DB->read("questions", array("name" => $qThreeDesc)));
+    $qFourDesc = "Angular JS";
+    $qFourId = key($this->_DB->read("questions", array("name" => $qFourDesc)));
+    $qFiveDesc = "Open Source";
+    $qFiveId = key($this->_DB->read("questions", array("name" => $qFiveDesc)));
 
     $this->assertSame(
-      "{\"{$qOneId}\":\"{$qOneDesc}\",\"{$qTwoId}\":\"{$qTwoDesc}\",\"{$qThreeId}\":\"{$qThreeDesc}\"," .
-      "\"{$qFourId}\":\"{$qFourDesc}\",\"{$qFiveId}\":\"{$qFiveDesc}\"}",
+      "{\"{$qTwoId}\":\"{$qTwoDesc}\",\"{$qThreeId}\":\"{$qThreeDesc}\",\"{$qFiveId}\":\"{$qFiveDesc}\"," .
+      "\"{$qOneId}\":\"{$qOneDesc}\",\"{$qFourId}\":\"{$qFourDesc}\"}",
       $this->_VisualsModel->getListOfQuestions($authorId)
     );
   }
@@ -333,7 +338,7 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
     $tId = key($this->_DB->read("tests", array("name" => "Test Two")));
 
     $this->assertSame(
-      "{\"testData\":{\"totalQuestions\":2}," . 
+      "{\"testData\":{\"totalQuestions\":2}," .
         "\"userData\":{\"{$studentOne}\":{\"uq\":1,\"ca\":1,\"uf\":0,\"name\":\"Test Student\"}," .
         "\"{$studentTwo}\":{\"uq\":1,\"ca\":0,\"uf\":1,\"name\":\"Test Student Two\"}}}",
       $this->_VisualsModel->getSingleTestJSON(new MongoId($tId), $authorId)
