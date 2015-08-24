@@ -218,6 +218,75 @@ class AuthorModel {
   }
 
   /**
+   *  GET FULL DETAILS FOR A SINGLE TEST
+   *  Get full (summary) details, including question and user details through additional queries
+   *  @return JSON on success, otherwise false (boolean)
+   */
+  public function getFullTestDetails($testIdObj, $userIdStr) {
+
+    // if test ID object is MongoId and userId string is hexadecimal chars
+    if (is_a($testIdObj, 'MongoId') && preg_match('/^([a-z0-9])+$/', $userIdStr) === 1) {
+
+      // get tests from MongoDB
+      $test = $this->_DB->read("tests", array(
+        "_id" => $testIdObj
+      ));
+      if (empty($test)) return false;
+      $test = array_pop($test);
+
+      // check user and author match
+      if ($test["author"] !== $userIdStr) return false;
+
+      // create root response object
+      $response = new stdClass();
+      $response->{'questions'} = new stdClass();
+
+      // loop through questions and append details to response object
+      foreach ($test["questions"] as $questionId) {
+
+        $document = $this->_DB->read("questions", array("_id" => new MongoId($questionId)));
+        $document = array_pop($document);
+        $response->{'questions'}->{$questionId} = new stdClass();
+        $response->{'questions'}->{$questionId}->{'name'} = $document["name"];
+        $response->{'questions'}->{$questionId}->{'type'} = ucfirst($document["schema"]);
+        $response->{'questions'}->{$questionId}->{'question'} = $document["question"];
+      }
+
+      // add details about who the test has been issued to, if available
+      if (isset($test["available"])) {
+
+        // loop through users and add to response
+        $issued = array();
+        foreach ($test["available"] as $userId) {
+
+          $document = $this->_DB->read("users", array("_id" => new MongoId($userId)));
+          $document = array_pop($document);
+          $issued[$userId] = $document["full_name"];
+        }
+        $response->{'issued'} = $issued;
+      }
+
+      // add details about who the test has been taken by, if available
+      if (isset($test["taken"])) {
+
+        // loop through users and add to response
+        $taken = array();
+        foreach ($test["taken"] as $userId => $details) {
+
+          $document = $this->_DB->read("users", array("_id" => new MongoId($userId)));
+          $document = array_pop($document);
+          $taken[$userId] = $document["full_name"];
+        }
+        $response->{'taken'} = $taken;
+      }
+
+      return json_encode($response);
+    }
+
+    return false;
+  }
+
+  /**
    *  UPDATE A TEST
    *  Update the value of a test (expects MongoId object)
    *  If key exists in schema and operation is permitted
@@ -261,20 +330,52 @@ class AuthorModel {
     $test = array_pop($test);
     if ($test === false) return false;
 
+    // get groups
+    $groups = $this->_DB->read("groups", "ALL DOCUMENTS");
+
     // get list of students
     $users = $this->_DB->read("users", array("account_type" => "student"));
     $userRoot = new stdClass();
+    $userRoot->{'groups'} = new stdClass();
+    $userRoot->{'students'} = new stdClass();
 
-    foreach($users as $uId => $details) {
+    foreach ($users as $uId => $details) {
 
-      if (isset($test["taken"]))
-        if (array_key_exists($uId, $test["taken"])) continue;
+      $checkGroups = false;
+      if (isset($test["taken"])) {
+        if (array_key_exists($uId, $test["taken"])) {
 
-      if (isset($test["available"]))
-        if (in_array($uId, $test["available"])) continue;
+          $checkGroups = true;
+        }
+      }
+
+      if (isset($test["available"])) {
+        if (in_array($uId, $test["available"])) {
+
+          $checkGroups = true;
+        }
+      }
 
       // only add users that have not taken the test or have not been registered
-      $userRoot->{$uId} = $details["full_name"];
+      if ($checkGroups) {
+
+        foreach ($groups as $gId => $details) {
+          if (in_array($uId, $details["members"])) {
+
+            unset($groups[$gId]);
+          }
+        }
+
+      } else {
+
+        $userRoot->{'students'}->{$uId} = $details["full_name"];
+      }
+    }
+
+    // add remaining group id's and names to response Object
+    foreach ($groups as $gId => $details) {
+
+      $userRoot->{'groups'}->{$gId} = $details["name"];
     }
 
     return json_encode($userRoot);
@@ -313,6 +414,62 @@ class AuthorModel {
 
         // otherwise create a new array
         $availableArray = array($student["_id"]->{'$id'});
+      }
+
+      // return the result of the database operation
+      return $this->_DB->update("tests", array("_id" => $testIdObj), array("available" => $availableArray));
+    }
+
+    return false;
+  }
+
+  /**
+   *  MAKE A TEST AVAILABLE TO A GROUP
+   *  Register user ids with a test so they may take it
+   *  @return true (boolean) on success, else false
+   */
+  public function makeTestAvailableToGroup($testIdObj, $groupIdObj) {
+
+    // check testIdObj and $groupIdObj are MongoIds
+    if (is_a($testIdObj, 'MongoId') && is_a($groupIdObj, 'MongoId')) {
+
+      // check that queries for the test and group return one result only
+      $test = $this->_DB->read("tests", array("_id" => $testIdObj));
+      if (count($test) !== 1) return false;
+      $test = array_pop($test);
+
+      $group = $this->_DB->read("groups", array("_id" => $groupIdObj));
+      if (count($group) !== 1) return count($group);
+      $group = array_pop($group);
+
+      // check if any group member has already taken the test
+      $addStudentArray = array();
+      foreach ($group["members"] as $sId) {
+
+        $user = $this->_DB->read("users", array("_id" => new MongoId($sId)));
+        $user = array_pop($user);
+
+        if (isset($test["taken"]))
+          if (in_array($user["_id"]->{'$id'}, $test["taken"])) return false;
+
+        if (isset($test["available"]))
+          if (in_array($user["_id"]->{'$id'}, $test["available"])) return false;
+
+        $addStudentArray[] = $sId;
+      }
+
+      // copy the availability array and add new students if it exists
+      if (isset($test["available"])) {
+
+        $availableArray = $test["available"];
+        foreach ($addStudentArray as $sId) {
+          $availableArray[] = $sId;
+        }
+
+      } else {
+
+        // otherwise create a new array
+        $availableArray = $addStudentArray;
       }
 
       // return the result of the database operation

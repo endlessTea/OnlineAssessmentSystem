@@ -227,8 +227,102 @@ class UserModel {
 
       $userRoot->{$uId} = new stdClass();
       $userRoot->{$uId}->{'user_name'} = $details["user_name"];
+      $userRoot->{$uId}->{'full_name'} = $details["full_name"];
     }
 
     return json_encode($userRoot);
+  }
+
+  /**
+   *  CREATE DISTRIBUTION GROUP
+   *  Create a list of users (students) that may be used for bulk test distribution
+   *  @return true (boolean) on success, else false
+   */
+  public function createGroup($groupName, $studentIds) {
+
+    if (is_array($studentIds) && is_string($groupName)) {
+
+      // check if each id is a valid student id
+      if (empty($studentIds)) return false;
+      foreach ($studentIds as $sId) {
+
+        try {
+
+          $user = $this->_DB->read("users", array("_id" => new MongoId($sId)));
+          if (empty($user)) return false;
+          $user = array_pop($user);
+          if ($user["account_type"] !== "student") return false;
+
+        } catch (Exception $e) {
+
+          return false;
+        }
+      }
+
+      // all student id's are valid, insert new group entry
+      return $this->_DB->create("groups", array(
+        "name" => $groupName,
+        "members" => $studentIds
+      ));
+    }
+
+    return false;
+  }
+
+  /**
+   *  GET LIST OF GROUPS
+   *  Return a list of groups created so far
+   *  @return JSON of data on success, else false (boolean)
+   */
+  public function getListOfGroups() {
+
+    return json_encode(
+      $this->_DB->read("groups", "ALL DOCUMENTS")
+    );
+  }
+
+  /**
+   *  GET GROUP MEMBER DETAILS
+   *  @return JSON of data on success, else false (boolean)
+   */
+  public function getGroupMemberDetails($groupIdObj) {
+
+    if (is_a($groupIdObj, 'MongoId')) {
+
+      // get group
+      $group = $this->_DB->read("groups", array(
+        "_id" => $groupIdObj
+      ));
+      if (empty($group)) return false;
+      $group = array_pop($group);
+
+      $students = array();
+      foreach ($group["members"] as $sId) {
+
+        $user = $this->_DB->read("users", array(
+          "_id" => new MongoId($sId)
+        ));
+        $user = array_pop($user);
+        $students[$sId] = $user["full_name"];
+      }
+
+      return json_encode($students);
+    }
+
+    return false;
+  }
+
+  /**
+   *  DELETE GROUP
+   *  @return true (boolean) on success, else false
+   */
+  public function deleteGroup($groupIdObj) {
+
+    if (is_a($groupIdObj, 'MongoId')) {
+
+      return $this->_DB->delete("groups", array("_id" => $groupIdObj));
+    }
+
+    return false;
   }
 }

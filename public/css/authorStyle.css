@@ -75,6 +75,10 @@ input[type="submit"]:hover, button:hover {
   color: #fff;
 }
 
+#regex, #testPattern {
+  width: 400px;
+}
+
 td .table-button-container {
   width: 100px;
 }
@@ -86,6 +90,20 @@ th {
 
 #questionName {
   width: 350px;
+}
+
+#testName {
+  width: 350px;
+}
+
+#test-question-header {
+  text-align: left;
+  margin-left: 90px;
+}
+
+.question-info-list {
+  text-align: left;
+  margin: auto 50px auto 30px;
 }
 
 #authorContainer table {
@@ -216,4 +234,45 @@ th {
 #exit-author-platform:hover {
   cursor: pointer;
   text-shadow: 3px 3px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* drag drop lists */
+#sortable1, #sortable2 {
+  border: 2px solid #009933;
+  border-radius: 5px;
+  box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.5);
+  width: 450px;
+  height: 200px;
+  list-style-type: none;
+  margin: 0;
+  padding: 5px 0 0 0;
+	display: inline-block;
+  margin-right: 10px;
+	overflow: auto;
+}
+
+#sortable1 {
+  margin-right: 20px;
+}
+
+#sortable1 li, #sortable2 li {
+  margin: 5px 0 5px 10px;
+  padding: 5px;
+  font-size: 0.9em;
+  width: 400px;
+  border: 1px solid #009933;
+  border-radius: 5px;
+  background-color: #B2E0B2;
+}
+
+#selectionLists li:hover {
+  cursor: pointer;
+}
+
+#selectionLists {
+	text-align: center;
+}
+
+#selectionLists .row {
+	padding: 2px;
 }

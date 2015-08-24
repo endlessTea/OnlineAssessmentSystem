@@ -360,10 +360,66 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
     $userIdThree = $this->_UserModel->getUserData()->userId;
 
     $this->assertSame(
-      "{\"{$userIdOne}\":{\"user_name\":\"sample\"}," .
-      "\"{$userIdTwo}\":{\"user_name\":\"alan\"}," .
-      "\"{$userIdThree}\":{\"user_name\":\"custard\"}}",
+      "{\"{$userIdOne}\":{\"user_name\":\"sample\",\"full_name\":\"Sample User\"}," .
+      "\"{$userIdTwo}\":{\"user_name\":\"alan\",\"full_name\":\"Alan Partridge\"}," .
+      "\"{$userIdThree}\":{\"user_name\":\"custard\",\"full_name\":\"Custard Distributor\"}}",
       $this->_UserModel->getListOfStudents()
+    );
+  }
+
+  /**
+   *  @test
+   *  Create a distribution group
+   */
+  public function createGroup_createValidGroup_methodReturnsTrueDocumentCreated() {
+
+    $this->_UserModel->findUser("sample");
+    $userIdOne = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("alan");
+    $userIdTwo = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("custard");
+    $userIdThree = $this->_UserModel->getUserData()->userId;
+
+    $studentIds = array($userIdOne, $userIdTwo, $userIdThree);
+    $this->assertTrue(
+      $this->_UserModel->createGroup("Test Group", $studentIds)
+    );
+  }
+
+  /**
+   *  @test
+   *  Attempt to create group with an invalid student id
+   */
+  public function createGroup_arrayIncludesInexistentStudent_methodReturnsFalse() {
+
+    $this->_UserModel->findUser("sample");
+    $userIdOne = $this->_UserModel->getUserData()->userId;
+    $userIdTwo = "fneiosnf3092hf982nf29o";
+    $this->_UserModel->findUser("custard");
+    $userIdThree = $this->_UserModel->getUserData()->userId;
+
+    $badData = array($userIdOne, $userIdTwo, $userIdThree);
+    $this->assertFalse(
+      $this->_UserModel->createGroup("Test Group 2", $badData)
+    );
+  }
+
+  /**
+   *  @test
+   *  Attempt to create group with an assessor id included
+   */
+  public function createGroup_arrayIncludesAssessorId_methodReturnsFalse() {
+
+    $this->_UserModel->findUser("sample");
+    $userIdOne = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("jeremy");    // assessor account
+    $userIdTwo = $this->_UserModel->getUserData()->userId;
+    $this->_UserModel->findUser("custard");
+    $userIdThree = $this->_UserModel->getUserData()->userId;
+
+    $notAllStudentIds = array($userIdOne, $userIdTwo, $userIdThree);
+    $this->assertFalse(
+      $this->_UserModel->createGroup("Test Group 3", $notAllStudentIds)
     );
   }
 
@@ -374,7 +430,8 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   public function _dropUserCollection_methodReturnsTrue() {
 
     $dropUsersResult = $this->_DB->delete("users", "DROP COLLECTION");
-    $this->assertTrue($dropUsersResult);
+    $dropGroupsResult = $this->_DB->delete("groups", "DROP COLLECTION");
+    $this->assertTrue($dropUsersResult && $dropGroupsResult);
   }
 
   /**

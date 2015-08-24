@@ -532,6 +532,100 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
 
   /**
    *  @test
+   *  Check details for a test that has not been taken or issued
+   */
+  public function getFullTestDetails_testNotIssuedOrTaken_methodReturnsMatchingJSON() {
+
+    $testId = key($this->_DB->read("tests", array("author" => $this->_testTestAuthorId)));
+
+    $qOneDesc = "2 + 2 = 4";
+    $qOneId = key($this->_DB->read("questions", array("question" => $qOneDesc)));
+    $qTwoDesc = "2 + 4 = 10";
+    $qTwoId = key($this->_DB->read("questions", array("question" => $qTwoDesc)));
+    $qThreeDesc = "5 * 5 = 25";
+    $qThreeId = key($this->_DB->read("questions", array("question" => $qThreeDesc)));
+    $qFourDesc = "8 - 2 = 1";
+    $qFourId = key($this->_DB->read("questions", array("question" => $qFourDesc)));
+
+    $this->assertSame(
+      "{\"questions\":{\"{$qOneId}\":{\"name\":\"Maths 1\",\"type\":\"Boolean\",\"question\":\"{$qOneDesc}\"}," .
+        "\"{$qTwoId}\":{\"name\":\"Maths 2\",\"type\":\"Boolean\",\"question\":\"{$qTwoDesc}\"}," .
+        "\"{$qThreeId}\":{\"name\":\"Maths 3\",\"type\":\"Boolean\",\"question\":\"{$qThreeDesc}\"}," .
+        "\"{$qFourId}\":{\"name\":\"Maths 4\",\"type\":\"Boolean\",\"question\":\"{$qFourDesc}\"}}}",
+      $this->_AuthorModel->getFullTestDetails(new MongoId($testId), $this->_testTestAuthorId)
+    );
+  }
+
+  /**
+   *  @test
+   *  Check details for a test that has been taken and issued
+   */
+  public function getFullTestDetails_testTaken_methodReturnsMatchingJSON() {
+
+    // create users to take test and get id's
+    $um = new UserModel();
+    $um->createUser("stdone", "password", "Student One");
+    $um->findUser("stdone");
+    $stdOneId = $um->getUserData()->userId;
+    $stdOneName = $um->getUserData()->fullName;
+    $um->createUser("stdtwo", "password", "Student Two");
+    $um->findUser("stdtwo");
+    $stdTwoId = $um->getUserData()->userId;
+    $stdTwoName = $um->getUserData()->fullName;
+
+    $testId = key($this->_DB->read("tests", array("author" => $this->_testTestAuthorId)));
+
+    // add users to available/taken arrays
+    $this->assertTrue($this->_DB->update(
+      "tests",
+      array("_id" => new MongoId($testId)),
+      array("available" => array($stdOneId)
+    )));
+    $this->assertTrue($this->_DB->update(
+      "tests",
+      array("_id" => new MongoId($testId)),
+      array("taken" => array($stdTwoId => "4")
+    )));
+
+    $qOneDesc = "2 + 2 = 4";
+    $qOneId = key($this->_DB->read("questions", array("question" => $qOneDesc)));
+    $qTwoDesc = "2 + 4 = 10";
+    $qTwoId = key($this->_DB->read("questions", array("question" => $qTwoDesc)));
+    $qThreeDesc = "5 * 5 = 25";
+    $qThreeId = key($this->_DB->read("questions", array("question" => $qThreeDesc)));
+    $qFourDesc = "8 - 2 = 1";
+    $qFourId = key($this->_DB->read("questions", array("question" => $qFourDesc)));
+
+    $this->assertSame(
+      "{\"questions\":{\"{$qOneId}\":{\"name\":\"Maths 1\",\"type\":\"Boolean\",\"question\":\"{$qOneDesc}\"}," .
+        "\"{$qTwoId}\":{\"name\":\"Maths 2\",\"type\":\"Boolean\",\"question\":\"{$qTwoDesc}\"}," .
+        "\"{$qThreeId}\":{\"name\":\"Maths 3\",\"type\":\"Boolean\",\"question\":\"{$qThreeDesc}\"}," .
+        "\"{$qFourId}\":{\"name\":\"Maths 4\",\"type\":\"Boolean\",\"question\":\"{$qFourDesc}\"}}," .
+        "\"issued\":{\"{$stdOneId}\":\"{$stdOneName}\"}," .
+        "\"taken\":{\"{$stdTwoId}\":\"{$stdTwoName}\"}}",
+      $this->_AuthorModel->getFullTestDetails(new MongoId($testId), $this->_testTestAuthorId)
+    );
+  }
+
+  /**
+   *  @test
+   *  Attempt to get test details when the user is not the author of the test
+   */
+  public function getFullTestDetails_userIsNotAuthor_methodReturnsFalse() {
+
+    // attempt to get details with a student id
+    $um = new UserModel();
+    $um->findUser("stdone");
+    $stdOneId = $um->getUserData()->userId;
+    $testId = key($this->_DB->read("tests", array("author" => $this->_testTestAuthorId)));
+
+    $this->assertFalse(
+      $this->_AuthorModel->getFullTestDetails(new MongoId($testId), $stdOneId)
+    );
+  }
+
+  /**
+   *  @test
    *  Update an existing key value pair in a test that is not restricted
    */
   public function updateTest_performValidUpdate_methodReturnsTrue() {
@@ -628,7 +722,49 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
     $this->assertFalse($result);
   }
 
-  // TODO check that getStudentsForTest returns correct JSON
+  /**
+   *  @test
+   *  Get a valid list of groups and students that may take a test
+   */
+  public function getStudentsForTest_checkGroupAndStudentsReturn_methodReturnsMatchingJSON() {
+
+    // create users and group
+    $um = new UserModel();
+    $um->createUser("stdthree", "password", "Student Three");
+    $um->findUser("stdthree");
+    $stdThreeId = $um->getUserData()->userId;
+    $um->createUser("stdfour", "password", "Student Four");
+    $um->findUser("stdfour");
+    $stdFourId = $um->getUserData()->userId;
+    $um->createUser("stdfive", "password", "Student Five");
+    $um->findUser("stdfive");
+    $stdFiveId = $um->getUserData()->userId;
+
+    $studentArray = array($stdThreeId, $stdFourId);
+    $this->assertTrue($um->createGroup("Test Group", $studentArray));
+    $groupId = key($this->_DB->read("groups", array("name" => "Test Group")));
+
+    // now create another group with a student that has taken/been issued the test
+    $um->findUser("stdone");
+    $stdOneId = $um->getUserData()->userId;
+    $studentArray[] = $stdOneId;
+    $this->assertTrue($um->createGroup("Not Applicable Group", $studentArray));
+
+    $test = $this->_DB->read("tests", array(
+      "author" => $this->_testTestAuthorId
+    ));
+    $testId = key($test);
+
+    $this->assertSame(
+      "{\"groups\":{\"{$groupId}\":\"Test Group\"}," .
+        "\"students\":{\"{$stdThreeId}\":\"Student Three\"," .
+        "\"{$stdFourId}\":\"Student Four\",\"{$stdFiveId}\":\"Student Five\"}}",
+      $this->_AuthorModel->getStudentsForTest(
+        new MongoId($testId),
+        $this->_testTestAuthorId
+      )
+    );
+  }
 
   /**
    *  @test
@@ -700,6 +836,80 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
 
   /**
    *  @test
+   *  Make test available to a group where no members have taken it / been issued it
+   */
+  public function makeTestAvailableToGroup_validGroupRequest_methodReturnsTrue() {
+
+    // create users
+    $um = new UserModel();
+    $um->createUser("groupmem1", "password", "Group Member One");
+    $um->findUser("groupmem1");
+    $gmOne = $um->getUserData()->userId;
+    $um->createUser("groupmem2", "password", "Group Member Two");
+    $um->findUser("groupmem2");
+    $gmTwo = $um->getUserData()->userId;
+    $um->createUser("groupmem3", "password", "Group Member Three");
+    $um->findUser("groupmem3");
+    $gmThree = $um->getUserData()->userId;
+
+    // create group
+    $ids = array($gmOne, $gmTwo, $gmThree);
+    $um->createGroup("Test Group One", $ids);
+    $group = $this->_DB->read("groups", array("name" => "Test Group One"));
+    $gId = key($group);
+
+    // get test id
+    $test = $this->_DB->read("tests", array(
+      "author" => $this->_testTestAuthorId
+    ));
+    $testId = key($test);
+
+    $this->assertTrue(
+      $this->_AuthorModel->makeTestAvailableToGroup(
+        new MongoId($testId),
+        new MongoId($gId)
+      )
+    );
+  }
+
+  /**
+   *  @test
+   *  Attempt to issue test to a group where one of the members has already taken the test
+   */
+  public function makeTestAvailableToGroup_memberAlreadyTaken_methodReturnsFalse() {
+
+    // create users
+    $um = new UserModel();
+    $um->createUser("groupmem4", "password", "Group Member Four");
+    $um->findUser("groupmem4");
+    $gmFour = $um->getUserData()->userId;
+    $user = $this->_DB->read("users", array(
+      "user_name" => "jeeves"
+    ));
+    $studentTakenId = key($user);
+
+    // create group
+    $ids = array($gmFour, $studentTakenId);
+    $um->createGroup("Test Group Two", $ids);
+    $group = $this->_DB->read("groups", array("name" => "Test Group Two"));
+    $gId = key($group);
+
+    // get test id
+    $test = $this->_DB->read("tests", array(
+      "author" => $this->_testTestAuthorId
+    ));
+    $testId = key($test);
+
+    $this->assertFalse(
+      $this->_AuthorModel->makeTestAvailableToGroup(
+        new MongoId($testId),
+        new MongoId($gId)
+      )
+    );
+  }
+
+  /**
+   *  @test
    *  Attempt to delete a test with an author ID that doesn't match
    */
   public function deleteTest_attemptDeleteAuthorIdDoesntMatch_methodReturnsFalse() {
@@ -761,7 +971,8 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
     $dropQuestionsResult = $this->_DB->delete("questions", "DROP COLLECTION");
     $dropTestsResult = $this->_DB->delete("tests", "DROP COLLECTION");
     $dropUsersResult = $this->_DB->delete("users", "DROP COLLECTION");
-    $this->assertTrue($dropQuestionsResult && $dropTestsResult && $dropUsersResult);
+    $dropGroupsResult = $this->_DB->delete("groups", "DROP COLLECTION");
+    $this->assertTrue($dropQuestionsResult && $dropTestsResult && $dropUsersResult && $dropGroupsResult);
   }
 
   /**

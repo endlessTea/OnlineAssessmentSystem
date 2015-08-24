@@ -7,6 +7,7 @@
   <!-- CSS: use core stylesheet and authoring platform dashboard styles -->
   <link rel="stylesheet" href="<?= URL; ?>public/css/_mainStyle.css">
   <link rel="stylesheet" href="<?= URL; ?>public/css/authorStyle.css">
+  <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
 
 </head>
 <body>
@@ -43,10 +44,10 @@
         <p>MANAGE<br>QUESTIONS</p>
       </div>
       <div class="author-question-container">
-        <div class="author-control" onclick="alert('todo');">
+        <div class="author-control" onclick="loadUsersForGroupCreation();">
           <p>CREATE GROUP</p>
         </div>
-        <div class="author-control test-options" onclick="alert('todo');">
+        <div class="author-control test-options" onclick="manageGroups();">
           <p>MANAGE GROUPS</p>
         </div>
       </div>
@@ -58,9 +59,9 @@
           <p>MANAGE TESTS</p>
         </div>
       </div>
-      <div class="author-control" onclick="loadTests();">
+      <!-- <div class="author-control" onclick="loadTests();">
         <p>ISSUE<br>TEST</p>
-      </div>
+      </div> -->
     </div>
 
     <div id="authorContainer">
@@ -74,6 +75,7 @@
     <!-- JavaScript: jQuery and custom JS for Ajax/event handling -->
     <script src="<?= URL; ?>public/js/libs/jquery-1.11.3.min.js" charset="utf-8"></script>
     <script src="<?= URL; ?>public/js/author.js" charset="utf-8"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
 
     <!-- Define base URL for JavaScript to send Ajax requests -->
     <script>

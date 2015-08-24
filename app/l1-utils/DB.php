@@ -29,7 +29,7 @@ class DB {
 
       // define valid collections
       self::$_validCollections = array(
-        "users", "questions", "tests", "samples"
+        "users", "questions", "tests", "samples", "groups"
       );
 
       // create unique index for users based on username

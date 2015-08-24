@@ -156,6 +156,61 @@ class AuthorController {
   }
 
   /**
+   *  AJAX: GET USERS
+   *  Get a list of user IDs and names to create distribution groups
+   */
+  public function getStudents() {
+
+    header('Content-Type: application/json');
+    echo $this->_UserModel->getListOfStudents();
+  }
+
+  /**
+   *  AJAX: CREATE DISTRIBUTION GROUP
+   *  Create a user group based on student ids
+   */
+  public function createGroup() {
+
+    echo ($this->_UserModel->createGroup(
+      $this->_AppModel->getPOSTData("gn"),
+      $this->_AppModel->getPOSTData("us", "getJSON")
+    )) ? "<p>Group created!</p>" : "<p>Error creating group</p>";
+  }
+
+  /**
+   *  AJAX: GET GROUPS
+   *  Get group details for management page
+   */
+  public function getGroups() {
+
+    header('Content-Type: application/json');
+    echo $this->_UserModel->getListOfGroups();
+  }
+
+  /**
+   *  AJAX: GET GROUP MEMBER DETAILS
+   *  Get group details for management page
+   */
+  public function getGroupMemberDetails() {
+
+    header('Content-Type: application/json');
+    echo $this->_UserModel->getGroupMemberDetails(
+      new MongoId($this->_AppModel->getPOSTData("gId"))
+    );
+  }
+
+  /**
+   *  AJAX: DELETE GROUP
+   *  Request to delete a group; returns an indication of success/failure
+   */
+  public function deleteGroup() {
+
+    echo ($this->_UserModel->deleteGroup(
+      new MongoId($this->_AppModel->getPOSTData("gId"))
+    )) ? "<p>Group deleted!</p>" : "<p>Error deleting group</p>";
+  }
+
+  /**
    *  AJAX: CREATE TEST
    *  Process question Id's and create a new document
    */
@@ -183,6 +238,37 @@ class AuthorController {
     echo json_encode($this->_AuthorModel->getTests(
       $this->_UserModel->getUserData()->userId
     ));
+  }
+
+  /**
+   *  AJAX: DELETE TEST
+   *  Request to delete a test; returns an indication of success/failure
+   */
+  public function getTestDetails() {
+
+    // attempt to convert test identifier to MongoId
+    try {
+
+      $testIdObj = new MongoId($this->_AppModel->getPOSTData("tId"));
+
+    } catch (Exception $e) {
+
+      echo "Invalid test identifier";
+      exit;
+    }
+
+    $data = $this->_AuthorModel->getFullTestDetails(
+      $testIdObj,
+      $this->_UserModel->getUserData()->userId
+    );
+    if ($data == false) {
+
+      echo "Unable to retrieve test details";
+
+    } else {
+
+      echo $data;
+    }
   }
 
   /**
@@ -241,7 +327,7 @@ class AuthorController {
     try {
 
       $testIdObj = new MongoId($this->_AppModel->getPOSTData("tId"));
-      $userIdObj = new MongoId($this->_AppModel->getPOSTData("sId"));
+      $userOrGroupIdObj = new MongoId($this->_AppModel->getPOSTData("ugId"));
 
     } catch (Exception $e) {
 
@@ -249,9 +335,24 @@ class AuthorController {
       exit;
     }
 
-    echo ($this->_AuthorModel->makeTestAvailableToUser(
-      $testIdObj,
-      $userIdObj
-    )) ? "<p>Test issued!</p>" : "<p>Error issuing test</p>";
+    $usage = $this->_AppModel->getPOSTData("u");
+    if ($usage === "student") {
+
+      echo ($this->_AuthorModel->makeTestAvailableToUser(
+        $testIdObj,
+        $userOrGroupIdObj
+      )) ? "<p>Test issued!</p>" : "<p>Error issuing test</p>";
+
+    } elseif ($usage === "group") {
+
+      echo ($this->_AuthorModel->makeTestAvailableToGroup(
+        $testIdObj,
+        $userOrGroupIdObj
+      )) ? "<p>Test issued!</p>" : "<p>Error issuing test</p>";
+
+    } else {
+
+      echo "Invalid usage: " . $usage;
+    }
   }
 }
