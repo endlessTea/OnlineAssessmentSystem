@@ -36,7 +36,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   ##########################################################
 
   /**
-   *  @test
+   *  @test 7.1
    *  Create question that is compliant with question schema (boolean)
    */
   public function createQuestion_schemaCompliantBoolean_methodReturnsTrue() {
@@ -53,7 +53,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.2
    *  Create schema compliant question (multiple choice)
    */
   public function createQuestion_schemaCompliantMultiple_methodReturnsTrue() {
@@ -76,7 +76,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.3
    *  Create schema compliant question (RegExp pattern)
    */
   public function createQuestion_schemaCompliantPattern_methodReturnsTrue() {
@@ -94,7 +94,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.4
    *  Create schema compliant question (short answer)
    */
   public function createQuestion_schemaCompliantShortAnswer_methodReturnsTrue() {
@@ -111,7 +111,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.5
    *  Attempt to create a question that does not belong to a recognised schema
    */
   public function createQuestion_unrecognisedSchema_methodReturnsFalse() {
@@ -125,7 +125,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.6
    *  Create question that does not provide optional data
    */
   public function createQuestion_booleanSchemaTestOptional_methodReturnsTrue() {
@@ -141,7 +141,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /*
-   *  @test
+   *  @test 7.7
    *  Attempt to create a short answer question where answer is not provided by the author
    */
   public function createQuestion_shortAnswerNoFeedback_methodReturnsTrue() {
@@ -158,7 +158,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.8
    *  Attempt to create question that does not comply with question schema
    */
   public function createQuestion_doesNotComplyWithSchema_methodReturnsFalse() {
@@ -174,7 +174,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.9
    *  Attempt to create question that does not supply all the required information
    */
   public function createQuestion_missingInformation_methodReturnsFalse() {
@@ -189,7 +189,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.10
    *  Attempt to create question with inappropriate (invalid) data
    */
   public function createQuestion_invalidData_methodReturnsFalse() {
@@ -205,7 +205,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.11
    *  Attempt to create question with full valid data and extra invalid data
    */
   public function createQuestion_validQuestionPlusInvalidData_methodReturnsFalse() {
@@ -223,7 +223,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.12
    *  Get both questions created earlier matching the author id
    */
   public function getQuestions_matchingAuthorId_methodReturnsArrayOfFiveDocuments() {
@@ -233,7 +233,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.13
    *  Return an empty array for request for questions where author id doesn't match
    */
   public function getQuestions_authorIdDoesNotMatch_methodReturnsEmptyArray() {
@@ -243,7 +243,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.14
    *  Attempt to get questions where the author id isn't hexadecimal characters
    */
   public function getQuestions_authorIdNotHexadecimalString_methodReturnsFalse() {
@@ -253,7 +253,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.15
    *  Update an existing key value pair in a document that is not restricted
    */
   public function updateQuestion_performValidUpdate_methodReturnsTrue() {
@@ -272,7 +272,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.16
    *  Update a question with a new key value pair (optional) that was not included on creation
    */
   public function updateQuestion_performUpdateNewOptionalKVPair_methodReturnsTrue() {
@@ -291,7 +291,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.17
    *  Attempt to update a question with an invalid question identifier
    */
   public function updateQuestion_attemptNonMongoIdUpdate_methodReturnsFalse() {
@@ -304,7 +304,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.18
    *  Attempt to update a question where the key does not exist in the schema
    */
   public function updateQuestion_attemptUpdateKeyNotInSchema_methodReturnsFalse() {
@@ -322,7 +322,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.19
    *  Attempt to update a question where the update is not permitted (e.g. author update)
    */
   public function updateQuestion_attemptUpdateNotPermitted_methodReturnsFalse() {
@@ -340,7 +340,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.20
    *  Delete a question with matching author ID
    */
   public function deleteQuestion_deleteWithMatchingAuthor_methodReturnsTrue() {
@@ -359,7 +359,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.21
    *  Attempt to delete a question with an ID that isn't a Mongo ID object
    */
   public function deleteQuestion_attemptDeleteNotMongoId_methodReturnsFalse() {
@@ -372,7 +372,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.22
    *  Attempt to delete a question with an author ID that doesn't match
    */
   public function deleteQuestion_attemptDeleteAuthorIdDoesntMatch_methodReturnsFalse() {
@@ -395,7 +395,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   #####################################################
 
   /**
-   *  @test
+   *  @test 7.23
    *  Create questions and create a typical test
    */
   public function createTest_createQuestionsTypicalTest_methodReturnsTrue() {
@@ -445,7 +445,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.24
    *  Attempt to create a test with a missing requirement (questions)
    */
   public function createTest_attemptToCreateMissingRequirement_methodReturnsFalse() {
@@ -459,7 +459,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.25
    *  Get test created earlier
    */
   public function getTests_validRequest_methodReturnsTest() {
@@ -469,7 +469,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.26
    *  Return an empty array for request for tests where author id doesn't match
    */
   public function getTests_authorIdDoesNotMatch_methodReturnsEmptyArray() {
@@ -479,7 +479,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.27
    *  Attempt to get tests where the author id isn't hexadecimal characters
    */
   public function getTests_authorIdNotHexadecimalString_methodReturnsFalse() {
@@ -489,7 +489,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.28
    *  Request a single test, providing test id and author id
    */
   public function getSingleTest_validRequest_methodReturnsTest() {
@@ -504,7 +504,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.29
    *  Return false for test id that is not a MongoId object
    */
   public function getSingleTest_testIdNotMongoIdObject_methodReturnsFalse() {
@@ -516,7 +516,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.30
    *  Attempt to get tests where the author id isn't hexadecimal characters
    */
   public function getSingleTest_authorIdNotHexadecimalString_methodReturnsFalse() {
@@ -531,7 +531,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.31
    *  Check details for a test that has not been taken or issued
    */
   public function getFullTestDetails_testNotIssuedOrTaken_methodReturnsMatchingJSON() {
@@ -557,7 +557,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.32
    *  Check details for a test that has been taken and issued
    */
   public function getFullTestDetails_testTaken_methodReturnsMatchingJSON() {
@@ -608,7 +608,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.33
    *  Attempt to get test details when the user is not the author of the test
    */
   public function getFullTestDetails_userIsNotAuthor_methodReturnsFalse() {
@@ -625,7 +625,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.34
    *  Update an existing key value pair in a test that is not restricted
    */
   public function updateTest_performValidUpdate_methodReturnsTrue() {
@@ -649,7 +649,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   // TODO: reject update if questions is not an array
 
   /**
-   *  @test
+   *  @test 7.35
    *  Attempt to update a test if questions are not an array
    */
   public function updateTest_attemptUpdateQuestionsNotArray_methodReturnsFalse() {
@@ -669,7 +669,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.36
    *  Attempt to update a test with an invalid identifier (i.e. not MongoId)
    */
   public function updateTest_attemptNonMongoIdUpdate_methodReturnsFalse() {
@@ -685,7 +685,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.37
    *  Attempt to update a test where the key does not exist in the schema
    */
   public function updateTest_attemptUpdateKeyNotInSchema_methodReturnsFalse() {
@@ -705,7 +705,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.38
    *  Attempt to update a test where the update is not permitted (e.g. author update)
    */
   public function updateTest_attemptUpdateNotPermitted_methodReturnsFalse() {
@@ -723,7 +723,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.39
    *  Get a valid list of groups and students that may take a test
    */
   public function getStudentsForTest_checkGroupAndStudentsReturn_methodReturnsMatchingJSON() {
@@ -767,7 +767,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.40
    *  Make test available to a valid user
    */
   public function makeTestAvailableToUser_validUserAssociation_methodReturnsTrueAndIdRegistered() {
@@ -797,7 +797,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.41
    *  Attempt to make test available to invalid user id
    */
   public function makeTestAvailableToUser_invalidUserId_methodReturnsFalse() {
@@ -812,7 +812,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.42
    *  Attempt to make test available to a user that has already taken the test
    */
   public function makeTestAvailableToUser_userAlreadyTakenTest_methodReturnsFalse() {
@@ -835,7 +835,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.43
    *  Make test available to a group where no members have taken it / been issued it
    */
   public function makeTestAvailableToGroup_validGroupRequest_methodReturnsTrue() {
@@ -873,7 +873,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.44
    *  Attempt to issue test to a group where one of the members has already taken the test
    */
   public function makeTestAvailableToGroup_memberAlreadyTaken_methodReturnsFalse() {
@@ -909,7 +909,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.45
    *  Attempt to delete a test with an author ID that doesn't match
    */
   public function deleteTest_attemptDeleteAuthorIdDoesntMatch_methodReturnsFalse() {
@@ -927,7 +927,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.46
    *  Attempt to delete a test with an ID that isn't a Mongo ID object
    */
   public function deleteTest_attemptDeleteNotMongoId_methodReturnsFalse() {
@@ -940,7 +940,7 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 7.47
    *  Delete a test with matching author ID
    */
   public function deleteTest_deleteWithMatchingAuthor_methodReturnsTrue() {
@@ -979,6 +979,6 @@ class AuthorModelTest extends PHPUnit_Framework_TestCase {
    *  @test
    */
   public function _confirmEnd() {
-    print_r("\n  - end of AuthorModel Test -  \n\n");
+    print_r("\n  - end of AuthorModel Test -  \n");
   }
 }

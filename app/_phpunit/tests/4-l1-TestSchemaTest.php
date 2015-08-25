@@ -39,7 +39,7 @@ class TestSchemaTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 4.1
    *  Check if list of schema names is returned correctly
    */
   public function getSchemaList_checkReturnsCorrectly_valuesMatch() {
@@ -51,7 +51,7 @@ class TestSchemaTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 4.2
    *  Check if single existing schema returns correctly
    */
   public function getSchema_checkReturnsCorrectly_valuesMatch() {
@@ -63,7 +63,7 @@ class TestSchemaTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 4.3
    *  Attempt to obtain a schema that does not exist
    */
   public function getSchema_attemptToGetInexistentSchema_methodReturnsFalse() {
@@ -75,6 +75,6 @@ class TestSchemaTest extends PHPUnit_Framework_TestCase {
    *  @test
    */
   public function _confirmEnd() {
-    print_r("\n  - end of TestSchema Test -  \n\n");
+    print_r("\n  - end of TestSchema Test -  \n");
   }
 }

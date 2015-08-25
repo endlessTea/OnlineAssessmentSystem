@@ -31,7 +31,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.1
    *  Confirm salt method returns unique character strings
    */
   public function makeSalt_createTwoUniqueSalts_valuesDifferent() {
@@ -42,7 +42,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.2
    *  Confirm salt method returns 32 hexadecimal character string
    */
   public function makeSalt_createSaltMatchRegExp_value32HexadecimalCharacters() {
@@ -52,7 +52,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.3
    *  Confirm hash method returns different string with different salt
    */
   public function makeHash_createHashesDifferentSalts_valuesDifferent() {
@@ -70,7 +70,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.4
    *  Confirm hash method returns the same string with matching salt
    */
   public function makeHash_createHashesSameSalt_valuesMatch() {
@@ -87,7 +87,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.5
    *  Confirm hash method returns 64 hexadecimal character string
    */
   public function makeHash_createHashMatchRegExp_value64HexadecimalCharacters() {
@@ -101,7 +101,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.6
    *  Create user, confirm operation returns true
    */
   public function createUser_createSampleUser_methodReturnsTrue() {
@@ -114,7 +114,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.7
    *  Create multiple users, operations return true
    */
   public function createUser_createMultipleUsers_methodsReturnTrue() {
@@ -138,7 +138,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.8
    *  Test username uniqueness
    */
   public function createUser_attemptCreateDuplicateUser_returnsSpecificString() {
@@ -154,7 +154,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.9
    *  Check if a user exists with UserModel's "find" method (MongoId object)
    */
   public function findUser_findSampleUserByMongoId_methodReturnsTrue() {
@@ -166,7 +166,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.10
    *  Check if a user exists with username as identifier
    */
   public function findUser_findSampleUserByUsername_methodReturnsTrue() {
@@ -176,7 +176,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.11
    *  Check for an inexistent user using "find" method
    */
   public function findUser_attemptToFindInexistentUser_methodReturnsFalse() {
@@ -187,7 +187,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.12
    *  Set Session value to sample user ID, construct Model, check if user data matches
    */
   public function constructAndGetUserData_checkDataMatch_methodReturnsMatchingData() {
@@ -203,7 +203,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.13
    *  Set Session value to sample user ID, construct Model, check if login status === true
    */
   public function constructAndGetLoginStatus_checkLoginStatus_methodReturnsTrue() {
@@ -215,7 +215,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.14
    *  Construct Model, check if login status === false (no session)
    */
   public function constructAndGetLoginStatus_checkLoginStatusNoSession_methodReturnsFalse() {
@@ -225,7 +225,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.15
    *  Update user password hash
    */
   public function updateUser_changePassword_methodReturnsTrue() {
@@ -246,7 +246,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.16
    *  Attempt to update username (action not allowed)
    */
   public function updateUser_attemptUsernameChange_methodReturnsFalse() {
@@ -259,7 +259,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.17
    *  Attempt to update user password when user is not logged in
    */
   public function updateUser_attemptPasswordChangeUserNotLoggedIn_methodReturnsFalse() {
@@ -269,7 +269,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.18
    *  Log in user to private instance variable of UserModel
    */
   public function logUserIn_logInUserToUserModelInstanceVariable_methodReturnsTrue() {
@@ -279,7 +279,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.19
    *  Attempt login of an inexistent user
    */
   public function logUserIn_attemptLogInWithInvalidUsername_methodReturnsFalse() {
@@ -290,7 +290,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.20
    *  Attempt login of an existing user with an incorrect password
    */
   public function logUserIn_attemptLogInWithInvalidPassword_methodReturnsFalse() {
@@ -301,7 +301,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.21
    *  Check the login status of the private instance variable of UserModel
    */
   public function getLoginStatus_checkInstanceVariableOfUMIsLoggedIn_methodReturnsTrue() {
@@ -312,7 +312,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.22
    *  Log user out of the private instance variable of UserModel
    */
   public function logUserOut_logOutInstanceVariableUserModel_methodReturnsTrue() {
@@ -323,7 +323,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.23
    *  Log user in with Model construction, then log user out with object method
    */
   public function logUserOut_logOutAfterObjectConstructionUsingSession_methodReturnsTrue() {
@@ -336,7 +336,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.24
    *  Attempt log out with no user currently logged in
    */
   public function logUserOut_logOutNoUserLoggedIn_methodReturnsFalse() {
@@ -346,7 +346,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.25
    *  Confirm list of users matches limited subset of values
    */
   public function getListOfStudents_validRequest_methodReturnsMatchingValues() {
@@ -368,7 +368,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.26
    *  Create a distribution group
    */
   public function createGroup_createValidGroup_methodReturnsTrueDocumentCreated() {
@@ -387,7 +387,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.27
    *  Attempt to create group with an invalid student id
    */
   public function createGroup_arrayIncludesInexistentStudent_methodReturnsFalse() {
@@ -405,7 +405,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 5.28
    *  Attempt to create group with an assessor id included
    */
   public function createGroup_arrayIncludesAssessorId_methodReturnsFalse() {
@@ -424,7 +424,7 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 
    *  Drop Users collection (reset for later testing)
    */
   public function _dropUserCollection_methodReturnsTrue() {
@@ -438,6 +438,6 @@ class UserModelTest extends PHPUnit_Framework_TestCase {
    *  @test
    */
   public function _confirmEnd() {
-    print_r("\n  - end of UserModel Test -  \n\n");
+    print_r("\n  - end of UserModel Test -  \n");
   }
 }

@@ -270,7 +270,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 8.1
    *  Check that the list of available tests returns user
    */
   public function getListOfAvailableTests_checkWithValidStudent_methodReturnsMatchingValue() {
@@ -291,7 +291,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 8.2
    *  Check that a user not enrolled on any tests
    */
   public function getListOfAvailableTests_checkWithStudentNoTests_methodReturnsSpecificString() {
@@ -306,7 +306,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 8.3
    *  Check that a user string that doesn't match hexadecimal returns false
    */
   public function getListOfAvailableTests_checkWithInvalidUserId_methodReturnsSpecificString() {
@@ -318,7 +318,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 8.4
    *  Check if a user is eligible to take a test
    */
   public function checkTestAvailable_checkWithValidStudent_methodReturnsTrue() {
@@ -338,7 +338,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 8.5
    *  Check if a user that is not registered with a test is eligible
    */
   public function checkTestAvailable_checkWithIneligibleStudent_methodReturnsFalse() {
@@ -357,7 +357,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 8.6
    *  Check if a user that has already taken the test is not eligible
    */
   public function checkTestAvailable_checkWithStudentTakenTest_methodReturnsFalse() {
@@ -376,7 +376,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 8.7
    *  Check if a user has taken a test
    */
   public function checkTestTaken_checkWithStudentTakenTest_methodReturnsTrue() {
@@ -395,7 +395,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 8.8
    *  Check if a user has not taken a test
    */
   public function checkTestTaken_checkWithStudentTestAvailable_methodReturnsFalse() {
@@ -415,7 +415,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 8.9
    *  Check JSON data matches for a valid request for test data
    */
   public function getQuestionsJSON_validRequest_methodReturnsMatchingValues() {
@@ -433,7 +433,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 8.10
    *  Attempt to get JSON of data for invalid test
    */
   public function getQuestionsJSON_invalidTestId_methodReturnsFalse() {
@@ -442,7 +442,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 8.11
    *  Get answers to short answer questions
    */
   public function getAnswersForSelfMarking_validRequest_methodReturnsMatchingJSON() {
@@ -459,7 +459,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 8.12
    *  Submit answers to a test (BOOLEAN)
    */
   public function updateAnswers_submitValidAnswersBoolean_methodReturnsJSONDocumentsUpdated() {
@@ -509,7 +509,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 8.13
    *  Submit answers to a test (MULTIPLE CHOICE)
    */
   public function updateAnswers_submitValidAnswersMC_methodReturnsJSONDocumentsUpdated() {
@@ -558,7 +558,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 8.14
    *  Submit answers to a test (PATTERN MATCHING)
    */
   public function updateAnswers_submitValidAnswersPattern_methodReturnsJSONDocumentsUpdated() {
@@ -603,7 +603,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 8.15
    *  Submit valid 'correctness of answers' for Short Answer test (result of self-marking)
    */
   public function updateAnswers_submitValidCOA_methodReturnsJSONDocumentsUpdated() {
@@ -648,7 +648,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 8.16
    *  Attempt to submit answers instead of 'correctness of answers' (attempt to get server to mark them)
    */
   public function updateAnswers_submitAnswersNotCOA_methodReturnsFalse() {
@@ -688,7 +688,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 8.17
    *  Attempt to submit answers to a test where students are not eligible to take it
    */
   public function updateAnswers_studentsNotEligible_methodReturnsFalse() {
@@ -721,7 +721,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 8.18
    *  Attempt to submit invalid JSON as answers to a test
    */
   public function updateAnswers_submitInvalidInput_methodReturnsFalse() {
@@ -736,7 +736,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 8.19
    *  Attempt to submit missing questions (root + answer and 'understanding of question')
    */
   public function updateAnswers_missingQuestion_methodReturnsFalse() {
@@ -760,7 +760,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 8.20
    *  Attempt to submit a single missing answer or 'understanding of question'
    */
   public function updateAnswers_missingAnswerOrUQ_methodReturnsFalse() {
@@ -798,7 +798,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 8.21
    *  Attempt to submit an invalid answer or 'understanding of question'
    */
   public function updateAnswers_invalidAnswerOrUQ_methodReturnsFalse() {
@@ -838,7 +838,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 8.22
    *  Attempt to submit invalid answers to a test (MULTIPLE CHOICE)
    */
   public function updateAnswers_invalidAnswerMultipleChoice_methodReturnsFalse() {
@@ -867,7 +867,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 8.23
    *  Submit student feedback for questions (valid)
    */
   public function updateFeedback_submitValidInput_methodReturnsTrueDocumentUpdated() {
@@ -898,7 +898,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 8.24
    *  Attempt to submit feedback for a student that has not taken a test
    */
   public function updateFeedback_studentHasntTakenTest_methodReturnsFalse() {
@@ -920,7 +920,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 8.25
    *  Attempt to submit invalid JSON as feedback to test
    */
   public function updateFeedback_submitInvalidInput_methodReturnsFalse() {
@@ -935,7 +935,7 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 8.26
    *  Attempt to submit invalid feedback values to test
    */
   public function updateFeedback_invalidFeedbackValues_methodReturnsFalse() {
@@ -971,6 +971,6 @@ class AssessModelTest extends PHPUnit_Framework_TestCase {
    *  @test
    */
   public function _confirmEnd() {
-    print_r("\n  - end of AssessModel Test -  \n\n");
+    print_r("\n  - end of AssessModel Test -  \n");
   }
 }

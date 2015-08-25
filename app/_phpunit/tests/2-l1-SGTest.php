@@ -26,7 +26,7 @@ class SGTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 2.1
    *  Request escaped input (GET)
    */
   public function get_usageEqualsEscape_returnsEscapedInput() {
@@ -40,7 +40,7 @@ class SGTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 2.2
    *  Request url as array containing controller, action and parameters
    */
   public function get_usageEqualsUrl_returnsArray() {
@@ -60,7 +60,7 @@ class SGTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 2.3
    *  Request dangerous input (GET)
    */
   public function get_usageEqualsDangerous_returnsUnsafeInput() {
@@ -74,7 +74,7 @@ class SGTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 2.4
    *  Request with unspecified usage (key not 'url') (GET)
    */
   public function get_usageUnspecified_returnsSpecificString() {
@@ -87,7 +87,7 @@ class SGTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 2.5
    *  Request escaped input (POST)
    */
   public function post_usageEqualsEscape_returnsEscapedInput() {
@@ -101,7 +101,7 @@ class SGTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 2.6
    *  Request parsed JSON input (POST)
    */
   public function post_usageEqualsJSON_returnsParsedInput() {
@@ -122,7 +122,7 @@ class SGTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 2.7
    *  Request JSON input that is not valid (POST)
    */
   public function post_usageEqualsJSONInvalidJSONInput_returnsJSONErrorMessage() {
@@ -136,7 +136,7 @@ class SGTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 2.8
    *  Request dangerous input (POST)
    */
   public function post_usageEqualsDangerous_returnsUnsafeInput() {
@@ -150,7 +150,7 @@ class SGTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 2.9
    *  Request with unspecified usage (POST)
    */
   public function post_usageUnspecified_returnsSpecificString() {
@@ -163,7 +163,7 @@ class SGTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 2.10
    *  Check if empty session check returns false
    */
   public function session_checkInexistent_returnsFalse() {
@@ -173,7 +173,7 @@ class SGTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 2.11
    *  Check if method for creating a new session returns true
    */
   public function session_putSessionValue_returnsTrue() {
@@ -183,7 +183,7 @@ class SGTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 2.12
    *  Check if existing session check returns true
    */
   public function session_checkExistingSession_returnsTrue() {
@@ -194,7 +194,7 @@ class SGTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 2.13
    *  Check if session 'get' method returns matching value
    */
   public function session_getSessionValue_returnsSpecificString() {
@@ -208,7 +208,7 @@ class SGTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 2.14
    *  Check if deleting a session returns true (boolean)
    */
   public function session_deleteSession_returnsTrue() {
@@ -219,7 +219,7 @@ class SGTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 2.15
    *  Check unspecified delete usage returns warning string
    */
   public function session_usageUnspecified_returnsSpecificString() {
@@ -235,6 +235,6 @@ class SGTest extends PHPUnit_Framework_TestCase {
    *  @test
    */
   public function _confirmEnd() {
-    print_r("\n  - end of SG Test -  \n\n");
+    print_r("\n  - end of SG Test -  \n");
   }
 }

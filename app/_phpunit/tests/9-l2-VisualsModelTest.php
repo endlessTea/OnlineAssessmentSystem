@@ -221,7 +221,7 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 9.1
    *  Get list of question id's and names associated with a user account
    */
   public function getListOfQuestions_getAll_methodReturnsMatchingJSON() {
@@ -248,7 +248,7 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 9.2
    *  Get single question data
    */
   public function getSingleQuestionJSON_getTakenData_methodReturnsMatchingJSON() {
@@ -270,7 +270,7 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 9.3
    *  Attempt to get question data where no "taken" information exists
    */
   public function getSingleQuestionJSON_noTakenData_methodReturnsFalse() {
@@ -286,7 +286,7 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 9.4
    *  Attempt to get a question where the user id does not match the question author
    */
   public function getSingleQuestionJSON_authorDoesNotMatch_methodReturnsFalse() {
@@ -301,7 +301,7 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 9.5
    *  Get list of test id's and names associated with a user account
    */
   public function getListOfTests_getAll_methodReturnsMatchingJSON() {
@@ -323,7 +323,7 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 9.6
    *  Get single test data
    */
   public function getSingleTestJSON_getTakenData_methodReturnsMatchingJSON() {
@@ -346,7 +346,7 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 9.7
    *  Attempt to get test data where no "taken" information exists
    */
   public function getSingleTestJSON_noTakenData_methodReturnsFalse() {
@@ -362,7 +362,7 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 9.8
    *  Attempt to get a test where the user id does not match the test author
    */
   public function getSingleTestJSON_authorDoesNotMatch_methodReturnsFalse() {
@@ -392,6 +392,6 @@ class VisualsModelTest extends PHPUnit_Framework_TestCase {
    *  @test
    */
   public function _confirmEnd() {
-    print_r("\n  - end of VisualsModel Test -  \n\n");
+    print_r("\n  - end of VisualsModel Test -  \n");
   }
 }

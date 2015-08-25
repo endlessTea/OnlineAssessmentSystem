@@ -49,7 +49,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 1.1
    *  Check that the getInstance factory method returns the same object reference
    */
   public function getInstance_callMethodTwice_sameObjectReturned() {
@@ -59,7 +59,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 1.2
    *  Insert a single document (valid collection)
    */
   public function create_insertSingleDocument_returnsTrue() {
@@ -69,7 +69,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 1.3
    *  Insert multiple documents (valid collection)
    */
   public function create_insertMultipleDocuments_returnsTrue() {
@@ -82,7 +82,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 1.4
    *  Attempt to insert an invalid document (standard object)
    */
   public function create_insertStandardObjectAsDocument_returnsSpecificString() {
@@ -96,7 +96,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 1.5
    *  Attempt single document insert to an invalid collection
    */
   public function create_attemptInsertWithInvalidCollection_returnsSpecificString() {
@@ -109,7 +109,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 1.6
    *  Get all documents in a collection
    */
   public function read_getAllDocumentsInCollection_arraySizeThree() {
@@ -119,7 +119,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 1.7
    *  Get a specific document in a collection
    */
   public function read_getSpecificDocument_arraySizeOne() {
@@ -129,7 +129,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 1.8
    *  Attempt to get documents with invalid conditions (standard object)
    */
   public function read_getDocumentsInvalidConditions_returnsSpecificString() {
@@ -143,7 +143,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 1.9
    *  Update documents using conditions
    */
   public function update_changeDocumentValues_returnsTrue() {
@@ -161,7 +161,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 1.10
    *  Attempt an update with no conditions or updates
    */
   public function update_attemptUpdateNoConditionsOrUpdates_returnsSpecificString() {
@@ -174,7 +174,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 1.11
    *  Update an array by copying contents and overwritting the existing array
    */
   public function update_overwriteExistingArray_arrayLengthEqualsFour() {
@@ -202,7 +202,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 1.12
    *  Create additional field using update operation
    */
   public function update_createAdditionalField_arrayLengthEqualsTwo() {
@@ -227,7 +227,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 1.13
    *  Delete single document from collection with condition
    */
   public function delete_deleteSingleRecord_returnsTrue() {
@@ -239,7 +239,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 1.14
    *  Drop collection; delete remaining documents inserted
    */
   public function delete_dropCollection_returnsTrue() {
@@ -249,7 +249,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 1.15
    *  Attempt drop of invalid collection
    */
   public function delete_dropInvalidCollection_returnsSpecificString() {
@@ -262,7 +262,7 @@ class DBTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 1.16
    *  Attempt to delete with invalid 2nd parameter (not an array)
    */
   public function delete_attemptWithInvalidSecondParam_returnsSpecificString() {
@@ -279,6 +279,6 @@ class DBTest extends PHPUnit_Framework_TestCase {
    *  @test
    */
   public function _confirmEnd() {
-    print_r("\n  - end of DB Test -  \n\n");
+    print_r("\n  - end of DB Test -  \n");
   }
 }

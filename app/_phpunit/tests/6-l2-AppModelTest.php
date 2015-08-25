@@ -26,7 +26,7 @@ class AppModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 6.1
    *  Check that a request for GET data returns escaped data
    */
   public function getGETData_confirmDataEscaped_returnsEscapedData() {
@@ -40,7 +40,7 @@ class AppModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 6.2
    *  Check that the URL request returns a correctly parsed array of values
    */
   public function getURL_confirmValuesParsedAsArray_returnsArrayOfValues() {
@@ -60,7 +60,7 @@ class AppModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 6.3
    *  Check that a request for POST data returns escaped data
    */
   public function getPOSTData_confirmDataEscaped_returnsEscapedData() {
@@ -74,7 +74,7 @@ class AppModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 6.4
    *  Check that the correct frames load for corresponding controllers
    */
   public function renderFrame_testAllControllers_methodsReturnMatchingStrings() {
@@ -98,7 +98,7 @@ class AppModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 6.5
    *  Check if redirect will take user to 404 page with 404 parameter
    */
   public function redirectTo_testRedirectTo404ErrorPage_returnsSpecificString() {
@@ -111,7 +111,7 @@ class AppModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 6.6
    *  Check if redirect will take user to 403 page with 403 parameter
    */
   public function redirectTo_testRedirectTo403ForbiddenPage_returnsSpecificString() {
@@ -124,7 +124,7 @@ class AppModelTest extends PHPUnit_Framework_TestCase {
   }
 
   /**
-   *  @test
+   *  @test 6.7
    *  Check that the access method to return list of available schemas returns matching values
    */
   public function getSchemaList_requestValues_methodReturnsMatchingValues() {
@@ -139,6 +139,6 @@ class AppModelTest extends PHPUnit_Framework_TestCase {
    *  @test
    */
   public function _confirmEnd() {
-    print_r("\n  - end of AppModel Test -  \n\n");
+    print_r("\n  - end of AppModel Test -  \n");
   }
 }
