@@ -8,7 +8,7 @@ Formative assessment systems allow teaching staff to create questions and tests 
 
 ## Set-up
 
-*Note: guidance was written in August 2015 and may be deprecated. Exact steps required may be slightly different*
+*Note: guidance was written in August 2015 and may be deprecated. Exact steps required may be slightly different.*
 
 To run the project you will need the following resources:
 * A PHP development environment / Apache server (XAMPP or a LAMP stack).
