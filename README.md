@@ -63,3 +63,75 @@ C:\xampp\php
 Now, without clicking ‘OK’ open Windows Explorer and navigate to the directory where MongoDB is installed. Double click ‘Server’, then ‘3.0’, then ‘bin’, then right click on ‘mongo’ and copy the Location text.
 
 Return to the ‘Edit System Variable’ window and APPEND a semi-colon to the variable value, then paste the Location text after it. NOW click ‘OK’, then ‘OK’ again.
+
+### Step 5: Check that Mongo services work at the Command Line / Command Prompt
+
+Open Terminal or Command Prompt and type 'mongod'. If you receive the following error:
+
+```
+[…] Hotfix kb2731284 or a later update is not installed […]
+```
+
+Just create the following directory for MongoDB files to go to automatically:
+
+```
+C:\data\db
+```
+
+Then run the command again. You should see something like this at the bottom:
+
+```
+[…] [initandlisten] waiting for connections on port 27017 […]
+```
+
+If so, you have successfully configured the MongoDB server. Press Ctrl + C to stop the process: we’ll run this later on after the next steps.
+
+### Step 6: Transfer the application source code
+
+Create the following directory:
+
+```
+C:\xampp\htdocs\msc
+```
+
+Transfer all of the application source code to this directory.
+
+### Step 7: Test that the application loads up correctly
+
+Open the XAMPP Control Panel as administrator and ensure that the Apache web server is running (Apache text should have a green highlighted background). Run the MongoDB in an instance of Command Prompt or Terminal to start the server. Open a web browser and navigate to http://localhost/msc
+
+On success you should see the login screen. Try registering an Assessor account and logging in. If you receive:
+
+```
+Fatal error: Class 'MongoClient' not found […]
+```
+
+The wrong version of the PHP driver has been installed. Try the other version mentioned earlier: it needs to match your version of PHP, as well as your version of MongoDB.
+
+### Step 8: Transfer the data from the user evaluations
+
+Open a new instance of Terminal or the Command Prompt: make sure your first instance is running the MongoDB server (type ‘mongod’ to run the server).
+
+In your new instance, navigate to the following directory:
+
+```
+C:\xampp\htdocs\msc\_mongodata
+```
+
+Running the following commands one after the other to import the sample data:
+
+```
+mongoimport –-db msc_eval --collection users --file users.json
+mongoimport –-db msc_eval --collection questions --file questions.json 
+mongoimport –-db msc_eval --collection tests --file tests.json
+```
+
+Then open the following file in a text editor:
+
+```
+C:\xampp\htdocs\msc\app\_start\config.php
+```
+
+Change the value next to ‘db’ from ‘msc_demo’ to ‘msc_eval’, underneath ‘Configuration details’.
+
+Return to your web browser, visit http://localhost/msc and log in as ‘test’ with the password ‘password’. Student accounts follow the naming convention ‘stdone’, ‘stdtwo’ etc. with the same password of ‘password’.
