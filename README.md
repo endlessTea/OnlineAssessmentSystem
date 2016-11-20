@@ -2,6 +2,10 @@
 
 ## Summary
 
+A web application for online assessments and visual summaries of student performance and feedback using [D3.js](https://d3js.org/). Or here's the fancier description from the dissertation if you're *really* interested:
+
+Formative assessment systems allow teaching staff to create questions and tests to distribute to students for the purpose of supporting students’ learning. Additionally, some systems provide statistics for student performance through reports or information visualisation techniques. These visualisation techniques can be used to render such information in the form of graphics, although it is less common to see these techniques applied to the collection and interpretation of feedback from students. Feedback from students collected through formative assessment can include how well they understood a particular question, or how well they understood a piece of feedback if it was received. The project seeks to create a functional online assessment and feedback system, as well as explore the means in which student feedback, as well as performance on questions and tests, can be collected during assessment and provided back to teaching staff using data visualisation techniques. The effectiveness of self-assessment questions and automatic feedback delivery to students is also evaluated by seeking the views of students and teaching staff that would represent typical users of the system.
+
 ## Set-up
 
 *Note: guidance was written in August 2015 and may be deprecated. Exact steps required may be slightly different*
