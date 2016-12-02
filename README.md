@@ -1,6 +1,6 @@
 # OnlineAssessmentSystem
 
-## Summary
+## Summary 
 
 A web application for online assessments and visual summaries of student performance feedback using [D3.js](https://d3js.org/). Allows users to author tests, set up automatic marking and distribute it to system users. Here's the dissertation summary if you're *really* interested:
 
@@ -34,7 +34,7 @@ Click ‘Next’ and agree to the GNU licence agreement. Choose the ‘Complete�
 [Download the MongoDB PHP driver](http://docs.mongodb.org/ecosystem/drivers/php/) and follow instructions to install the PHP Driver for MongoDB. You should download version 1.6.x of the PHP driver if you have installed MongoDB version 3+. Download the appropriate ZIP archive from Amazon Web Services (Windows users). Extract the archive and copy the file for your 32 or 64 bit operating system:
 
 ```
-php_mongo-1.6.8-5.6-vc11.dll 
+php_mongo-1.6.8-5.6-vc11.dll
 php_mongo-1.6.8-5.6-vc11-x86_64.dll
 ```
 
@@ -126,7 +126,7 @@ Running the following commands one after the other to import the sample data:
 
 ```
 mongoimport –-db msc_eval --collection users --file users.json
-mongoimport –-db msc_eval --collection questions --file questions.json 
+mongoimport –-db msc_eval --collection questions --file questions.json
 mongoimport –-db msc_eval --collection tests --file tests.json
 ```
 
